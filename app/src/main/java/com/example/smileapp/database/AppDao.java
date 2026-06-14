@@ -7,11 +7,12 @@ import androidx.room.Update;
 import com.example.smileapp.models.Appointment;
 import com.example.smileapp.models.BrushingLog;
 import com.example.smileapp.models.User;
+import androidx.room.OnConflictStrategy;
 import java.util.List;
 
 @Dao
 public interface AppDao {
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertUser(User user);
 
     @Query("SELECT * FROM users WHERE email = :email AND password = :password LIMIT 1")
@@ -38,7 +39,7 @@ public interface AppDao {
     @Query("SELECT * FROM appointments WHERE doctorId = :doctorId")
     List<Appointment> getAppointmentsForDoctor(String doctorId);
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertBrushingLog(BrushingLog log);
 
     @Query("SELECT * FROM brushing_logs WHERE childId = :childId")
@@ -47,12 +48,18 @@ public interface AppDao {
     @Query("SELECT * FROM brushing_logs WHERE approved = 0")
     List<BrushingLog> getPendingBrushingLogs();
 
-    // Get pending brushing logs for children of a specific doctor
-    @Query("SELECT * FROM brushing_logs WHERE approved = 0 AND childId IN (SELECT uid FROM users WHERE doctorId = :doctorId AND role = 'child')")
+    // Get pending brushing logs for children of a specific doctor - SIMPLIFIED
+    @Query("SELECT * FROM brushing_logs WHERE approved = 0 AND doctorId = :doctorId")
     List<BrushingLog> getPendingBrushingLogsForDoctor(String doctorId);
 
-    @Query("UPDATE brushing_logs SET approved = 1 WHERE id = :logId")
+    @Query("UPDATE brushing_logs SET approved = 1, isRejected = 0 WHERE id = :logId")
     void approveBrushingLog(int logId);
+
+    @Query("UPDATE brushing_logs SET approved = 0, isRejected = 1, doctorFeedback = :feedback WHERE id = :logId")
+    void rejectBrushingLog(int logId, String feedback);
+
+    @Query("SELECT * FROM brushing_logs WHERE childId = :childId AND isRejected = 1 AND approved = 0 ORDER BY timestamp DESC LIMIT 1")
+    BrushingLog getLatestRejectedLog(String childId);
 
     @Query("SELECT * FROM brushing_logs WHERE firestoreId = :firestoreId LIMIT 1")
     BrushingLog getBrushingLogByFirestoreId(String firestoreId);
@@ -69,8 +76,17 @@ public interface AppDao {
     @Query("SELECT * FROM users WHERE doctorId = :doctorId AND role = 'child' AND isApproved = 1")
     List<User> getPatientsByDoctor(String doctorId);
 
+    @Query("SELECT * FROM users WHERE doctorId = :doctorId AND role = 'doctor' LIMIT 1")
+    User getUserBySequentialId(String doctorId);
+
     @Query("UPDATE users SET points = points - :pointsToRemove WHERE uid = :uid")
     void removePoints(String uid, int pointsToRemove);
+
+    @Query("SELECT * FROM brushing_logs WHERE childId = :childId AND timestamp >= :startOfDay AND timestamp <= :endOfDay")
+    List<BrushingLog> getBrushingLogsForChildToday(String childId, long startOfDay, long endOfDay);
+
+    @Query("SELECT * FROM brushing_logs WHERE childId = :childId AND timestamp >= :startOfDay AND timestamp <= :endOfDay AND approved = 1")
+    List<BrushingLog> getApprovedBrushingLogsForChildToday(String childId, long startOfDay, long endOfDay);
 
     @Query("SELECT SUM(points) FROM users WHERE doctorId = :doctorId AND role = 'child'")
     int getTotalPointsAwardedByDoctor(String doctorId);

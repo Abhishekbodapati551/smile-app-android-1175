@@ -8,19 +8,22 @@ import com.example.smileapp.models.Appointment;
 import com.example.smileapp.models.BrushingLog;
 import com.example.smileapp.models.User;
 
-@Database(entities = {User.class, Appointment.class, BrushingLog.class}, version = 8)
+@Database(entities = {User.class, Appointment.class, BrushingLog.class}, version = 11)
 public abstract class AppDatabase extends RoomDatabase {
-    private static AppDatabase instance;
+    private static volatile AppDatabase instance;
 
     public abstract AppDao appDao();
 
-    public static synchronized AppDatabase getInstance(Context context) {
+    public static AppDatabase getInstance(Context context) {
         if (instance == null) {
-            instance = Room.databaseBuilder(context.getApplicationContext(),
-                    AppDatabase.class, "smile_app_db")
-                    .fallbackToDestructiveMigration()
-                    .allowMainThreadQueries()
-                    .build();
+            synchronized (AppDatabase.class) {
+                if (instance == null) {
+                    instance = Room.databaseBuilder(context.getApplicationContext(),
+                            AppDatabase.class, "smile_app_db")
+                            .fallbackToDestructiveMigration()
+                            .build();
+                }
+            }
         }
         return instance;
     }

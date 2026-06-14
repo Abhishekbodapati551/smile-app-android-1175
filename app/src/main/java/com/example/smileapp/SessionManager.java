@@ -25,7 +25,7 @@ public class SessionManager {
         editor.putBoolean(KEY_IS_LOGGED_IN, true);
         editor.putString(KEY_USER_ID, userId);
         editor.putString(KEY_ROLE, role);
-        editor.commit();
+        editor.apply();
     }
 
     public boolean isLoggedIn() {
@@ -46,7 +46,7 @@ public class SessionManager {
         String password = getSavedPassword();
         editor.clear();
         saveCredentials(email, password);
-        editor.commit();
+        editor.apply();
     }
 
     public void saveCredentials(String email, String password) {
