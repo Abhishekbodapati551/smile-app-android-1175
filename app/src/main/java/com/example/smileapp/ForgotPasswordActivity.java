@@ -10,21 +10,17 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.firebase.auth.FirebaseAuth;
 
 public class ForgotPasswordActivity extends AppCompatActivity {
 
     private TextInputEditText emailEditText;
     private MaterialButton resetLinkButton;
     private TextView backToLoginText;
-    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_forgot_password);
-
-        mAuth = FirebaseAuth.getInstance();
 
         emailEditText = findViewById(R.id.email_edit_text);
         resetLinkButton = findViewById(R.id.reset_button);
@@ -40,15 +36,20 @@ public class ForgotPasswordActivity extends AppCompatActivity {
                     return;
                 }
 
-                mAuth.sendPasswordResetEmail(email)
-                        .addOnCompleteListener(task -> {
-                            if (task.isSuccessful()) {
-                                Toast.makeText(ForgotPasswordActivity.this, "Reset link sent to your email", Toast.LENGTH_LONG).show();
-                                finish();
-                            } else {
-                                Toast.makeText(ForgotPasswordActivity.this, "Error: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
-                            }
-                        });
+                resetLinkButton.setEnabled(false);
+
+                new Thread(() -> {
+                    boolean success = SupabaseAuthHelper.resetPasswordBlocking(email);
+                    runOnUiThread(() -> {
+                        resetLinkButton.setEnabled(true);
+                        if (success) {
+                            Toast.makeText(ForgotPasswordActivity.this, "Reset link sent to your email", Toast.LENGTH_LONG).show();
+                            finish();
+                        } else {
+                            Toast.makeText(ForgotPasswordActivity.this, "Error: Failed to send reset link. Please check your email and try again.", Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }).start();
             }
         });
 

@@ -44,6 +44,19 @@ object SupabaseAuthHelper {
     }
 
     @JvmStatic
+    fun resetPasswordBlocking(email: String): Boolean {
+        return runBlocking {
+            try {
+                SupabaseManager.getClient().auth.resetPasswordForEmail(email)
+                true
+            } catch (e: Exception) {
+                Log.e("SupabaseAuth", "Reset password failed: ${e.message}")
+                false
+            }
+        }
+    }
+
+    @JvmStatic
     fun uploadVideoBlocking(userId: String, inputStream: InputStream): String {
         return runBlocking {
             val client = SupabaseManager.getClient()
