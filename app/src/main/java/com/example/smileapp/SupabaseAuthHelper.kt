@@ -200,11 +200,59 @@ object SupabaseAuthHelper {
     fun saveAppointmentBlocking(app: Appointment): Boolean {
         return runBlocking {
             try {
-                SupabaseManager.getClient().postgrest["appointments"].insert(app)
+                val client = SupabaseManager.getClient()
+                // Explicitly mapping to JsonObject to ensure column names match
+                val data = buildJsonObject {
+                    put("child_id", app.childId)
+                    put("child_name", app.childName)
+                    put("doctor_id", app.doctorId)
+                    put("appt_date", app.date)
+                    put("type", app.type)
+                    put("status", app.status)
+                }
+                Log.d("SupabaseAuth", "Inserting appointment: $data")
+                client.postgrest["appointments"].insert(data)
                 true
             } catch (e: Exception) { 
                 Log.e("SupabaseAuth", "Save appt failed: ${e.message}")
                 false 
+            }
+        }
+    }
+
+    @JvmStatic
+    fun updateAppointmentBlocking(app: Appointment): Boolean {
+        return runBlocking {
+            try {
+                val client = SupabaseManager.getClient()
+                // Explicitly mapping fields to avoid serialization issues during update
+                // Ensure field names EXACTLY match the database columns in Supabase
+                val updateData = buildJsonObject {
+                    put("appt_date", app.date)
+                    put("type", app.type)
+                    put("status", app.status)
+                    // Explicitly include child_id and doctor_id just in case, though they shouldn't change
+                    put("child_id", app.childId)
+                    put("doctor_id", app.doctorId)
+                }
+                
+                Log.d("SupabaseAuth", "Updating appointment with ID: ${app.id}")
+                Log.d("SupabaseAuth", "Update Payload: $updateData")
+                
+                val response = client.postgrest["appointments"].update(updateData) {
+                    filter { eq("id", app.id) }
+                }
+                
+                Log.d("SupabaseAuth", "Update successful")
+                true
+            } catch (e: Exception) {
+                val errorBody = if (e is io.ktor.client.plugins.ResponseException) {
+                    try { e.response.bodyAsText() } catch (ex: Exception) { "Could not read body" }
+                } else "No response body"
+                
+                Log.e("SupabaseAuth", "Update appt failed: ${e.message}")
+                Log.e("SupabaseAuth", "Error details: $errorBody")
+                false
             }
         }
     }
@@ -348,12 +396,21 @@ object SupabaseAuthHelper {
             try {
                 val client = SupabaseManager.getClient()
                 val channel = client.realtime.channel("public:appointments")
-                channel.postgresChangeFlow<PostgresAction.Insert>(schema = "public") { 
+                
+                // Listen for BOTH Insert and Update events (important for rescheduling)
+                channel.postgresChangeFlow<PostgresAction>(schema = "public") { 
                     table = "appointments" 
-                }.onEach {
-                    val appt = it.decodeRecord<Appointment>()
-                    if (appt.childId == userId) onNewAppointment(appt)
+                }.onEach { action ->
+                    val appt = when (action) {
+                        is PostgresAction.Insert -> action.decodeRecord<Appointment>()
+                        is PostgresAction.Update -> action.decodeRecord<Appointment>()
+                        else -> null
+                    }
+                    if (appt != null && appt.childId == userId) {
+                        onNewAppointment(appt)
+                    }
                 }.launchIn(GlobalScope)
+
                 channel.subscribe()
             } catch (e: Exception) {
                 Log.e("SupabaseAuth", "Realtime listener failed: ${e.message}")

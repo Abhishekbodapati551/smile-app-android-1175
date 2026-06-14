@@ -90,4 +90,7 @@ public interface AppDao {
 
     @Query("SELECT SUM(points) FROM users WHERE doctorId = :doctorId AND role = 'child'")
     int getTotalPointsAwardedByDoctor(String doctorId);
+
+    @Query("DELETE FROM appointments")
+    void clearAllAppointments();
 }

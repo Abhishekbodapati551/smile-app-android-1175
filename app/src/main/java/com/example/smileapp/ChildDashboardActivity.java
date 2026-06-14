@@ -25,9 +25,11 @@ public class ChildDashboardActivity extends AppCompatActivity {
     private AppDatabase db;
     private String userId;
     private TextView welcomeText, streakText, taskStatusText;
-    private MaterialCardView apptNotificationCard, feedbackCard, rejectionCard;
+    private MaterialCardView apptNotificationCard, feedbackCard, rejectionCard, taskCard;
     private TextView apptDetailsText, feedbackText, rejectionReasonText;
     private ProgressBar taskProgressBar;
+    private MaterialCardView r1Card, r2Card, r3Card, r4Card;
+    private View r1Check, r2Check, r3Check, r4Check;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,9 +56,37 @@ public class ChildDashboardActivity extends AppCompatActivity {
         rejectionReasonText = findViewById(R.id.rejection_reason_text);
         ImageButton closeRejectionBtn = findViewById(R.id.close_rejection_btn);
 
+        taskCard = findViewById(R.id.task_card);
+
+        r1Card = findViewById(R.id.reward_1_card);
+        r2Card = findViewById(R.id.reward_2_card);
+        r3Card = findViewById(R.id.reward_3_card);
+        r4Card = findViewById(R.id.reward_4_card);
+        
+        r1Check = findViewById(R.id.reward_1_check);
+        r2Check = findViewById(R.id.reward_2_check);
+        r3Check = findViewById(R.id.reward_3_check);
+        r4Check = findViewById(R.id.reward_4_check);
+
         if (closeNotificationBtn != null) closeNotificationBtn.setOnClickListener(v -> apptNotificationCard.setVisibility(View.GONE));
         if (closeFeedbackBtn != null) closeFeedbackBtn.setOnClickListener(v -> feedbackCard.setVisibility(View.GONE));
         if (closeRejectionBtn != null) closeRejectionBtn.setOnClickListener(v -> rejectionCard.setVisibility(View.GONE));
+
+        // Make Feedback and Rejection cards interactive
+        if (feedbackCard != null) feedbackCard.setOnClickListener(v -> {
+            androidx.appcompat.app.AlertDialog.Builder b = new androidx.appcompat.app.AlertDialog.Builder(this);
+            b.setTitle("Doctor's Message").setMessage(feedbackText.getText()).setPositiveButton("OK", null).show();
+        });
+
+        if (rejectionCard != null) rejectionCard.setOnClickListener(v -> {
+            startActivity(new Intent(this, BrushingTipsActivity.class));
+        });
+
+        if (taskCard != null) taskCard.setOnClickListener(v -> {
+            Intent intent = new Intent(this, BrushingTipsActivity.class);
+            intent.putExtra("USER_ID", userId);
+            startActivity(intent);
+        });
 
         setupClickListeners();
         loadUserData();
@@ -153,40 +183,66 @@ public class ChildDashboardActivity extends AppCompatActivity {
                 for (Appointment a : freshAppts) {
                     db.appDao().insertAppointment(a);
                 }
+                
+                // Show the most recent upcoming one on the dashboard
+                Appointment latest = null;
+                long now = System.currentTimeMillis();
+                for (Appointment a : freshAppts) {
+                    if (a.date > now) {
+                        if (latest == null || a.date < latest.date) latest = a;
+                    }
+                }
+                
+                if (latest != null) {
+                    Appointment finalLatest = latest;
+                    SimpleDateFormat sdf = new SimpleDateFormat("MMM dd 'at' hh:mm a", Locale.getDefault());
+                    String formattedDate = sdf.format(new Date(finalLatest.date));
+                    runOnUiThread(() -> {
+                        apptDetailsText.setText(finalLatest.type + ": " + formattedDate);
+                        apptNotificationCard.setVisibility(View.VISIBLE);
+                    });
+                } else {
+                    runOnUiThread(() -> apptNotificationCard.setVisibility(View.GONE));
+                }
             } catch (Exception e) {
                 Log.e("ChildDashboard", "Appt sync failed", e);
             }
 
-            // 5. Check for RECENT appointments to show on dashboard
+            // 5. Check for rejections or feedback
             try {
-                // Fetch all appts for this child from cloud
-                // We'll use a new method for this or just the dao
-                List<Appointment> localAppts = db.appDao().getAppointmentsForChild(userId);
-                for (Appointment a : localAppts) {
-                    if (a.date > System.currentTimeMillis()) {
-                        SimpleDateFormat sdf = new SimpleDateFormat("MMM dd 'at' hh:mm a", Locale.getDefault());
-                        String formattedDate = sdf.format(new Date(a.date));
-                        runOnUiThread(() -> {
-                            apptDetailsText.setText(a.type + ": " + formattedDate);
-                            apptNotificationCard.setVisibility(View.VISIBLE);
-                        });
-                        break; // Just show one
+                List<BrushingLog> logs = SupabaseAuthHelper.fetchBrushingLogsForChildBlocking(userId);
+                BrushingLog latestRejected = null;
+                BrushingLog latestFeedback = null;
+                
+                for (BrushingLog log : logs) {
+                    if (log.isRejected) {
+                        if (latestRejected == null || log.timestamp > latestRejected.timestamp) latestRejected = log;
+                    }
+                    if (log.doctorFeedback != null && !log.doctorFeedback.isEmpty() && !log.isRejected) {
+                        if (latestFeedback == null || log.timestamp > latestFeedback.timestamp) latestFeedback = log;
                     }
                 }
-            } catch (Exception e) {}
-
-            // 5. Check for rejections
-            try {
-                List<BrushingLog> rejectedLogs = SupabaseAuthHelper.fetchRejectedBrushingLogsBlocking(userId);
-                if (!rejectedLogs.isEmpty()) {
-                    BrushingLog latest = rejectedLogs.get(0);
-                    runOnUiThread(() -> {
-                        rejectionReasonText.setText("Please try again. Reason: " + (latest.doctorFeedback != null ? latest.doctorFeedback : "Not clear."));
+                
+                final BrushingLog finalRejected = latestRejected;
+                final BrushingLog finalFeedback = latestFeedback;
+                
+                runOnUiThread(() -> {
+                    if (finalRejected != null) {
+                        rejectionReasonText.setText("Please try again. Reason: " + finalRejected.doctorFeedback);
                         rejectionCard.setVisibility(View.VISIBLE);
-                    });
-                }
+                    } else {
+                        rejectionCard.setVisibility(View.GONE);
+                    }
+                    
+                    if (finalFeedback != null) {
+                        feedbackText.setText(finalFeedback.doctorFeedback);
+                        feedbackCard.setVisibility(View.VISIBLE);
+                    } else {
+                        feedbackCard.setVisibility(View.GONE);
+                    }
+                });
             } catch (Exception e) {
-                Log.e("ChildDashboard", "Rejection fetch failed", e);
+                Log.e("ChildDashboard", "Log sync failed", e);
             }
             
             refreshDailyProgress();
@@ -196,6 +252,56 @@ public class ChildDashboardActivity extends AppCompatActivity {
     private void updateChildUI(User user) {
         welcomeText.setText("Hi, " + user.name + "!");
         if (streakText != null) streakText.setText(user.streak + " Days");
+        
+        // Update Rewards Visibility based on points
+        updateRewardsUI(user.points);
+    }
+
+    private void updateRewardsUI(int points) {
+        runOnUiThread(() -> {
+            // Colors from colors.xml
+            int lockedColor = 0xFFE0E0E0; // Grey
+            int starColor = 0xFFFFD54F; // Yellow
+            int pensColor = 0xFFF06292; // Pink
+            int teddyColor = 0xFFBA68C8; // Purple
+            int trophyColor = 0xFF4FC3F7; // Blue
+
+            // Reward 1: Star (100 pts)
+            if (points >= 100) {
+                r1Card.setCardBackgroundColor(starColor);
+                r1Check.setVisibility(View.VISIBLE);
+            } else {
+                r1Card.setCardBackgroundColor(lockedColor);
+                r1Check.setVisibility(View.GONE);
+            }
+
+            // Reward 2: Pens (200 pts)
+            if (points >= 200) {
+                r2Card.setCardBackgroundColor(pensColor);
+                r2Check.setVisibility(View.VISIBLE);
+            } else {
+                r2Card.setCardBackgroundColor(lockedColor);
+                r2Check.setVisibility(View.GONE);
+            }
+
+            // Reward 3: Teddy (300 pts)
+            if (points >= 300) {
+                r3Card.setCardBackgroundColor(teddyColor);
+                r3Check.setVisibility(View.VISIBLE);
+            } else {
+                r3Card.setCardBackgroundColor(lockedColor);
+                r3Check.setVisibility(View.GONE);
+            }
+
+            // Reward 4: Trophy (500 pts)
+            if (points >= 500) {
+                r4Card.setCardBackgroundColor(trophyColor);
+                r4Check.setVisibility(View.VISIBLE);
+            } else {
+                r4Card.setCardBackgroundColor(lockedColor);
+                r4Check.setVisibility(View.GONE);
+            }
+        });
     }
 
     private void refreshDailyProgress() {

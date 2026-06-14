@@ -58,9 +58,20 @@ BEGIN
   UPDATE public.profiles SET points = COALESCE(points, 0) + p_points_to_add, streak = COALESCE(streak, 0) + 1 WHERE id = v_child_id;
 END; $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- 8. PERMISSIONS
+-- 8. PERMISSIONS & REALTIME
 ALTER TABLE public.profiles DISABLE ROW LEVEL SECURITY;
 ALTER TABLE public.brushing_logs DISABLE ROW LEVEL SECURITY;
 ALTER TABLE public.appointments DISABLE ROW LEVEL SECURITY;
+
+-- Enable Realtime for these tables
+ALTER TABLE public.profiles REPLICA IDENTITY FULL;
+ALTER TABLE public.brushing_logs REPLICA IDENTITY FULL;
+ALTER TABLE public.appointments REPLICA IDENTITY FULL;
+
+BEGIN;
+  DROP PUBLICATION IF EXISTS supabase_realtime;
+  CREATE PUBLICATION supabase_realtime FOR TABLE public.profiles, public.brushing_logs, public.appointments;
+COMMIT;
+
 DROP POLICY IF EXISTS "Public Access" ON storage.objects;
 CREATE POLICY "Public Access" ON storage.objects FOR ALL USING (true) WITH CHECK (true);

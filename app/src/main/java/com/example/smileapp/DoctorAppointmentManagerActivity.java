@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
@@ -35,6 +36,7 @@ public class DoctorAppointmentManagerActivity extends AppCompatActivity {
     private String sequentialDoctorId;
     private RecyclerView recyclerView;
     private AppointmentAdapter adapter;
+    private ProgressBar mainProgress;
     private List<Appointment> appointmentList = new ArrayList<>();
     private List<User> myPatients = new ArrayList<>();
 
@@ -50,6 +52,7 @@ public class DoctorAppointmentManagerActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new AppointmentAdapter(appointmentList);
         recyclerView.setAdapter(adapter);
+        mainProgress = findViewById(R.id.main_progress);
 
         findViewById(R.id.add_appointment_btn).setOnClickListener(v -> showAddAppointmentDialog());
 
@@ -74,15 +77,18 @@ public class DoctorAppointmentManagerActivity extends AppCompatActivity {
 
     private void loadAppointments() {
         if (sequentialDoctorId == null) return;
+        runOnUiThread(() -> mainProgress.setVisibility(View.VISIBLE));
         SupabaseManager.execute(() -> {
             try {
                 // 1. Fetch fresh appointments from Supabase
                 List<Appointment> latestApps = SupabaseAuthHelper.fetchAppointmentsBlocking(sequentialDoctorId);
                 
-                // 2. Update local DB
+                // 2. Clear local table first to ensure we use Cloud IDs
+                db.appDao().clearAllAppointments();
                 for (Appointment a : latestApps) db.appDao().insertAppointment(a);
 
                 runOnUiThread(() -> {
+                    mainProgress.setVisibility(View.GONE);
                     appointmentList.clear();
                     appointmentList.addAll(latestApps);
                     adapter.notifyDataSetChanged();
@@ -92,6 +98,7 @@ public class DoctorAppointmentManagerActivity extends AppCompatActivity {
                 // Fallback to local
                 List<Appointment> apps = db.appDao().getAppointmentsForDoctor(sequentialDoctorId);
                 runOnUiThread(() -> {
+                    mainProgress.setVisibility(View.GONE);
                     appointmentList.clear();
                     appointmentList.addAll(apps);
                     adapter.notifyDataSetChanged();
@@ -146,16 +153,74 @@ public class DoctorAppointmentManagerActivity extends AppCompatActivity {
     }
 
     private void saveAppointment(Appointment app) {
+        runOnUiThread(() -> mainProgress.setVisibility(View.VISIBLE));
         new Thread(() -> {
-            boolean success = SupabaseAuthHelper.saveAppointmentBlocking(app);
+            boolean success;
+            if (app.id > 0) {
+                // Update existing appointment
+                success = SupabaseAuthHelper.updateAppointmentBlocking(app);
+            } else {
+                // Insert new appointment
+                success = SupabaseAuthHelper.saveAppointmentBlocking(app);
+            }
+
             if (success) {
                 db.appDao().insertAppointment(app);
                 runOnUiThread(() -> {
-                    Toast.makeText(this, "Scheduled!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, app.id > 0 ? "Rescheduled!" : "Scheduled!", Toast.LENGTH_SHORT).show();
                     loadAppointments();
+                });
+            } else {
+                runOnUiThread(() -> {
+                    mainProgress.setVisibility(View.GONE);
+                    Toast.makeText(this, "Failed to save appointment", Toast.LENGTH_SHORT).show();
                 });
             }
         }).start();
+    }
+
+    private void showRescheduleDialog(Appointment app) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View view = LayoutInflater.from(this).inflate(R.layout.dialog_add_appointment, null);
+        builder.setView(view);
+
+        TextView title = view.findViewById(R.id.dialog_title);
+        if (title != null) title.setText("Reschedule Appointment");
+
+        AutoCompleteTextView patientSpinner = view.findViewById(R.id.patient_selector);
+        TextInputEditText typeEdit = view.findViewById(R.id.appointment_type_edit);
+        TextView dateText = view.findViewById(R.id.selected_date_text);
+        MaterialButton pickDateBtn = view.findViewById(R.id.pick_date_btn);
+
+        // Pre-fill
+        patientSpinner.setText(app.childName);
+        patientSpinner.setEnabled(false); // Can't change patient while rescheduling
+        typeEdit.setText(app.type);
+        
+        final Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(app.date);
+        dateText.setText(new SimpleDateFormat("MMM dd, yyyy - hh:mm a", Locale.getDefault()).format(calendar.getTime()));
+
+        pickDateBtn.setOnClickListener(v -> {
+            new DatePickerDialog(this, android.R.style.Theme_DeviceDefault_Light_Dialog_Alert, (v1, y, m, d) -> {
+                calendar.set(y, m, d);
+                new TimePickerDialog(this, android.R.style.Theme_DeviceDefault_Light_Dialog_Alert, (v2, h, min) -> {
+                    calendar.set(Calendar.HOUR_OF_DAY, h);
+                    calendar.set(Calendar.MINUTE, min);
+                    dateText.setText(new SimpleDateFormat("MMM dd, yyyy - hh:mm a", Locale.getDefault()).format(calendar.getTime()));
+                }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), false).show();
+            }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show();
+        });
+
+        builder.setPositiveButton("Update", (dialog, which) -> {
+            String type = typeEdit.getText().toString().trim();
+            if (!type.isEmpty()) {
+                app.type = type;
+                app.date = calendar.getTimeInMillis();
+                saveAppointment(app);
+            }
+        });
+        builder.setNegativeButton("Cancel", null).show();
     }
 
     private class AppointmentAdapter extends RecyclerView.Adapter<AppointmentAdapter.ViewHolder> {
@@ -172,16 +237,19 @@ public class DoctorAppointmentManagerActivity extends AppCompatActivity {
             holder.pName.setText(a.childName);
             holder.type.setText(a.type);
             holder.date.setText(new SimpleDateFormat("MMM dd, yyyy - hh:mm a", Locale.getDefault()).format(new Date(a.date)));
+            holder.rescheduleBtn.setOnClickListener(v -> showRescheduleDialog(a));
         }
         @Override
         public int getItemCount() { return apps.size(); }
         class ViewHolder extends RecyclerView.ViewHolder {
             TextView pName, type, date;
+            MaterialButton rescheduleBtn;
             public ViewHolder(@NonNull View v) {
                 super(v);
                 pName = v.findViewById(R.id.patient_name);
                 type = v.findViewById(R.id.appointment_type);
                 date = v.findViewById(R.id.appointment_date);
+                rescheduleBtn = v.findViewById(R.id.reschedule_btn);
             }
         }
     }

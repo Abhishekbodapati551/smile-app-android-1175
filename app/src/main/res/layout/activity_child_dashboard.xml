@@ -494,8 +494,9 @@
                     android:layout_marginTop="16dp"
                     android:orientation="horizontal">
 
-                    <!-- Reward 1 -->
+                    <!-- Reward 1: Star Badge -->
                     <LinearLayout
+                        android:id="@+id/reward_1_container"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -506,48 +507,7 @@
                             android:layout_width="64dp"
                             android:layout_height="64dp">
                             <com.google.android.material.card.MaterialCardView
-                                android:layout_width="64dp"
-                                android:layout_height="64dp"
-                                app:cardBackgroundColor="@color/reward_pink"
-                                app:cardCornerRadius="16dp"
-                                app:cardElevation="2dp">
-                                <ImageView
-                                    android:layout_width="32dp"
-                                    android:layout_height="32dp"
-                                    android:layout_gravity="center"
-                                    android:src="@android:drawable/ic_menu_send"
-                                    app:tint="@color/white" />
-                            </com.google.android.material.card.MaterialCardView>
-                            <ImageView
-                                android:layout_width="16dp"
-                                android:layout_height="16dp"
-                                android:layout_gravity="top|end"
-                                android:layout_margin="2dp"
-                                android:src="@android:drawable/checkbox_on_background"
-                                app:tint="@color/white" />
-                        </FrameLayout>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:text="Teddy Bear"
-                            android:textColor="#757575"
-                            android:textSize="11sp" />
-                    </LinearLayout>
-
-                    <!-- Reward 2 -->
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:orientation="vertical">
-
-                        <FrameLayout
-                            android:layout_width="64dp"
-                            android:layout_height="64dp">
-                            <com.google.android.material.card.MaterialCardView
+                                android:id="@+id/reward_1_card"
                                 android:layout_width="64dp"
                                 android:layout_height="64dp"
                                 app:cardBackgroundColor="@color/reward_yellow"
@@ -557,14 +517,16 @@
                                     android:layout_width="32dp"
                                     android:layout_height="32dp"
                                     android:layout_gravity="center"
-                                    android:src="@android:drawable/ic_menu_send"
+                                    android:src="@android:drawable/btn_star_big_on"
                                     app:tint="@color/white" />
                             </com.google.android.material.card.MaterialCardView>
                             <ImageView
+                                android:id="@+id/reward_1_check"
                                 android:layout_width="16dp"
                                 android:layout_height="16dp"
                                 android:layout_gravity="top|end"
                                 android:layout_margin="2dp"
+                                android:visibility="gone"
                                 android:src="@android:drawable/checkbox_on_background"
                                 app:tint="@color/white" />
                         </FrameLayout>
@@ -578,58 +540,134 @@
                             android:textSize="11sp" />
                     </LinearLayout>
 
-                    <!-- Reward 3 -->
+                    <!-- Reward 2: Pens Set -->
                     <LinearLayout
+                        android:id="@+id/reward_2_container"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:gravity="center"
                         android:orientation="vertical">
 
-                        <com.google.android.material.card.MaterialCardView
+                        <FrameLayout
                             android:layout_width="64dp"
-                            android:layout_height="64dp"
-                            app:cardBackgroundColor="@color/reward_locked"
-                            app:cardCornerRadius="16dp"
-                            app:cardElevation="0dp">
+                            android:layout_height="64dp">
+                            <com.google.android.material.card.MaterialCardView
+                                android:id="@+id/reward_2_card"
+                                android:layout_width="64dp"
+                                android:layout_height="64dp"
+                                app:cardBackgroundColor="@color/reward_pink"
+                                app:cardCornerRadius="16dp"
+                                app:cardElevation="2dp">
+                                <ImageView
+                                    android:layout_width="32dp"
+                                    android:layout_height="32dp"
+                                    android:layout_gravity="center"
+                                    android:src="@android:drawable/ic_menu_edit"
+                                    app:tint="@color/white" />
+                            </com.google.android.material.card.MaterialCardView>
                             <ImageView
-                                android:layout_width="32dp"
-                                android:layout_height="32dp"
-                                android:layout_gravity="center"
-                                android:src="@android:drawable/ic_menu_send"
-                                app:tint="#E0E0E0" />
-                        </com.google.android.material.card.MaterialCardView>
+                                android:id="@+id/reward_2_check"
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"
+                                android:layout_gravity="top|end"
+                                android:layout_margin="2dp"
+                                android:visibility="gone"
+                                android:src="@android:drawable/checkbox_on_background"
+                                app:tint="@color/white" />
+                        </FrameLayout>
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
-                            android:text="Rainbow"
-                            android:textColor="#BDBDBD"
+                            android:text="Pens Set"
+                            android:textColor="#757575"
                             android:textSize="11sp" />
                     </LinearLayout>
 
-                    <!-- Reward 4 -->
+                    <!-- Reward 3: Teddy Bear -->
                     <LinearLayout
+                        android:id="@+id/reward_3_container"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:gravity="center"
                         android:orientation="vertical">
 
-                        <com.google.android.material.card.MaterialCardView
+                        <FrameLayout
                             android:layout_width="64dp"
-                            android:layout_height="64dp"
-                            app:cardBackgroundColor="@color/reward_locked"
-                            app:cardCornerRadius="16dp"
-                            app:cardElevation="0dp">
+                            android:layout_height="64dp">
+                            <com.google.android.material.card.MaterialCardView
+                                android:id="@+id/reward_3_card"
+                                android:layout_width="64dp"
+                                android:layout_height="64dp"
+                                app:cardBackgroundColor="@color/reward_locked"
+                                app:cardCornerRadius="16dp"
+                                app:cardElevation="0dp">
+                                <ImageView
+                                    android:layout_width="32dp"
+                                    android:layout_height="32dp"
+                                    android:layout_gravity="center"
+                                    android:src="@android:drawable/ic_menu_send"
+                                    app:tint="#E0E0E0" />
+                            </com.google.android.material.card.MaterialCardView>
                             <ImageView
-                                android:layout_width="32dp"
-                                android:layout_height="32dp"
-                                android:layout_gravity="center"
-                                android:src="@android:drawable/ic_menu_send"
-                                app:tint="#E0E0E0" />
-                        </com.google.android.material.card.MaterialCardView>
+                                android:id="@+id/reward_3_check"
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"
+                                android:layout_gravity="top|end"
+                                android:layout_margin="2dp"
+                                android:visibility="gone"
+                                android:src="@android:drawable/checkbox_on_background"
+                                app:tint="@color/white" />
+                        </FrameLayout>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:text="Teddy Bear"
+                            android:textColor="#BDBDBD"
+                            android:textSize="11sp" />
+                    </LinearLayout>
+
+                    <!-- Reward 4: Trophy -->
+                    <LinearLayout
+                        android:id="@+id/reward_4_container"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <FrameLayout
+                            android:layout_width="64dp"
+                            android:layout_height="64dp">
+                            <com.google.android.material.card.MaterialCardView
+                                android:id="@+id/reward_4_card"
+                                android:layout_width="64dp"
+                                android:layout_height="64dp"
+                                app:cardBackgroundColor="@color/reward_locked"
+                                app:cardCornerRadius="16dp"
+                                app:cardElevation="0dp">
+                                <ImageView
+                                    android:layout_width="32dp"
+                                    android:layout_height="32dp"
+                                    android:layout_gravity="center"
+                                    android:src="@android:drawable/btn_star_big_on"
+                                    app:tint="#E0E0E0" />
+                            </com.google.android.material.card.MaterialCardView>
+                            <ImageView
+                                android:id="@+id/reward_4_check"
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"
+                                android:layout_gravity="top|end"
+                                android:layout_margin="2dp"
+                                android:visibility="gone"
+                                android:src="@android:drawable/checkbox_on_background"
+                                app:tint="@color/white" />
+                        </FrameLayout>
 
                         <TextView
                             android:layout_width="wrap_content"

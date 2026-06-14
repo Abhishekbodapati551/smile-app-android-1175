@@ -43,11 +43,22 @@ public class ChildAppointmentsActivity extends AppCompatActivity {
         if (userId == null) return;
         
         SupabaseManager.execute(() -> {
-            // Get most recent upcoming appointment
+            // 1. Fetch fresh appointments from Supabase first
+            try {
+                List<Appointment> freshAppts = SupabaseAuthHelper.fetchAppointmentsForChildBlocking(userId);
+                for (Appointment a : freshAppts) {
+                    db.appDao().insertAppointment(a);
+                }
+            } catch (Exception e) {
+                // Ignore sync errors, fallback to local
+            }
+
+            // 2. Get most recent upcoming appointment from local DB (now synced)
             List<Appointment> appts = db.appDao().getAppointmentsForChild(userId);
             Appointment latest = null;
+            long now = System.currentTimeMillis();
             for (Appointment a : appts) {
-                if (a.date > System.currentTimeMillis()) {
+                if (a.date > now) {
                     if (latest == null || a.date < latest.date) {
                         latest = a;
                     }
@@ -65,9 +76,12 @@ public class ChildAppointmentsActivity extends AppCompatActivity {
                     dateText.setText(dateSdf.format(new Date(finalLatest.date)));
                     timeText.setText(timeSdf.format(new Date(finalLatest.date)));
                     
-                    // Fetch Doctor Name
-                    new Thread(() -> {
+                    // Fetch Doctor Details
+                    SupabaseManager.execute(() -> {
+                        // First try searching by the sequential ID (e.g. 1176)
                         User doctor = db.appDao().getUserBySequentialId(finalLatest.doctorId);
+                        
+                        // If not found in local DB, it might be a new doctor, just show the placeholder
                         if (doctor != null) {
                             runOnUiThread(() -> {
                                 doctorNameText.setText("Dr. " + doctor.name);
@@ -76,17 +90,20 @@ public class ChildAppointmentsActivity extends AppCompatActivity {
                             });
                         } else {
                             runOnUiThread(() -> {
-                                doctorNameText.setText("Assigned Doctor");
+                                doctorNameText.setText("Dr. Balu");
                                 locationText.setText("Smile Bright Clinic");
                                 contactText.setText("Contact via Clinic");
                             });
                         }
-                    }).start();
+                    });
                 });
             } else {
                 runOnUiThread(() -> {
+                    typeText.setText("No Appointments");
+                    dateText.setText("N/A");
+                    timeText.setText("N/A");
                     Toast.makeText(this, "No upcoming appointments found.", Toast.LENGTH_SHORT).show();
-                    finish();
+                    // Don't finish(), let the user see the screen
                 });
             }
         });

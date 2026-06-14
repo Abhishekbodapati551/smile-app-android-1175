@@ -115,6 +115,10 @@ public class BrushingTaskActivity extends AppCompatActivity {
 
             } catch (Exception e) {
                 Log.e(TAG, "Use case binding failed", e);
+                runOnUiThread(() -> {
+                    Toast.makeText(this, "Camera Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    finish();
+                });
             }
         }, ContextCompat.getMainExecutor(this));
     }

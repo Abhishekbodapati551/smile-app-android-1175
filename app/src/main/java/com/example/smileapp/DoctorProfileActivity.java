@@ -1,8 +1,10 @@
 package com.example.smileapp;
 
 import android.os.Bundle;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,6 +22,7 @@ public class DoctorProfileActivity extends AppCompatActivity {
     private EditText clinicNameEdit, emailEdit, doctorIdEdit;
     private MaterialButton saveButton;
     private ImageButton backButton;
+    private ProgressBar saveProgress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +40,7 @@ public class DoctorProfileActivity extends AppCompatActivity {
         doctorIdEdit = findViewById(R.id.doctor_id_edit);
         saveButton = findViewById(R.id.save_profile_button);
         backButton = findViewById(R.id.back_button);
+        saveProgress = findViewById(R.id.save_progress);
 
         loadDoctorData();
 
@@ -82,6 +86,9 @@ public class DoctorProfileActivity extends AppCompatActivity {
             return;
         }
 
+        saveButton.setVisibility(View.GONE);
+        saveProgress.setVisibility(View.VISIBLE);
+
         new Thread(() -> {
             // 1. Update Supabase
             boolean success = SupabaseAuthHelper.updateDoctorProfileBlocking(doctor.uid, newDocId, newClinicName);
@@ -93,11 +100,15 @@ public class DoctorProfileActivity extends AppCompatActivity {
                 db.appDao().updateUser(doctor);
 
                 runOnUiThread(() -> {
+                    saveButton.setVisibility(View.VISIBLE);
+                    saveProgress.setVisibility(View.GONE);
                     Toast.makeText(this, "Profile and ID updated successfully!", Toast.LENGTH_LONG).show();
                     loadDoctorData(); // Refresh UI
                 });
             } else {
                 runOnUiThread(() -> {
+                    saveButton.setVisibility(View.VISIBLE);
+                    saveProgress.setVisibility(View.GONE);
                     Toast.makeText(this, "Update failed. Check your connection.", Toast.LENGTH_SHORT).show();
                 });
             }
