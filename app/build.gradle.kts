@@ -1,6 +1,5 @@
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.google.services)
     id("org.jetbrains.kotlin.plugin.serialization") version "2.0.21"
 }
 
@@ -53,12 +52,6 @@ dependencies {
 
     implementation(libs.credentials)
     implementation(libs.credentialsPlayServicesAuth)
-
-    // Firebase
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.auth)
-    implementation(libs.firebase.firestore)
-    implementation(libs.firebase.storage)
 
     implementation(libs.activity.ktx)
     implementation(libs.appcompat)
