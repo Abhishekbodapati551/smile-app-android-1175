@@ -35,7 +35,7 @@ public class ChildRewardsActivity extends AppCompatActivity {
         findViewById(R.id.btn_buy_star).setOnClickListener(v -> handlePurchase("Star Badge", 100));
         findViewById(R.id.btn_buy_pens).setOnClickListener(v -> handlePurchase("Pens Set", 200));
         findViewById(R.id.btn_buy_teddy).setOnClickListener(v -> handlePurchase("Teddy Bear", 300));
-        findViewById(R.id.btn_buy_icecream).setOnClickListener(v -> handlePurchase("Ice Cream Kit", 500));
+        findViewById(R.id.btn_buy_icecream).setOnClickListener(v -> handlePurchase("Trophy", 500));
     }
 
     private void loadPoints() {

@@ -142,7 +142,7 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Item 4: Ice Cream Kit -->
+            <!-- Item 4: Trophy -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -155,8 +155,8 @@
                     android:gravity="center"
                     android:orientation="vertical"
                     android:padding="16dp">
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="🍦" android:textSize="40sp"/>
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Ice Cream Kit" android:textStyle="bold" android:layout_marginTop="8dp"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="🏆" android:textSize="40sp"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Trophy" android:textStyle="bold" android:layout_marginTop="8dp"/>
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="500 Points" android:textColor="@color/text_secondary"/>
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btn_buy_icecream"
