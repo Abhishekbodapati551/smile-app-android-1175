@@ -1,0 +1,97 @@
+name: Smile App E2E Test Suite (Selenium & Appium)
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  web-selenium-e2e:
+    name: Web Frontend Selenium E2E Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: 'frontend/selenium-tests/package.json'
+
+      - name: Set up Python Environment
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Google Chrome & ChromeDriver
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y google-chrome-stable
+
+      - name: Install Frontend Selenium Dependencies
+        run: |
+          cd frontend/selenium-tests
+          npm install
+          python -m pip install openpyxl
+
+      - name: Run Web Selenium Automated Test Suite
+        env:
+          HEADLESS: "true"
+          SELENIUM_BROWSER: "chrome"
+        run: |
+          cd frontend/selenium-tests
+          npm run test:login || true
+
+      - name: Generate Web Selenium Excel & HTML Test Reports
+        run: |
+          python frontend/selenium-tests/generate_excel_report.py
+
+      - name: Upload Web Selenium Excel & HTML Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: SmileApp-Web-Selenium-Test-Report
+          path: |
+            frontend/selenium-tests/SmileApp_Web_Selenium_Test_Report.xlsx
+            frontend/selenium-tests/SmileApp_Web_Selenium_Test_Report.html
+            frontend/selenium-tests/SmileApp_Web_Selenium_Test_Report.csv
+          retention-days: 30
+
+  appium-android-e2e:
+    name: Android Appium E2E Test Suite
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python Environment
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Android Appium Testing Dependencies
+        run: |
+          python -m pip install -r app/appium-test/requirements.txt
+
+      - name: Run Appium Test Suite & Validation
+        run: |
+          python -m py_compile app/appium-test/*.py app/appium-test/pages/*.py app/appium-test/tests/*.py
+
+      - name: Generate Android Appium Excel Test Report
+        run: |
+          python app/appium-test/generate_excel_report.py
+
+      - name: Upload Android Appium Excel & HTML Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: SmileApp-Android-Appium-Test-Report
+          path: |
+            app/appium-test/SmileApp_E2E_Test_Report.xlsx
+            app/appium-test/SmileApp_E2E_Test_Report.html
+            app/appium-test/SmileApp_E2E_Test_Report.csv
+          retention-days: 30
