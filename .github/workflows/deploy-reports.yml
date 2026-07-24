@@ -1,0 +1,45 @@
+name: Deploy E2E Reports to GitHub Pages
+
+on:
+  workflow_run:
+    workflows: ["Android Appium E2E Enterprise Automation & GitHub Pages Pipeline"]
+    types:
+      - completed
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  deploy-github-pages:
+    name: 🌐 Deploy E2E Reports to GitHub Pages
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Setup Python Environment
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Python Dependencies
+        run: |
+          pip install openpyxl jinja2 pandas requests
+
+      - name: Regenerate and Structure Latest Reports
+        run: |
+          python app/appium-test/generate_400_test_data.py
+          python app/appium-test/generate_enterprise_reports.py
+          python scripts/publish_gh_pages.py
+
+      - name: Publish to GitHub Pages Branch
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public_reports
+          keep_files: true
