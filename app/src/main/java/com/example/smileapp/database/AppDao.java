@@ -33,11 +33,17 @@ public interface AppDao {
     @Query("DELETE FROM appointments WHERE id = :id")
     void deleteAppointment(int id);
 
-    @Query("SELECT * FROM appointments WHERE childId = :childId")
+    @Query("SELECT * FROM appointments WHERE childId = :childId AND status = 'upcoming' ORDER BY date ASC")
     List<Appointment> getAppointmentsForChild(String childId);
 
-    @Query("SELECT * FROM appointments WHERE doctorId = :doctorId")
+    @Query("SELECT * FROM appointments WHERE childId = :childId AND status != 'upcoming' ORDER BY date DESC")
+    List<Appointment> getAppointmentHistoryForChild(String childId);
+
+    @Query("SELECT * FROM appointments WHERE doctorId = :doctorId AND status = 'upcoming' ORDER BY date ASC")
     List<Appointment> getAppointmentsForDoctor(String doctorId);
+
+    @Query("SELECT * FROM appointments WHERE doctorId = :doctorId AND status != 'upcoming' ORDER BY date DESC")
+    List<Appointment> getAppointmentHistoryForDoctor(String doctorId);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertBrushingLog(BrushingLog log);

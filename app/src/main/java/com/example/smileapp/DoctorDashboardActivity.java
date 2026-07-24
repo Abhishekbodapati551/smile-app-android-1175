@@ -266,6 +266,13 @@ public class DoctorDashboardActivity extends AppCompatActivity {
                     holder.title.setText(app.childName);
                     SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, hh:mm a", Locale.getDefault());
                     holder.subtitle.setText(app.type + " - " + sdf.format(new Date(app.date)));
+
+                    holder.itemView.setOnClickListener(v -> {
+                        Intent intent = new Intent(DoctorDashboardActivity.this, PatientProfileActivity.class);
+                        intent.putExtra("PATIENT_ID", app.childId);
+                        intent.putExtra("APPOINTMENT_ID", app.id);
+                        startActivity(intent);
+                    });
                 }
             } else {
                 if (position < dashboardPatients.size()) {

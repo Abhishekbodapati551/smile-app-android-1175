@@ -25,8 +25,8 @@ public class ChildDashboardActivity extends AppCompatActivity {
     private AppDatabase db;
     private String userId;
     private TextView welcomeText, streakText, taskStatusText;
-    private MaterialCardView apptNotificationCard, feedbackCard, rejectionCard, taskCard;
-    private TextView apptDetailsText, feedbackText, rejectionReasonText;
+    private MaterialCardView apptNotificationCard, feedbackCard, rejectionCard, taskCard, warningCard;
+    private TextView apptDetailsText, feedbackText, rejectionReasonText, warningText;
     private ProgressBar taskProgressBar;
     private MaterialCardView r1Card, r2Card, r3Card, r4Card;
     private View r1Check, r2Check, r3Check, r4Check;
@@ -56,6 +56,10 @@ public class ChildDashboardActivity extends AppCompatActivity {
         rejectionReasonText = findViewById(R.id.rejection_reason_text);
         ImageButton closeRejectionBtn = findViewById(R.id.close_rejection_btn);
 
+        warningCard = findViewById(R.id.warning_card);
+        warningText = findViewById(R.id.warning_text);
+        ImageButton closeWarningBtn = findViewById(R.id.close_warning_btn);
+
         taskCard = findViewById(R.id.task_card);
 
         r1Card = findViewById(R.id.reward_1_card);
@@ -71,6 +75,7 @@ public class ChildDashboardActivity extends AppCompatActivity {
         if (closeNotificationBtn != null) closeNotificationBtn.setOnClickListener(v -> apptNotificationCard.setVisibility(View.GONE));
         if (closeFeedbackBtn != null) closeFeedbackBtn.setOnClickListener(v -> feedbackCard.setVisibility(View.GONE));
         if (closeRejectionBtn != null) closeRejectionBtn.setOnClickListener(v -> rejectionCard.setVisibility(View.GONE));
+        if (closeWarningBtn != null) closeWarningBtn.setOnClickListener(v -> warningCard.setVisibility(View.GONE));
 
         // Make Feedback and Rejection cards interactive
         if (feedbackCard != null) feedbackCard.setOnClickListener(v -> {
@@ -253,6 +258,13 @@ public class ChildDashboardActivity extends AppCompatActivity {
         welcomeText.setText("Hi, " + user.name + "!");
         if (streakText != null) streakText.setText(user.streak + " Days");
         
+        if (user.warningNote != null && !user.warningNote.isEmpty()) {
+            warningText.setText(user.warningNote);
+            warningCard.setVisibility(View.VISIBLE);
+        } else {
+            warningCard.setVisibility(View.GONE);
+        }
+
         // Update Rewards Visibility based on points
         updateRewardsUI(user.points);
     }

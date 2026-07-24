@@ -360,6 +360,24 @@ object SupabaseAuthHelper {
     }
 
     @JvmStatic
+    fun updateWarningNoteBlocking(uid: String, note: String?): Boolean {
+        return runBlocking {
+            try {
+                val client = SupabaseManager.getClient()
+                client.postgrest["profiles"].update({
+                    set("warning_note", note)
+                }) {
+                    filter { eq("id", uid) }
+                }
+                true
+            } catch (e: Exception) {
+                Log.e("SupabaseAuth", "Update warning note failed: ${e.message}")
+                false
+            }
+        }
+    }
+
+    @JvmStatic
     fun updateDoctorProfileBlocking(uid: String, newDocId: String, hospitalName: String): Boolean {
         return runBlocking {
             try {

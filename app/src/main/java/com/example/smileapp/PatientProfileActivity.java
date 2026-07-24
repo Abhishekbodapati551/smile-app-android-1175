@@ -13,6 +13,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.smileapp.database.AppDatabase;
 import com.example.smileapp.models.BrushingLog;
 import com.example.smileapp.models.User;
+import android.widget.Toast;
+import com.example.smileapp.models.Appointment;
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.card.MaterialCardView;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -23,7 +27,12 @@ public class PatientProfileActivity extends AppCompatActivity {
 
     private AppDatabase db;
     private String patientUid;
+    private int specificApptId = -1;
+    private Appointment activeAppt;
     private TextView nameText, emailText, pointsText, streakText;
+    private TextView attendanceTitle, activeApptType, activeApptDate;
+    private MaterialCardView attendanceCard;
+    private MaterialButton btnPresent, btnAbsent;
     private RecyclerView historyRecycler;
     private HistoryAdapter adapter;
     private List<BrushingLog> historyList = new ArrayList<>();
@@ -35,11 +44,20 @@ public class PatientProfileActivity extends AppCompatActivity {
 
         db = AppDatabase.getInstance(this);
         patientUid = getIntent().getStringExtra("PATIENT_ID");
+        specificApptId = getIntent().getIntExtra("APPOINTMENT_ID", -1);
 
         nameText = findViewById(R.id.patient_name);
         emailText = findViewById(R.id.patient_email);
         pointsText = findViewById(R.id.patient_points);
         streakText = findViewById(R.id.patient_streak);
+
+        attendanceTitle = findViewById(R.id.attendance_title);
+        attendanceCard = findViewById(R.id.attendance_card);
+        activeApptType = findViewById(R.id.active_appt_type);
+        activeApptDate = findViewById(R.id.active_appt_date);
+        btnPresent = findViewById(R.id.btn_mark_present);
+        btnAbsent = findViewById(R.id.btn_mark_absent);
+
         historyRecycler = findViewById(R.id.brushing_history_recycler);
         ImageButton backBtn = findViewById(R.id.back_button);
 
@@ -49,7 +67,39 @@ public class PatientProfileActivity extends AppCompatActivity {
         adapter = new HistoryAdapter(historyList);
         historyRecycler.setAdapter(adapter);
 
+        btnPresent.setOnClickListener(v -> markAttendance("present"));
+        btnAbsent.setOnClickListener(v -> markAttendance("absent"));
+
         loadPatientData();
+    }
+
+    private void markAttendance(String status) {
+        if (activeAppt == null) return;
+        activeAppt.status = status;
+        
+        new Thread(() -> {
+            boolean success = SupabaseAuthHelper.updateAppointmentBlocking(activeAppt);
+            if (success) {
+                db.appDao().updateAppointment(activeAppt);
+                
+                if ("absent".equals(status)) {
+                    String warning = "Note: You were missed at your appointment on " + 
+                            new SimpleDateFormat("MMM dd", Locale.getDefault()).format(new Date(activeAppt.date)) + 
+                            ". Please contact the clinic.";
+                    SupabaseAuthHelper.updateWarningNoteBlocking(patientUid, warning);
+                } else {
+                    // Clear warning if present
+                    SupabaseAuthHelper.updateWarningNoteBlocking(patientUid, null);
+                }
+
+                runOnUiThread(() -> {
+                    Toast.makeText(this, "Marked as " + status, Toast.LENGTH_SHORT).show();
+                    attendanceTitle.setVisibility(View.GONE);
+                    attendanceCard.setVisibility(View.GONE);
+                    loadPatientData(); // Refresh history
+                });
+            }
+        }).start();
     }
 
     private void loadPatientData() {
@@ -58,6 +108,13 @@ public class PatientProfileActivity extends AppCompatActivity {
             User patient = db.appDao().getUserById(patientUid);
             List<BrushingLog> logs = db.appDao().getBrushingLogsForChild(patientUid);
             
+            // Fetch appointment if needed
+            if (specificApptId != -1) {
+                activeAppt = null; // Reset
+                List<Appointment> allAppts = db.appDao().getAppointmentsForChild(patientUid);
+                for (Appointment a : allAppts) if (a.id == specificApptId) { activeAppt = a; break; }
+            }
+
             runOnUiThread(() -> {
                 if (patient != null) {
                     nameText.setText(patient.name);
@@ -65,6 +122,17 @@ public class PatientProfileActivity extends AppCompatActivity {
                     pointsText.setText("⭐ " + patient.points);
                     streakText.setText("🔥 " + patient.streak);
                 }
+                
+                if (activeAppt != null && "upcoming".equals(activeAppt.status)) {
+                    attendanceTitle.setVisibility(View.VISIBLE);
+                    attendanceCard.setVisibility(View.VISIBLE);
+                    activeApptType.setText(activeAppt.type);
+                    activeApptDate.setText(new SimpleDateFormat("MMM dd, hh:mm a", Locale.getDefault()).format(new Date(activeAppt.date)));
+                } else {
+                    attendanceTitle.setVisibility(View.GONE);
+                    attendanceCard.setVisibility(View.GONE);
+                }
+
                 historyList.clear();
                 historyList.addAll(logs);
                 adapter.notifyDataSetChanged();

@@ -31,7 +31,10 @@ data class User(
 
     @JvmField var points: Int = 0,
     @JvmField var streak: Int = 0,
-    @JvmField var stars: Int = 0
+    @JvmField var stars: Int = 0,
+
+    @SerialName("warning_note")
+    @JvmField var warningNote: String? = null
 ) {
     // Constructor for Java compatibility
     constructor(uid: String, name: String, email: String, pass: String, role: String) : this(
