@@ -89,7 +89,7 @@
         </div>
     </div>
 
-    <!-- 4. CHILD DASHBOARD (MIRROR) -->
+    <!-- 4. CHILD DASHBOARD -->
     <div id="screen-dashboard-child" class="min-h-screen bg-app hidden pb-10 text-white">
         <nav class="p-8 flex justify-between items-center sticky top-0 bg-app/80 backdrop-blur-md z-50">
             <div>
@@ -167,8 +167,8 @@
                     <p id="doctor-id-display" class="opacity-70 italic font-bold"></p>
                 </div>
                 <div class="flex items-center space-x-4">
-                    <button onclick="syncNow()" class="bg-white/20 hover:bg-white/30 px-6 py-3 rounded-2xl text-sm font-black shadow-lg">SYNC ALL</button>
-                    <button onclick="logout()" class="bg-white/20 p-4 rounded-full text-xl">🚪</button>
+                    <button onclick="syncNow()" class="bg-white/20 hover:bg-white/30 px-6 py-3 rounded-2xl text-sm font-black shadow-lg transition-all active:scale-95">SYNC ALL</button>
+                    <button onclick="logout()" class="bg-white/20 p-4 rounded-full text-xl shadow-lg transition-all hover:bg-red-500/30">🚪</button>
                 </div>
             </div>
         </header>
@@ -176,20 +176,20 @@
         <main class="max-w-6xl mx-auto px-6 -mt-10 space-y-8">
             <!-- Stats Grid -->
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                <div onclick="showSubPage('patients')" class="bg-white p-6 rounded-[32px] shadow-lg cursor-pointer hover:scale-105 transition-transform border-b-4 border-blue-100">
-                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-wider">Patients</p>
+                <div onclick="showSubPage('patients')" class="bg-white p-6 rounded-[32px] shadow-lg cursor-pointer hover:scale-105 transition-transform border-b-4 border-blue-100 group">
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-wider group-hover:text-blue-500 transition-colors">Patients</p>
                     <p id="stat-patients" class="text-4xl font-black text-blue-900">0</p>
                 </div>
-                <div onclick="showSubPage('appointments')" class="bg-white p-6 rounded-[32px] shadow-lg cursor-pointer hover:scale-105 transition-transform border-b-4 border-teal-100">
-                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-wider">Upcoming</p>
+                <div onclick="showSubPage('appointments')" class="bg-white p-6 rounded-[32px] shadow-lg cursor-pointer hover:scale-105 transition-transform border-b-4 border-teal-100 group">
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-wider group-hover:text-teal-500 transition-colors">Upcoming</p>
                     <p id="stat-appts" class="text-4xl font-black text-teal-600">0</p>
                 </div>
-                <div onclick="showSubPage('approvals')" class="bg-white p-6 rounded-[32px] shadow-lg cursor-pointer hover:scale-105 transition-transform border-b-4 border-orange-100">
-                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-wider">Approvals</p>
+                <div onclick="showSubPage('approvals')" class="bg-white p-6 rounded-[32px] shadow-lg cursor-pointer hover:scale-105 transition-transform border-b-4 border-orange-100 group">
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-wider group-hover:text-orange-500 transition-colors">Approvals</p>
                     <p id="stat-approvals" class="text-4xl font-black text-orange-500">0</p>
                 </div>
-                <div onclick="showSubPage('reviews')" class="bg-white p-6 rounded-[32px] shadow-lg cursor-pointer hover:scale-105 transition-transform border-b-4 border-purple-100">
-                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-wider">Reviews</p>
+                <div onclick="showSubPage('reviews')" class="bg-white p-6 rounded-[32px] shadow-lg cursor-pointer hover:scale-105 transition-transform border-b-4 border-purple-100 group">
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-wider group-hover:text-purple-500 transition-colors">Reviews</p>
                     <p id="stat-reviews" class="text-4xl font-black text-purple-600">0</p>
                 </div>
             </div>
@@ -234,16 +234,16 @@
     <!-- Generic SubPage -->
     <div id="modal-subpage" class="fixed inset-0 bg-slate-900/90 backdrop-blur-md z-[100] hidden overflow-y-auto p-4 md:p-10 text-slate-800">
         <div class="w-full max-w-4xl mx-auto bg-white rounded-[40px] shadow-2xl p-10 relative min-h-[600px]">
-            <button onclick="closeSubPage()" class="absolute top-8 right-8 text-slate-400 text-3xl">✕</button>
+            <button onclick="closeSubPage()" class="absolute top-8 right-8 text-slate-400 text-3xl hover:text-slate-600 transition-colors">✕</button>
             <h2 id="subpage-title" class="text-4xl font-black mb-10">Title</h2>
             <div id="subpage-content" class="space-y-4"></div>
         </div>
     </div>
 
     <!-- Patient Detail -->
-    <div id="modal-patient-detail" class="fixed inset-0 bg-slate-900/95 backdrop-blur-xl z-[150] hidden overflow-y-auto p-4 md:p-10 text-slate-800">
+    <div id="modal-patient-detail" class="fixed inset-0 bg-slate-900/95 backdrop-blur-xl z-[210] hidden overflow-y-auto p-4 md:p-10 text-slate-800">
         <div class="w-full max-w-2xl mx-auto bg-white rounded-[40px] shadow-2xl overflow-hidden relative">
-            <button onclick="document.getElementById('modal-patient-detail').classList.add('hidden')" class="absolute top-6 right-6 text-slate-400 text-2xl">✕</button>
+            <button onclick="document.getElementById('modal-patient-detail').classList.add('hidden')" class="absolute top-6 right-6 text-slate-400 text-2xl z-10">✕</button>
             <div class="bg-app p-10 text-white text-center">
                 <p class="text-6xl mb-4">👦</p>
                 <h2 id="det-name" class="text-3xl font-black">Name</h2>
@@ -269,7 +269,7 @@
         </div>
     </div>
 
-    <!-- Doctor Profile Modal (New) -->
+    <!-- Doctor Profile Modal -->
     <div id="modal-doctor-profile" class="fixed inset-0 bg-slate-900/90 backdrop-blur-md z-[160] hidden flex items-center justify-center p-4 text-slate-800">
         <div class="bg-white w-full max-w-lg rounded-[40px] shadow-2xl p-10 relative">
             <button onclick="document.getElementById('modal-doctor-profile').classList.add('hidden')" class="absolute top-8 right-8 text-slate-400 text-2xl">✕</button>
@@ -282,21 +282,50 @@
         </div>
     </div>
 
+    <!-- Appointment Modal (Handles both Add and Reschedule) -->
+    <div id="modal-add-appt" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-[180] hidden items-center justify-center p-4 text-slate-800">
+        <div class="bg-white w-full max-w-lg rounded-[40px] shadow-2xl p-10">
+            <h3 id="appt-modal-title" class="text-2xl font-black text-center mb-8">Schedule New Visit</h3>
+            <div class="space-y-6">
+                <div id="appt-patient-select-container">
+                    <label class="text-[10px] font-black text-slate-400 ml-2 uppercase">Select Patient</label>
+                    <select id="appt-patient" class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold cursor-pointer outline-none focus:border-teal-500">
+                        <option value="">Select Patient...</option>
+                    </select>
+                </div>
+                <div id="appt-patient-name-display" class="hidden">
+                    <label class="text-[10px] font-black text-slate-400 ml-2 uppercase">Patient</label>
+                    <div id="reschedule-patient-name" class="w-full p-4 bg-slate-100 border-2 border-slate-100 rounded-2xl font-bold text-slate-500">Patient Name</div>
+                </div>
+                <div>
+                    <label class="text-[10px] font-black text-slate-400 ml-2 uppercase">Visit Type</label>
+                    <input type="text" id="appt-type" placeholder="Visit Type (Check-up)" class="w-full p-4 bg-slate-50 border-2 rounded-2xl outline-none focus:border-teal-500">
+                </div>
+                <div>
+                    <label class="text-[10px] font-black text-slate-400 ml-2 uppercase">Date and Time</label>
+                    <input type="datetime-local" id="appt-date" class="w-full p-4 bg-slate-50 border-2 rounded-2xl font-bold outline-none focus:border-teal-500">
+                </div>
+                <button id="btn-save-appt" onclick="saveAppointment()" class="w-full bg-teal-500 text-white p-5 rounded-3xl font-black shadow-xl hover:bg-teal-600 transition-colors uppercase tracking-widest">Confirm Appointment</button>
+                <button onclick="document.getElementById('modal-add-appt').classList.add('hidden')" class="w-full text-slate-400 font-bold py-2">Cancel</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Reward Store -->
     <div id="modal-rewards-store" class="fixed inset-0 bg-slate-900/90 backdrop-blur-md z-[130] hidden overflow-y-auto p-4 md:p-10 text-slate-800">
         <div class="w-full max-w-4xl mx-auto glass-card rounded-[40px] shadow-2xl p-10 relative">
             <button onclick="document.getElementById('modal-rewards-store').classList.add('hidden')" class="absolute top-8 right-8 text-slate-400 text-3xl">✕</button>
             <h2 class="text-4xl font-black mb-2">🎁 Reward Store</h2>
-            <p class="text-slate-400 mb-8 font-bold uppercase tracking-widest text-xs">Collect your prizes</p>
+            <p class="text-slate-400 mb-8 font-bold uppercase tracking-widest text-xs">Mirror of Mobile Version</p>
             <div class="bg-pink-500 text-white p-8 rounded-[32px] mb-10 flex justify-between items-center shadow-xl">
-                <div><p class="text-xs opacity-80 font-bold uppercase">My Points</p><p id="store-points-val" class="text-4xl font-black mt-1">⭐ Loading...</p></div>
+                <div><p class="text-xs opacity-80 font-bold uppercase">Your Points</p><p id="store-points-val" class="text-4xl font-black mt-1">⭐ Loading...</p></div>
                 <div class="text-5xl">🏦</div>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="bg-white p-6 rounded-[32px] border shadow-sm text-center"><p class="text-5xl mb-4">⭐</p><h3 class="text-xl font-black">Star Badge</h3><p class="text-slate-400 font-bold text-sm mb-6">100 Pts</p><button onclick="handlePurchase('Star Badge', 100)" class="w-full bg-blue-600 text-white p-4 rounded-2xl font-black">COLLECT</button></div>
-                <div class="bg-white p-6 rounded-[32px] border shadow-sm text-center"><p class="text-5xl mb-4">🖋️</p><h3 class="text-xl font-black">Pens Set</h3><p class="text-slate-400 font-bold text-sm mb-6">200 Pts</p><button onclick="handlePurchase('Pens Set', 200)" class="w-full bg-blue-600 text-white p-4 rounded-2xl font-black">COLLECT</button></div>
-                <div class="bg-white p-6 rounded-[32px] border shadow-sm text-center"><p class="text-5xl mb-4">🧸</p><h3 class="text-xl font-black">Teddy Bear</h3><p class="text-slate-400 font-bold text-sm mb-6">300 Pts</p><button onclick="handlePurchase('Teddy Bear', 300)" class="w-full bg-blue-600 text-white p-4 rounded-2xl font-black">COLLECT</button></div>
-                <div class="bg-white p-6 rounded-[32px] border shadow-sm text-center"><p class="text-5xl mb-4">🏆</p><h3 class="text-xl font-black">Trophy</h3><p class="text-slate-400 font-bold text-sm mb-6">500 Pts</p><button onclick="handlePurchase('Trophy', 500)" class="w-full bg-blue-600 text-white p-4 rounded-2xl font-black">COLLECT</button></div>
+                <div class="bg-white p-6 rounded-[32px] border shadow-sm text-center"><p class="text-5xl mb-4">⭐</p><h3 class="text-xl font-black">Star Badge</h3><p class="text-slate-400 font-bold text-sm mb-6">100 Pts</p><button onclick="handlePurchase('Star Badge', 100)" class="w-full bg-blue-600 text-white p-4 rounded-2xl font-black hover:bg-blue-700">COLLECT</button></div>
+                <div class="bg-white p-6 rounded-[32px] border shadow-sm text-center"><p class="text-5xl mb-4">🖋️</p><h3 class="text-xl font-black">Pens Set</h3><p class="text-slate-400 font-bold text-sm mb-6">200 Pts</p><button onclick="handlePurchase('Pens Set', 200)" class="w-full bg-blue-600 text-white p-4 rounded-2xl font-black hover:bg-blue-700">COLLECT</button></div>
+                <div class="bg-white p-6 rounded-[32px] border shadow-sm text-center"><p class="text-5xl mb-4">🧸</p><h3 class="text-xl font-black">Teddy Bear</h3><p class="text-slate-400 font-bold text-sm mb-6">300 Pts</p><button onclick="handlePurchase('Teddy Bear', 300)" class="w-full bg-blue-600 text-white p-4 rounded-2xl font-black hover:bg-blue-700">COLLECT</button></div>
+                <div class="bg-white p-6 rounded-[32px] border shadow-sm text-center"><p class="text-5xl mb-4">🏆</p><h3 class="text-xl font-black">Trophy</h3><p class="text-slate-400 font-bold text-sm mb-6">500 Pts</p><button onclick="handlePurchase('Trophy', 500)" class="w-full bg-blue-600 text-white p-4 rounded-2xl font-black hover:bg-blue-700">COLLECT</button></div>
             </div>
         </div>
     </div>
@@ -308,6 +337,7 @@
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         let userData = null; let regRole = 'child'; let selectedPatientId = null; let selectedAppt = null;
+        let editApptId = null; // Used for rescheduling
 
         function navigateTo(id) { document.querySelectorAll('[id^="screen-"]').forEach(s => s.classList.add('hidden')); document.getElementById(`screen-${id}`).classList.remove('hidden'); window.scrollTo(0,0); }
         function setRegRole(r) { regRole = r; document.getElementById('reg-role-child').classList.toggle('bg-white', r==='child'); document.getElementById('reg-role-doctor').classList.toggle('bg-white', r==='doctor'); document.getElementById('doctor-id-field').classList.toggle('hidden', r==='doctor'); }
@@ -362,7 +392,7 @@
             navigateToSubPage("My Appointments", true);
             supabaseClient.from('appointments').select('*').eq('child_id', userData.id).order('appt_date', { ascending: false }).then(({data}) => {
                 const c = document.getElementById('subpage-content'); c.innerHTML = '';
-                data?.forEach(v => c.innerHTML += `<div class="bg-slate-50 p-6 rounded-3xl flex justify-between items-center"><div><p class="font-bold">${v.type}</p><p class="text-xs opacity-50">${new Date(v.appt_date).toLocaleString()}</p></div><p class="font-black uppercase text-xs">${v.status}</p></div>`);
+                data?.forEach(v => c.innerHTML += `<div class="bg-slate-50 p-6 rounded-3xl flex justify-between items-center mb-4 border"><div><p class="font-bold">${v.type}</p><p class="text-xs opacity-50">${new Date(v.appt_date).toLocaleString()}</p></div><p class="font-black uppercase text-xs">${v.status}</p></div>`);
             });
         }
 
@@ -406,14 +436,15 @@
             document.getElementById('det-email').innerText = p.email;
             document.getElementById('det-points').innerText = p.points || 0;
             document.getElementById('det-streak').innerText = p.streak || 0;
+            const attSection = document.getElementById('det-attendance-section');
             if (aid) {
                 const { data: a } = await supabaseClient.from('appointments').select('*').eq('id', aid).single();
-                selectedAppt = a; document.getElementById('det-appt-date').innerText = new Date(a.appt_date).toLocaleString(); document.getElementById('det-attendance-section').classList.remove('hidden');
-            } else document.getElementById('det-attendance-section').classList.add('hidden');
+                selectedAppt = a; document.getElementById('det-appt-date').innerText = new Date(a.appt_date).toLocaleString(); attSection.classList.remove('hidden');
+            } else attSection.classList.add('hidden');
             const hl = document.getElementById('det-history'); hl.innerHTML = '<div class="loader mx-auto"></div>';
             const { data: logs } = await supabaseClient.from('brushing_logs').select('*').eq('child_id', uid).order('created_at', { ascending: false }).limit(5);
             hl.innerHTML = logs?.length ? '' : 'No history.';
-            logs?.forEach(l => hl.innerHTML += `<div class="flex justify-between border-b py-2 text-xs"><span>${new Date(l.created_at).toLocaleDateString()}</span><span class="font-bold">${l.approved?'Approved':'Pending'}</span></div>`);
+            logs?.forEach(l => hl.innerHTML += `<div class="flex justify-between border-b py-2 text-xs"><span>${new Date(l.created_at).toLocaleDateString()}</span><span class="font-bold ${l.approved?'text-green-500':'text-orange-500'}">${l.approved?'Approved':'Pending'}</span></div>`);
         }
 
         async function markWebAttendance(s) {
@@ -439,18 +470,18 @@
             const c = document.getElementById('subpage-content'); const sid = userData.doctor_id;
             if (t === 'patients') {
                 const { data } = await supabaseClient.from('profiles').select('*').eq('doctor_id', sid).eq('is_approved', true);
-                c.innerHTML = ''; data?.forEach(u => c.innerHTML += `<div onclick="viewPatientDetail('${u.id}')" class="bg-slate-50 p-6 rounded-3xl flex justify-between items-center cursor-pointer hover:bg-white border transition-all"><div><p class="font-bold">${u.name}</p><p class="text-xs opacity-50">${u.email}</p></div><p class="text-teal-600 font-black">${u.points||0} PTS</p></div>`);
+                c.innerHTML = ''; data?.forEach(u => c.innerHTML += `<div onclick="viewPatientDetail('${u.id}')" class="bg-slate-50 p-6 rounded-3xl flex justify-between items-center cursor-pointer hover:bg-white border transition-all mb-4"><div><p class="font-bold">${u.name}</p><p class="text-xs opacity-50">${u.email}</p></div><p class="text-teal-600 font-black">${u.points||0} PTS</p></div>`);
             } else if (t === 'approvals') {
                 const { data } = await supabaseClient.from('profiles').select('*').eq('doctor_id', sid).eq('is_approved', false);
                 c.innerHTML = data?.length ? '' : 'No requests.';
-                data?.forEach(u => c.innerHTML += `<div class="bg-slate-50 p-6 rounded-3xl flex justify-between items-center border"><div><p class="font-bold">${u.name}</p><p class="text-xs opacity-50">${u.email}</p></div><button onclick="approveUser('${u.id}')" class="bg-orange-500 text-white px-6 py-2 rounded-xl font-bold">APPROVE</button></div>`);
+                data?.forEach(u => c.innerHTML += `<div class="bg-slate-50 p-6 rounded-3xl flex justify-between items-center border mb-4"><div><p class="font-bold">${u.name}</p><p class="text-xs opacity-50">${u.email}</p></div><button onclick="approveUser('${u.id}')" class="bg-orange-500 text-white px-6 py-2 rounded-xl font-bold">APPROVE</button></div>`);
             } else if (t === 'appointments') {
                 const { data } = await supabaseClient.from('appointments').select('*').eq('doctor_id', sid).order('appt_date', { ascending: false });
-                c.innerHTML = ''; data?.forEach(v => c.innerHTML += `<div onclick="viewPatientDetail('${v.child_id}', '${v.id}')" class="bg-slate-50 p-6 rounded-3xl flex justify-between items-center cursor-pointer hover:bg-white border transition-all"><div><p class="font-bold">${v.child_name}</p><p class="text-[10px] font-black text-teal-600 uppercase">${v.type}</p></div><div class="text-right"><p class="text-xs opacity-40 font-bold uppercase">${v.status}</p><p class="font-bold text-slate-500">${new Date(v.appt_date).toLocaleDateString()}</p></div></div>`);
+                c.innerHTML = ''; data?.forEach(v => c.innerHTML += `<div class="bg-slate-50 p-6 rounded-3xl flex justify-between items-center mb-4 border hover:bg-white transition-all"><div><p class="font-bold text-slate-800">${v.child_name}</p><p class="text-[10px] font-black text-teal-600 uppercase">${v.type}</p></div><div class="flex items-center space-x-4"><div class="text-right"><p class="text-xs font-bold ${v.status==='upcoming'?'text-blue-500':(v.status==='present'?'text-green-500':'text-red-500')} uppercase">${v.status}</p><p class="font-bold text-slate-500">${new Date(v.appt_date).toLocaleDateString()}</p></div><button onclick="openRescheduleModal('${v.id}', '${v.child_id}', '${v.child_name}', '${v.type}', ${v.appt_date})" class="text-blue-500 font-black text-[10px] uppercase hover:underline">Reschedule</button></div></div>`);
             } else if (t === 'reviews') {
                 const { data } = await supabaseClient.from('brushing_logs').select('*').eq('doctor_id', sid).eq('approved', false);
                 c.innerHTML = data?.length ? '' : 'No videos.';
-                data?.forEach(l => c.innerHTML += `<div class="bg-slate-50 p-6 rounded-3xl flex justify-between items-center border"><div><p class="font-bold">${l.child_name}</p><p class="text-xs opacity-50">${new Date(l.created_at).toLocaleString()}</p></div><div class="flex space-x-2"><button onclick="quickApproveLog('${l.id}')" class="bg-blue-600 text-white px-6 py-2 rounded-xl font-bold text-xs uppercase">Award 10 Pts</button></div></div>`);
+                data?.forEach(l => c.innerHTML += `<div class="bg-slate-50 p-6 rounded-3xl flex justify-between items-center border mb-4"><div><p class="font-bold">${l.child_name}</p><p class="text-xs opacity-50">${new Date(l.created_at).toLocaleString()}</p></div><button onclick="quickApproveLog('${l.id}')" class="bg-blue-600 text-white px-6 py-2 rounded-xl font-bold text-xs uppercase">Award 10 Pts</button></div>`);
             }
         }
 
@@ -466,26 +497,69 @@
         function closeSubPage() { document.getElementById('modal-subpage').classList.add('hidden'); }
         function navigateToSubPage(t, show) { document.getElementById('modal-subpage').classList.toggle('hidden', !show); if(show) document.getElementById('subpage-title').innerText = t; }
 
+        // APPOINTMENT LOGIC
         function openAppointmentModal() {
-            document.getElementById('modal-add-appt').classList.remove('hidden'); const sel = document.getElementById('appt-patient'); sel.innerHTML = '<option>Loading...</option>';
-            supabaseClient.from('profiles').select('*').eq('doctor_id', userData.doctor_id).eq('is_approved', true).then(({data}) => { sel.innerHTML = '<option value="">Select Patient...</option>'; data?.forEach(u => sel.innerHTML += `<option value="${u.id}|${u.name}">${u.name}</option>`); });
+            editApptId = null; document.getElementById('appt-modal-title').innerText = "Schedule New Visit";
+            document.getElementById('appt-patient-select-container').classList.remove('hidden');
+            document.getElementById('appt-patient-name-display').classList.add('hidden');
+            const sel = document.getElementById('appt-patient'); sel.innerHTML = '<option>Loading...</option>';
+            document.getElementById('modal-add-appt').classList.remove('hidden');
+            supabaseClient.from('profiles').select('*').eq('doctor_id', userData.doctor_id).eq('is_approved', true).then(({data}) => {
+                sel.innerHTML = '<option value="">Select Patient...</option>';
+                data?.forEach(u => sel.innerHTML += `<option value="${u.id}|${u.name}">${u.name}</option>`);
+            });
         }
+
+        function openRescheduleModal(aid, cid, cname, type, adate) {
+            editApptId = aid; document.getElementById('appt-modal-title').innerText = "Reschedule Visit";
+            document.getElementById('appt-patient-select-container').classList.add('hidden');
+            document.getElementById('appt-patient-name-display').classList.remove('hidden');
+            document.getElementById('reschedule-patient-name').innerText = cname;
+            document.getElementById('appt-type').value = type;
+            // Format date for datetime-local
+            let d = new Date(adate); d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+            document.getElementById('appt-date').value = d.toISOString().slice(0,16);
+            document.getElementById('modal-add-appt').classList.remove('hidden');
+        }
+
         async function saveAppointment() {
-            const p = document.getElementById('appt-patient').value.split('|'); const b = document.getElementById('btn-save-appt'); b.innerHTML = '<div class="loader mx-auto"></div>';
-            const { error } = await supabaseClient.from('appointments').insert({ child_id: p[0], child_name: p[1], doctor_id: userData.doctor_id, type: document.getElementById('appt-type').value, appt_date: new Date(document.getElementById('appt-date').value).getTime(), status: 'upcoming' });
-            if (error) alert(error.message); else { alert("Scheduled!"); document.getElementById('modal-add-appt').classList.add('hidden'); setupDoctorDashboard(); }
-            b.innerText = 'CONFIRM';
+            const b = document.getElementById('btn-save-appt'); b.innerHTML = '<div class="loader mx-auto"></div>';
+            const type = document.getElementById('appt-type').value;
+            const dateStr = document.getElementById('appt-date').value;
+            if (!dateStr || !type) return alert("Fill all fields");
+
+            const updateData = { type: type, appt_date: new Date(dateStr).getTime(), status: 'upcoming' };
+            let result;
+
+            if (editApptId) {
+                result = await supabaseClient.from('appointments').update(updateData).eq('id', editApptId);
+            } else {
+                const p = document.getElementById('appt-patient').value.split('|');
+                if (!p[0]) return alert("Select a patient");
+                updateData.child_id = p[0]; updateData.child_name = p[1]; updateData.doctor_id = userData.doctor_id;
+                result = await supabaseClient.from('appointments').insert(updateData);
+            }
+
+            if (result.error) alert(result.error.message);
+            else { alert(editApptId ? "Rescheduled!" : "Scheduled!"); document.getElementById('modal-add-appt').classList.add('hidden'); setupDoctorDashboard(); showSubPage('appointments'); }
+            b.innerText = 'Confirm Appointment';
         }
 
         // BRUSHING TIMER (WEB)
         let brushTimerInterval = null;
-        function startBrushingTimer() {
+        async function startBrushingTimer() {
             let time = 120; document.getElementById('btn-start-brush').classList.add('hidden');
             brushTimerInterval = setInterval(() => {
                 time--; let m = Math.floor(time/60), s = time%60;
                 document.getElementById('timer-val').innerText = `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
                 if (time <= 0) { clearInterval(brushTimerInterval); finishMission(); }
             }, 1000);
+        }
+
+        function closeBrushingModal() {
+            document.getElementById('modal-brushing').classList.add('hidden');
+            if (brushStream) brushStream.getTracks().forEach(t => t.stop());
+            clearInterval(brushTimerInterval); document.getElementById('btn-start-brush').classList.remove('hidden'); document.getElementById('timer-val').innerText = "02:00";
         }
     </script>
 </body>
