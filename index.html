@@ -429,22 +429,55 @@
         }
 
         async function viewPatientDetail(uid, aid = null) {
-            selectedPatientId = uid; selectedAppt = null;
+            console.log("Viewing patient:", uid, "Appointment:", aid);
+            selectedPatientId = uid;
+            selectedAppt = null;
+
+            // Reset UI and Show Modal
+            document.getElementById('det-name').innerText = "Loading...";
+            document.getElementById('det-email').innerText = "";
+            document.getElementById('det-points').innerText = "-";
+            document.getElementById('det-streak').innerText = "-";
+            document.getElementById('det-history').innerHTML = '<div class="loader mx-auto"></div>';
+            document.getElementById('det-attendance-section').classList.add('hidden');
             document.getElementById('modal-patient-detail').classList.remove('hidden');
-            const { data: p } = await supabaseClient.from('profiles').select('*').eq('id', uid).single();
-            document.getElementById('det-name').innerText = p.name;
-            document.getElementById('det-email').innerText = p.email;
-            document.getElementById('det-points').innerText = p.points || 0;
-            document.getElementById('det-streak').innerText = p.streak || 0;
-            const attSection = document.getElementById('det-attendance-section');
-            if (aid) {
-                const { data: a } = await supabaseClient.from('appointments').select('*').eq('id', aid).single();
-                selectedAppt = a; document.getElementById('det-appt-date').innerText = new Date(a.appt_date).toLocaleString(); attSection.classList.remove('hidden');
-            } else attSection.classList.add('hidden');
-            const hl = document.getElementById('det-history'); hl.innerHTML = '<div class="loader mx-auto"></div>';
-            const { data: logs } = await supabaseClient.from('brushing_logs').select('*').eq('child_id', uid).order('created_at', { ascending: false }).limit(5);
-            hl.innerHTML = logs?.length ? '' : 'No history.';
-            logs?.forEach(l => hl.innerHTML += `<div class="flex justify-between border-b py-2 text-xs"><span>${new Date(l.created_at).toLocaleDateString()}</span><span class="font-bold ${l.approved?'text-green-500':'text-orange-500'}">${l.approved?'Approved':'Pending'}</span></div>`);
+
+            try {
+                // 1. Fetch Profile
+                const { data: p, error: pError } = await supabaseClient.from('profiles').select('*').eq('id', uid).single();
+                if (pError) throw pError;
+
+                console.log("Fetched Profile:", p);
+                document.getElementById('det-name').innerText = p.name || "Unknown";
+                document.getElementById('det-email').innerText = p.email || "";
+                document.getElementById('det-points').innerText = p.points || 0;
+                document.getElementById('det-streak').innerText = p.streak || 0;
+
+                // 2. Fetch Appointment if provided
+                if (aid) {
+                    const { data: a, error: aError } = await supabaseClient.from('appointments').select('*').eq('id', aid).single();
+                    if (!aError && a) {
+                        selectedAppt = a;
+                        document.getElementById('det-appt-date').innerText = new Date(a.appt_date).toLocaleString();
+                        document.getElementById('det-attendance-section').classList.remove('hidden');
+                    }
+                }
+
+                // 3. Fetch History
+                const { data: logs, error: lError } = await supabaseClient.from('brushing_logs').select('*').eq('child_id', uid).order('created_at', { ascending: false }).limit(5);
+                const hl = document.getElementById('det-history');
+                hl.innerHTML = logs?.length ? '' : '<p class="text-slate-400 italic text-sm">No history found.</p>';
+                logs?.forEach(l => {
+                    hl.innerHTML += `<div class="flex justify-between items-center bg-slate-50 p-3 rounded-xl border border-slate-100">
+                        <span class="text-xs font-bold text-slate-600">${new Date(l.created_at).toLocaleDateString()}</span>
+                        <span class="text-[10px] font-black uppercase ${l.approved ? 'text-green-500' : 'text-orange-500'}">${l.approved ? 'Approved' : 'Pending'}</span>
+                    </div>`;
+                });
+            } catch (err) {
+                console.error("Error loading patient detail:", err);
+                alert("Could not load patient profile. Please try again.");
+                document.getElementById('modal-patient-detail').classList.add('hidden');
+            }
         }
 
         async function markWebAttendance(s) {
