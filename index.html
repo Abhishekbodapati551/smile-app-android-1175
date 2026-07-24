@@ -341,14 +341,44 @@
         });
 
         async function loadUserProfile(uid) {
-            const { data: profile } = await supabaseClient.from('profiles').select('*').eq('id', uid).single();
-            if (profile) {
+            try {
+                const { data: profile, error } = await supabaseClient.from('profiles').select('*').eq('id', uid).single();
+
+                if (error || !profile) {
+                    alert("Account found but profile is missing. Please contact support or register again.");
+                    await supabaseClient.auth.signOut();
+                    return;
+                }
+
                 userData = profile;
                 if (profile.role === 'child') {
-                    if (profile.is_approved) { navigateTo('dashboard-child'); setupChildDashboard(); subscribeToProfile(uid); }
-                    else { alert("Pending approval!"); supabaseClient.auth.signOut(); }
-                } else { navigateTo('dashboard-doctor'); setupDoctorDashboard(); subscribeToDoctorData(); }
+                    if (profile.is_approved) {
+                        navigateTo('dashboard-child');
+                        setupChildDashboard();
+                        subscribeToProfile(uid);
+                    } else {
+                        alert("Patient account pending doctor approval!");
+                        await supabaseClient.auth.signOut();
+                    }
+                } else if (profile.role === 'doctor') {
+                    navigateTo('dashboard-doctor');
+                    setupDoctorDashboard();
+                    subscribeToDoctorData();
+                } else {
+                    alert("Account role not recognized.");
+                    await supabaseClient.auth.signOut();
+                }
+            } catch (err) {
+                alert("Login Error: " + err.message);
+                resetLoginButtons();
             }
+        }
+
+        function resetLoginButtons() {
+            document.querySelectorAll('[id^="btn-login-"]').forEach(b => {
+                b.innerText = 'LOGIN';
+                b.disabled = false;
+            });
         }
 
         function subscribeToProfile(uid) {
