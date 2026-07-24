@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smile App - Web Dashboard</title>
+    <title>Smile App - Pro Web Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -14,12 +14,15 @@
         .hidden { display: none !important; }
         .loader { border: 3px solid #f3f3f3; border-top: 3px solid #3498db; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     </style>
 </head>
-<body class="bg-slate-100 min-h-screen">
+<body class="bg-slate-50 min-h-screen">
 
     <!-- 1. START SCREEN -->
-    <div id="screen-start" class="min-h-screen bg-app flex flex-col items-center justify-start pt-24 p-6 text-white">
+    <div id="screen-start" class="min-h-screen bg-app flex flex-col items-center justify-start pt-24 p-6 text-white transition-all">
         <div class="text-center mb-12 animate-bounce">
             <div class="relative w-32 h-32 bg-[#FFD54F] rounded-full mx-auto flex items-center justify-center shadow-2xl border-4 border-white/20">
                 <div class="absolute top-10 left-8 w-4 h-2 bg-slate-800 rounded-full"></div>
@@ -30,11 +33,11 @@
                 <div class="absolute top-4 right-4 text-white text-xl animate-pulse">✨</div>
             </div>
             <h1 class="text-5xl font-black mt-6">Smile App</h1>
-            <p class="text-xl opacity-80">Dental Care Adventure</p>
+            <p class="text-xl opacity-80 uppercase tracking-widest font-bold">Web Edition</p>
         </div>
         <div class="w-full max-w-sm space-y-4">
-            <button onclick="navigateTo('login-child')" class="w-full bg-white text-blue-900 p-5 rounded-3xl font-black text-xl shadow-xl hover:scale-105 transition-all">I'M A PATIENT</button>
-            <button onclick="navigateTo('login-doctor')" class="w-full bg-teal-500 text-white p-5 rounded-3xl font-black text-xl shadow-xl hover:scale-105 transition-all">I'M A DOCTOR</button>
+            <button onclick="navigateTo('login-child')" class="w-full bg-white text-blue-900 p-6 rounded-3xl font-black text-xl shadow-xl hover:scale-105 transition-all">I'M A PATIENT</button>
+            <button onclick="navigateTo('login-doctor')" class="w-full bg-teal-500 text-white p-6 rounded-3xl font-black text-xl shadow-xl hover:scale-105 transition-all border-b-4 border-teal-700">I'M A DOCTOR</button>
         </div>
     </div>
 
@@ -43,7 +46,7 @@
         <div class="w-full max-w-md glass-card p-10 rounded-[40px] shadow-2xl text-slate-800">
             <h2 class="text-3xl font-black text-center mb-8">Patient Login</h2>
             <div class="space-y-4">
-                <input type="email" id="child-email" placeholder="Email" class="w-full p-4 bg-slate-50 border-2 rounded-2xl outline-none focus:border-blue-500">
+                <input type="email" id="child-email" placeholder="Email Address" class="w-full p-4 bg-slate-50 border-2 rounded-2xl outline-none focus:border-blue-500">
                 <input type="password" id="child-password" placeholder="Password" class="w-full p-4 bg-slate-50 border-2 rounded-2xl outline-none focus:border-blue-500">
                 <button id="btn-login-child" onclick="handleLogin('child')" class="w-full bg-blue-600 text-white p-5 rounded-3xl font-black shadow-lg">LOGIN</button>
                 <p class="text-center font-bold text-slate-400">New here? <span class="text-blue-600 cursor-pointer" onclick="navigateTo('register')">Sign Up</span></p>
@@ -56,7 +59,7 @@
         <div class="w-full max-w-md glass-card p-10 rounded-[40px] shadow-2xl">
             <h2 class="text-3xl font-black text-center mb-8">Doctor Login</h2>
             <div class="space-y-4">
-                <input type="email" id="doctor-email" placeholder="Email" class="w-full p-4 bg-slate-50 border-2 rounded-2xl outline-none focus:border-teal-500">
+                <input type="email" id="doctor-email" placeholder="Email Address" class="w-full p-4 bg-slate-50 border-2 rounded-2xl outline-none focus:border-teal-500">
                 <input type="password" id="doctor-password" placeholder="Password" class="w-full p-4 bg-slate-50 border-2 rounded-2xl outline-none focus:border-teal-500">
                 <button id="btn-login-doctor" onclick="handleLogin('doctor')" class="w-full bg-teal-600 text-white p-5 rounded-3xl font-black shadow-lg">LOGIN</button>
                 <p class="text-center font-bold text-slate-400">Join the network? <span class="text-teal-600 cursor-pointer" onclick="navigateTo('register')">Register</span></p>
@@ -78,7 +81,7 @@
                 <input type="email" id="reg-email" placeholder="Email Address" class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none transition">
                 <input type="password" id="reg-password" placeholder="Password" class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none transition">
                 <div id="doctor-id-field">
-                    <input type="text" id="reg-doctor-id" placeholder="Enter Doctor ID (e.g. 1176)" class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl border-blue-200 outline-none transition">
+                    <input type="text" id="reg-doctor-id" placeholder="Enter 4-Digit Doctor ID" class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl border-blue-200 outline-none transition">
                 </div>
                 <button id="btn-signup" onclick="handleRegister()" class="w-full bg-blue-600 text-white p-5 rounded-3xl font-black text-xl shadow-lg hover:scale-105 transition-all mt-4">SIGN UP</button>
                 <p class="text-center font-bold text-slate-400">Already have an account? <span class="text-blue-600 cursor-pointer" onclick="navigateTo('start')">Login</span></p>
@@ -86,9 +89,9 @@
         </div>
     </div>
 
-    <!-- 4. CHILD DASHBOARD -->
+    <!-- 4. CHILD DASHBOARD (MIRROR) -->
     <div id="screen-dashboard-child" class="min-h-screen bg-app hidden pb-10 text-white">
-        <nav class="p-8 flex justify-between items-center">
+        <nav class="p-8 flex justify-between items-center sticky top-0 bg-app/80 backdrop-blur-md z-50">
             <div>
                 <h2 id="child-welcome-msg" class="text-3xl font-black">Hi, Friend!</h2>
                 <p id="child-subtitle" class="opacity-80">Ready for your mission?</p>
@@ -108,6 +111,7 @@
                 </div>
             </div>
 
+            <!-- Streak Card -->
             <div class="bg-white p-6 rounded-[32px] shadow-xl flex justify-between items-center text-slate-800">
                 <div>
                     <p class="text-slate-400 font-bold text-xs uppercase">Current Streak</p>
@@ -116,6 +120,7 @@
                 <div class="bg-orange-100 w-16 h-16 rounded-3xl flex items-center justify-center text-3xl">🔥</div>
             </div>
 
+            <!-- Brushing Task -->
             <div onclick="openBrushingModal()" class="bg-white p-6 rounded-[32px] shadow-xl cursor-pointer hover:scale-[1.02] transition-all text-slate-800">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-xl font-black text-blue-900">Today's Mission</h3>
@@ -127,12 +132,14 @@
                 <p id="mission-status-text" class="text-[10px] text-slate-400 mt-2 font-bold uppercase text-right">Not started yet</p>
             </div>
 
+            <!-- Appointment -->
             <div id="notif-appt" class="bg-blue-50 border-2 border-blue-200 p-6 rounded-[32px] hidden text-slate-800 cursor-pointer" onclick="showAllPatientAppts()">
                 <p class="font-black text-blue-800">Upcoming Appointment</p>
                 <p id="notif-appt-text" class="text-blue-600 text-sm"></p>
                 <p class="text-[10px] text-blue-300 mt-2 font-bold uppercase">Click to view all</p>
             </div>
 
+            <!-- Rewards -->
             <div class="bg-white/10 border border-white/20 p-6 rounded-[32px]">
                 <div class="flex justify-between items-center mb-6">
                     <h3 class="text-xl font-black">🎁 My Rewards</h3>
@@ -142,58 +149,69 @@
                     </div>
                 </div>
                 <div class="grid grid-cols-4 gap-2 text-center text-[10px] font-bold">
-                    <div id="rew-1" class="opacity-30 transition-all duration-500"><div class="bg-yellow-400 h-14 rounded-2xl mb-1 flex items-center justify-center text-xl shadow-lg">⭐</div>Star Badge</div>
-                    <div id="rew-2" class="opacity-30 transition-all duration-500"><div class="bg-pink-400 h-14 rounded-2xl mb-1 flex items-center justify-center text-xl shadow-lg">🖋️</div>Pens Set</div>
-                    <div id="rew-3" class="opacity-30 transition-all duration-500"><div class="bg-purple-400 h-14 rounded-2xl mb-1 flex items-center justify-center text-xl shadow-lg">🧸</div>Teddy Bear</div>
-                    <div id="rew-4" class="opacity-30 transition-all duration-500"><div class="bg-blue-400 h-14 rounded-2xl mb-1 flex items-center justify-center text-xl shadow-lg">🏆</div>Trophy</div>
+                    <div id="rew-1" class="opacity-30"><div class="bg-yellow-400 h-14 rounded-2xl mb-1 flex items-center justify-center text-xl">⭐</div>Star</div>
+                    <div id="rew-2" class="opacity-30"><div class="bg-pink-400 h-14 rounded-2xl mb-1 flex items-center justify-center text-xl">🖋️</div>Pens</div>
+                    <div id="rew-3" class="opacity-30"><div class="bg-purple-400 h-14 rounded-2xl mb-1 flex items-center justify-center text-xl">🧸</div>Teddy</div>
+                    <div id="rew-4" class="opacity-30"><div class="bg-blue-400 h-14 rounded-2xl mb-1 flex items-center justify-center text-xl">🏆</div>Trophy</div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- 5. DOCTOR DASHBOARD -->
+    <!-- 5. DOCTOR DASHBOARD (MIRROR) -->
     <div id="screen-dashboard-doctor" class="min-h-screen bg-slate-50 hidden pb-10">
         <header class="bg-app p-10 pt-16 text-white rounded-b-[50px] shadow-2xl">
-            <div class="max-w-5xl mx-auto flex justify-between items-center">
-                <div>
-                    <h2 id="doctor-welcome-msg" class="text-4xl font-black">Welcome</h2>
-                    <p id="doctor-id-display" class="opacity-70 italic"></p>
+            <div class="max-w-6xl mx-auto flex justify-between items-center">
+                <div onclick="openDoctorProfile()" class="cursor-pointer group">
+                    <h2 id="doctor-welcome-msg" class="text-4xl font-black group-hover:underline">Welcome</h2>
+                    <p id="doctor-id-display" class="opacity-70 italic font-bold"></p>
                 </div>
                 <div class="flex items-center space-x-4">
-                    <button onclick="syncNow()" class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-xl text-sm font-bold">SYNC DATA</button>
-                    <button onclick="logout()" class="bg-white/20 p-4 rounded-full">🚪</button>
+                    <button onclick="syncNow()" class="bg-white/20 hover:bg-white/30 px-6 py-3 rounded-2xl text-sm font-black shadow-lg">SYNC ALL</button>
+                    <button onclick="logout()" class="bg-white/20 p-4 rounded-full text-xl">🚪</button>
                 </div>
             </div>
         </header>
 
-        <main class="max-w-5xl mx-auto px-6 -mt-10 space-y-6">
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div onclick="showSubPage('patients')" class="bg-white p-6 rounded-[32px] shadow-lg cursor-pointer hover:scale-105 transition-transform text-slate-800">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase">Patients</p>
-                    <p id="stat-patients" class="text-3xl font-black text-blue-900">0</p>
+        <main class="max-w-6xl mx-auto px-6 -mt-10 space-y-8">
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <div onclick="showSubPage('patients')" class="bg-white p-6 rounded-[32px] shadow-lg cursor-pointer hover:scale-105 transition-transform border-b-4 border-blue-100">
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-wider">Patients</p>
+                    <p id="stat-patients" class="text-4xl font-black text-blue-900">0</p>
                 </div>
-                <div onclick="showSubPage('appointments')" class="bg-white p-6 rounded-[32px] shadow-lg cursor-pointer hover:scale-105 transition-transform text-slate-800">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase">Visits</p>
-                    <p id="stat-appts" class="text-3xl font-black text-teal-600">0</p>
+                <div onclick="showSubPage('appointments')" class="bg-white p-6 rounded-[32px] shadow-lg cursor-pointer hover:scale-105 transition-transform border-b-4 border-teal-100">
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-wider">Upcoming</p>
+                    <p id="stat-appts" class="text-4xl font-black text-teal-600">0</p>
                 </div>
-                <div onclick="showSubPage('approvals')" class="bg-white p-6 rounded-[32px] shadow-lg cursor-pointer hover:scale-105 transition-transform text-slate-800">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase">Pending</p>
-                    <p id="stat-approvals" class="text-3xl font-black text-orange-500">0</p>
+                <div onclick="showSubPage('approvals')" class="bg-white p-6 rounded-[32px] shadow-lg cursor-pointer hover:scale-105 transition-transform border-b-4 border-orange-100">
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-wider">Approvals</p>
+                    <p id="stat-approvals" class="text-4xl font-black text-orange-500">0</p>
                 </div>
-                <div onclick="showSubPage('reviews')" class="bg-white p-6 rounded-[32px] shadow-lg cursor-pointer hover:scale-105 transition-transform text-slate-800">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase">Reviews</p>
-                    <p id="stat-reviews" class="text-3xl font-black text-purple-600">0</p>
+                <div onclick="showSubPage('reviews')" class="bg-white p-6 rounded-[32px] shadow-lg cursor-pointer hover:scale-105 transition-transform border-b-4 border-purple-100">
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-wider">Reviews</p>
+                    <p id="stat-reviews" class="text-4xl font-black text-purple-600">0</p>
                 </div>
             </div>
 
-            <!-- Mini List: Today's Schedule -->
-            <div class="bg-white p-8 rounded-[40px] shadow-xl text-slate-800">
-                <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-2xl font-black">Today's Schedule</h3>
-                    <button onclick="openAppointmentModal()" class="bg-teal-500 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-lg">+ NEW VISIT</button>
+            <!-- Two-Column Layout -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Schedule -->
+                <div class="bg-white p-8 rounded-[40px] shadow-xl text-slate-800">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-2xl font-black">Today's Schedule</h3>
+                        <button onclick="openAppointmentModal()" class="bg-teal-500 text-white px-4 py-2 rounded-xl text-[10px] font-black shadow-lg">+ NEW VISIT</button>
+                    </div>
+                    <div id="doc-mini-appointments" class="space-y-4"></div>
                 </div>
-                <div id="doc-mini-appointments" class="space-y-4">
-                    <!-- Appointments load here -->
+
+                <!-- Recent Patients -->
+                <div class="bg-white p-8 rounded-[40px] shadow-xl text-slate-800">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-2xl font-black">Recent Patients</h3>
+                        <span onclick="showSubPage('patients')" class="text-blue-500 font-bold text-xs uppercase cursor-pointer">View All</span>
+                    </div>
+                    <div id="doc-mini-patients" class="space-y-4"></div>
                 </div>
             </div>
         </main>
@@ -213,490 +231,261 @@
         <button onclick="closeBrushingModal()" class="mt-6 text-slate-400 font-bold">Cancel Mission</button>
     </div>
 
-    <!-- Generic SubPage Modal -->
+    <!-- Generic SubPage -->
     <div id="modal-subpage" class="fixed inset-0 bg-slate-900/90 backdrop-blur-md z-[100] hidden overflow-y-auto p-4 md:p-10 text-slate-800">
-        <div class="w-full max-w-4xl mx-auto glass-card rounded-[40px] shadow-2xl p-10 relative">
-            <button onclick="closeSubPage()" class="absolute top-8 right-8 text-slate-400 text-3xl hover:text-slate-600 transition-colors">✕</button>
+        <div class="w-full max-w-4xl mx-auto bg-white rounded-[40px] shadow-2xl p-10 relative min-h-[600px]">
+            <button onclick="closeSubPage()" class="absolute top-8 right-8 text-slate-400 text-3xl">✕</button>
             <h2 id="subpage-title" class="text-4xl font-black mb-10">Title</h2>
             <div id="subpage-content" class="space-y-4"></div>
         </div>
     </div>
 
-    <!-- Patient Detail Modal (Doctor View) -->
+    <!-- Patient Detail -->
     <div id="modal-patient-detail" class="fixed inset-0 bg-slate-900/95 backdrop-blur-xl z-[150] hidden overflow-y-auto p-4 md:p-10 text-slate-800">
         <div class="w-full max-w-2xl mx-auto bg-white rounded-[40px] shadow-2xl overflow-hidden relative">
             <button onclick="document.getElementById('modal-patient-detail').classList.add('hidden')" class="absolute top-6 right-6 text-slate-400 text-2xl">✕</button>
-
             <div class="bg-app p-10 text-white text-center">
                 <p class="text-6xl mb-4">👦</p>
-                <h2 id="det-name" class="text-3xl font-black">Patient Name</h2>
+                <h2 id="det-name" class="text-3xl font-black">Name</h2>
                 <p id="det-email" class="opacity-70 text-sm"></p>
-                <div class="flex justify-center space-x-6 mt-6">
-                    <div class="text-center"><p id="det-points" class="text-2xl font-black">0</p><p class="text-[10px] uppercase font-bold opacity-60">Points</p></div>
-                    <div class="text-center"><p id="det-streak" class="text-2xl font-black">0</p><p class="text-[10px] uppercase font-bold opacity-60">Streak</p></div>
+                <div class="flex justify-center space-x-8 mt-6">
+                    <div><p id="det-points" class="text-2xl font-black">0</p><p class="text-[10px] font-black opacity-50 uppercase">Points</p></div>
+                    <div><p id="det-streak" class="text-2xl font-black">0</p><p class="text-[10px] font-black opacity-50 uppercase">Streak</p></div>
                 </div>
             </div>
-
             <div class="p-10 space-y-8">
-                <!-- Attendance Section -->
-                <div id="det-attendance-section">
-                    <h3 class="text-xl font-black mb-4">Active Appointment</h3>
+                <div id="det-attendance-section" class="hidden">
+                    <h3 class="text-xl font-black mb-4">Appointment Attendance</h3>
                     <div class="bg-slate-50 p-6 rounded-3xl border border-slate-100">
-                        <div class="flex justify-between items-start mb-6">
-                            <div>
-                                <p id="det-appt-type" class="font-black text-blue-600 uppercase text-xs"></p>
-                                <p id="det-appt-date" class="font-bold text-slate-800 text-lg mt-1"></p>
-                            </div>
-                            <span class="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-[10px] font-black uppercase">Upcoming</span>
-                        </div>
+                        <p id="det-appt-date" class="font-black text-blue-900 text-lg mb-6"></p>
                         <div class="grid grid-cols-2 gap-4">
-                            <button onclick="markWebAttendance('present')" class="bg-green-500 hover:bg-green-600 text-white p-4 rounded-2xl font-black shadow-lg transition-all">PRESENT</button>
-                            <button onclick="markWebAttendance('absent')" class="bg-red-500 hover:bg-red-600 text-white p-4 rounded-2xl font-black shadow-lg transition-all">ABSENT</button>
+                            <button onclick="markWebAttendance('present')" class="bg-green-500 text-white p-4 rounded-2xl font-black shadow-lg">PRESENT</button>
+                            <button onclick="markWebAttendance('absent')" class="bg-red-500 text-white p-4 rounded-2xl font-black shadow-lg">ABSENT</button>
                         </div>
                     </div>
                 </div>
-
-                <!-- History -->
-                <div>
-                    <h3 class="text-xl font-black mb-4">Brushing History</h3>
-                    <div id="det-history" class="space-y-3"></div>
-                </div>
+                <div><h3 class="text-xl font-black mb-4 text-slate-400 uppercase tracking-widest text-xs">Recent History</h3><div id="det-history" class="space-y-3"></div></div>
             </div>
         </div>
     </div>
 
-    <!-- Add Appointment Modal -->
-    <div id="modal-add-appt" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-[110] hidden items-center justify-center p-4 text-slate-800">
-        <div class="bg-white w-full max-w-lg rounded-[40px] shadow-2xl p-10">
-            <h3 class="text-2xl font-black text-center mb-8">Schedule New Visit</h3>
-            <div class="space-y-6">
-                <select id="appt-patient" class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold cursor-pointer outline-none focus:border-teal-500">
-                    <option value="">Select Patient...</option>
-                </select>
-                <input type="text" id="appt-type" placeholder="Visit Type (Check-up)" class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none focus:border-teal-500">
-                <input type="datetime-local" id="appt-date" class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold outline-none focus:border-teal-500">
-                <button id="btn-save-appt" onclick="saveAppointment()" class="w-full bg-teal-500 text-white p-5 rounded-3xl font-black shadow-xl hover:bg-teal-600 transition-colors">CONFIRM</button>
-                <button onclick="document.getElementById('modal-add-appt').classList.add('hidden')" class="w-full text-slate-400 font-bold py-2">Cancel</button>
+    <!-- Doctor Profile Modal (New) -->
+    <div id="modal-doctor-profile" class="fixed inset-0 bg-slate-900/90 backdrop-blur-md z-[160] hidden flex items-center justify-center p-4 text-slate-800">
+        <div class="bg-white w-full max-w-lg rounded-[40px] shadow-2xl p-10 relative">
+            <button onclick="document.getElementById('modal-doctor-profile').classList.add('hidden')" class="absolute top-8 right-8 text-slate-400 text-2xl">✕</button>
+            <h3 class="text-3xl font-black text-center mb-8">Edit Profile</h3>
+            <div class="space-y-4">
+                <div><label class="text-[10px] font-bold text-slate-400 ml-2 uppercase">Clinic Name</label><input type="text" id="prof-clinic" class="w-full p-4 bg-slate-50 border-2 rounded-2xl outline-none focus:border-teal-500"></div>
+                <div><label class="text-[10px] font-bold text-slate-400 ml-2 uppercase">Doctor ID (4 Digits)</label><input type="text" id="prof-id" maxlength="4" class="w-full p-4 bg-slate-50 border-2 rounded-2xl outline-none focus:border-teal-500"></div>
+                <button id="btn-save-profile" onclick="saveDoctorProfile()" class="w-full bg-teal-600 text-white p-5 rounded-3xl font-black shadow-xl mt-6">SAVE CHANGES</button>
             </div>
         </div>
     </div>
 
-    <!-- Reward Store Modal -->
+    <!-- Reward Store -->
     <div id="modal-rewards-store" class="fixed inset-0 bg-slate-900/90 backdrop-blur-md z-[130] hidden overflow-y-auto p-4 md:p-10 text-slate-800">
         <div class="w-full max-w-4xl mx-auto glass-card rounded-[40px] shadow-2xl p-10 relative">
             <button onclick="document.getElementById('modal-rewards-store').classList.add('hidden')" class="absolute top-8 right-8 text-slate-400 text-3xl">✕</button>
             <h2 class="text-4xl font-black mb-2">🎁 Reward Store</h2>
-            <p class="text-slate-400 mb-8 font-bold uppercase tracking-widest text-xs">Mirror of Mobile Version</p>
+            <p class="text-slate-400 mb-8 font-bold uppercase tracking-widest text-xs">Collect your prizes</p>
             <div class="bg-pink-500 text-white p-8 rounded-[32px] mb-10 flex justify-between items-center shadow-xl">
-                <div><p class="text-xs opacity-80 font-bold uppercase">Your Points</p><p id="store-points-val" class="text-4xl font-black mt-1">⭐ Loading...</p></div>
+                <div><p class="text-xs opacity-80 font-bold uppercase">My Points</p><p id="store-points-val" class="text-4xl font-black mt-1">⭐ Loading...</p></div>
                 <div class="text-5xl">🏦</div>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="bg-white p-6 rounded-[32px] border shadow-sm text-center"><p class="text-5xl mb-4">⭐</p><h3 class="text-xl font-black">Star Badge</h3><p class="text-slate-400 font-bold text-sm mb-6">100 Points</p><button onclick="handlePurchase('Star Badge', 100)" class="w-full bg-blue-600 text-white p-4 rounded-2xl font-black hover:bg-blue-700">COLLECT</button></div>
-                <div class="bg-white p-6 rounded-[32px] border shadow-sm text-center"><p class="text-5xl mb-4">🖋️</p><h3 class="text-xl font-black">Pens Set</h3><p class="text-slate-400 font-bold text-sm mb-6">200 Points</p><button onclick="handlePurchase('Pens Set', 200)" class="w-full bg-blue-600 text-white p-4 rounded-2xl font-black hover:bg-blue-700">COLLECT</button></div>
-                <div class="bg-white p-6 rounded-[32px] border shadow-sm text-center"><p class="text-5xl mb-4">🧸</p><h3 class="text-xl font-black">Teddy Bear</h3><p class="text-slate-400 font-bold text-sm mb-6">300 Points</p><button onclick="handlePurchase('Teddy Bear', 300)" class="w-full bg-blue-600 text-white p-4 rounded-2xl font-black hover:bg-blue-700">COLLECT</button></div>
-                <div class="bg-white p-6 rounded-[32px] border shadow-sm text-center"><p class="text-5xl mb-4">🏆</p><h3 class="text-xl font-black">Trophy</h3><p class="text-slate-400 font-bold text-sm mb-6">500 Points</p><button onclick="handlePurchase('Trophy', 500)" class="w-full bg-blue-600 text-white p-4 rounded-2xl font-black hover:bg-blue-700">COLLECT</button></div>
+                <div class="bg-white p-6 rounded-[32px] border shadow-sm text-center"><p class="text-5xl mb-4">⭐</p><h3 class="text-xl font-black">Star Badge</h3><p class="text-slate-400 font-bold text-sm mb-6">100 Pts</p><button onclick="handlePurchase('Star Badge', 100)" class="w-full bg-blue-600 text-white p-4 rounded-2xl font-black">COLLECT</button></div>
+                <div class="bg-white p-6 rounded-[32px] border shadow-sm text-center"><p class="text-5xl mb-4">🖋️</p><h3 class="text-xl font-black">Pens Set</h3><p class="text-slate-400 font-bold text-sm mb-6">200 Pts</p><button onclick="handlePurchase('Pens Set', 200)" class="w-full bg-blue-600 text-white p-4 rounded-2xl font-black">COLLECT</button></div>
+                <div class="bg-white p-6 rounded-[32px] border shadow-sm text-center"><p class="text-5xl mb-4">🧸</p><h3 class="text-xl font-black">Teddy Bear</h3><p class="text-slate-400 font-bold text-sm mb-6">300 Pts</p><button onclick="handlePurchase('Teddy Bear', 300)" class="w-full bg-blue-600 text-white p-4 rounded-2xl font-black">COLLECT</button></div>
+                <div class="bg-white p-6 rounded-[32px] border shadow-sm text-center"><p class="text-5xl mb-4">🏆</p><h3 class="text-xl font-black">Trophy</h3><p class="text-slate-400 font-bold text-sm mb-6">500 Pts</p><button onclick="handlePurchase('Trophy', 500)" class="w-full bg-blue-600 text-white p-4 rounded-2xl font-black">COLLECT</button></div>
             </div>
         </div>
     </div>
 
-    <!-- SCRIPT (LOGIC) -->
+    <!-- SCRIPT -->
     <script>
         const SUPABASE_URL = "https://gzqpqqngtcqcrugwwosy.supabase.co";
         const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd6cXBxcW5ndGNxY3J1Z3d3b3N5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIwMDEzNzEsImV4cCI6MjA4NzU3NzM3MX0.qXeGCaXJL_qfRw7ByoyznuR1cMZYIJnRdN0Tn2EDRhg";
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        let userData = null;
-        let regRole = 'child';
-        let profileSubscription = null;
-        let selectedPatientId = null;
-        let selectedAppt = null;
+        let userData = null; let regRole = 'child'; let selectedPatientId = null; let selectedAppt = null;
 
-        function navigateTo(screenId) {
-            document.querySelectorAll('[id^="screen-"]').forEach(s => s.classList.add('hidden'));
-            const target = document.getElementById(`screen-${screenId}`);
-            if (target) target.classList.remove('hidden');
-            window.scrollTo(0,0);
-        }
+        function navigateTo(id) { document.querySelectorAll('[id^="screen-"]').forEach(s => s.classList.add('hidden')); document.getElementById(`screen-${id}`).classList.remove('hidden'); window.scrollTo(0,0); }
+        function setRegRole(r) { regRole = r; document.getElementById('reg-role-child').classList.toggle('bg-white', r==='child'); document.getElementById('reg-role-doctor').classList.toggle('bg-white', r==='doctor'); document.getElementById('doctor-id-field').classList.toggle('hidden', r==='doctor'); }
 
-        function setRegRole(role) {
-            regRole = role;
-            const childBtn = document.getElementById('reg-role-child');
-            const doctorBtn = document.getElementById('reg-role-doctor');
-            const idField = document.getElementById('doctor-id-field');
-            if (role === 'child') {
-                childBtn.classList.add('bg-white', 'text-blue-900');
-                doctorBtn.classList.remove('bg-white', 'text-teal-900');
-                idField.classList.remove('hidden');
-            } else {
-                doctorBtn.classList.add('bg-white', 'text-teal-900');
-                childBtn.classList.remove('bg-white', 'text-blue-900');
-                idField.classList.add('hidden');
-            }
-        }
-
-        supabaseClient.auth.onAuthStateChange(async (event, session) => {
-            if (session) { await loadUserProfile(session.user.id); }
-            else { navigateTo('start'); if (profileSubscription) profileSubscription.unsubscribe(); }
-        });
+        supabaseClient.auth.onAuthStateChange(async (e, s) => { if (s) await loadUserProfile(s.user.id); else navigateTo('start'); });
 
         async function loadUserProfile(uid) {
-            try {
-                let { data: profile, error } = await supabaseClient.from('profiles').select('*').eq('id', uid).single();
-
-                if (error || !profile) {
-                    // AUTO-RECOVERY: If profile is missing but Auth exists
-                    const { data: { user } } = await supabaseClient.auth.getUser();
-                    const meta = user?.user_metadata;
-
-                    if (meta && meta.role) {
-                        const newProfile = {
-                            id: uid,
-                            email: user.email,
-                            name: meta.name || user.email.split('@')[0],
-                            role: meta.role,
-                            is_approved: meta.role === 'doctor',
-                            doctor_id: meta.doctor_id || (meta.role === 'doctor' ? Math.floor(1000 + Math.random() * 9000).toString() : null)
-                        };
-
-                        await supabaseClient.from('profiles').insert(newProfile);
-                        profile = newProfile;
-                    } else {
-                        alert("Profile data is missing. Please register a new account.");
-                        await supabaseClient.auth.signOut();
-                        return;
-                    }
-                }
-
+            const { data: profile } = await supabaseClient.from('profiles').select('*').eq('id', uid).single();
+            if (profile) {
                 userData = profile;
-                if (profile.role === 'child') {
-                    if (profile.is_approved) {
-                        navigateTo('dashboard-child');
-                        setupChildDashboard();
-                        subscribeToProfile(uid);
-                    } else {
-                        alert("Patient account pending doctor approval!");
-                        await supabaseClient.auth.signOut();
-                    }
-                } else if (profile.role === 'doctor') {
-                    navigateTo('dashboard-doctor');
-                    setupDoctorDashboard();
-                    subscribeToDoctorData();
-                } else {
-                    alert("Account role not recognized.");
-                    await supabaseClient.auth.signOut();
-                }
-            } catch (err) {
-                console.error("Login detail error:", err);
-                alert("Login Error: " + err.message);
-                resetLoginButtons();
+                if (profile.role === 'child' && profile.is_approved) { navigateTo('dashboard-child'); setupChildDashboard(); }
+                else if (profile.role === 'doctor') { navigateTo('dashboard-doctor'); setupDoctorDashboard(); }
+                else { alert("Pending approval!"); supabaseClient.auth.signOut(); }
             }
         }
 
-        function resetLoginButtons() {
-            document.querySelectorAll('[id^="btn-login-"]').forEach(b => {
-                b.innerText = 'LOGIN';
-                b.disabled = false;
-            });
-        }
-
-        function subscribeToProfile(uid) {
-            if (profileSubscription) profileSubscription.unsubscribe();
-            profileSubscription = supabaseClient.channel('public:profiles').on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles', filter: `id=eq.${uid}` }, payload => {
-                userData = payload.new; setupChildDashboard();
-            }).subscribe();
-        }
-
-        function subscribeToDoctorData() {
-            const sid = userData.doctor_id;
-            supabaseClient.channel('doctor-updates').on('postgres_changes', { event: '*', schema: 'public', table: 'profiles', filter: `doctor_id=eq.${sid}` }, () => fetchDoctorStats())
-                .on('postgres_changes', { event: '*', schema: 'public', table: 'brushing_logs', filter: `doctor_id=eq.${sid}` }, () => fetchDoctorStats())
-                .on('postgres_changes', { event: '*', schema: 'public', table: 'appointments', filter: `doctor_id=eq.${sid}` }, () => { fetchDoctorStats(); fetchDoctorAppointmentsMini(); })
-                .subscribe();
-        }
-
-        async function handleLogin(role) {
-            const email = document.getElementById(`${role}-email`).value;
-            const pass = document.getElementById(`${role}-password`).value;
-            const btn = document.getElementById(`btn-login-${role}`);
-            btn.innerHTML = '<div class="loader mx-auto"></div>';
-            const { error } = await supabaseClient.auth.signInWithPassword({ email, password: pass });
-            if (error) { alert(error.message); btn.innerText = 'LOGIN'; }
+        async function handleLogin(r) {
+            const b = document.getElementById(`btn-login-${r}`); b.innerHTML = '<div class="loader mx-auto"></div>';
+            const { error } = await supabaseClient.auth.signInWithPassword({ email: document.getElementById(`${r}-email`).value, password: document.getElementById(`${r}-password`).value });
+            if (error) { alert(error.message); b.innerText = 'LOGIN'; }
         }
 
         async function handleRegister() {
-            const name = document.getElementById('reg-name').value;
-            const email = document.getElementById('reg-email').value;
-            const pass = document.getElementById('reg-password').value;
-            const docId = document.getElementById('reg-doctor-id').value;
-            const btn = document.getElementById('btn-signup');
-            btn.innerHTML = '<div class="loader mx-auto"></div>';
-            const { error } = await supabaseClient.auth.signUp({ email, password: pass, options: { data: { name, role: regRole, doctor_id: regRole === 'child' ? docId : null } } });
-            if (error) { alert(error.message); btn.innerText = 'SIGN UP'; } else { alert("Success! Check email."); navigateTo('start'); }
+            const b = document.getElementById('btn-signup'); b.innerHTML = '<div class="loader mx-auto"></div>';
+            const { error } = await supabaseClient.auth.signUp({ email: document.getElementById('reg-email').value, password: document.getElementById('reg-password').value, options: { data: { name: document.getElementById('reg-name').value, role: regRole, doctor_id: regRole==='child'?document.getElementById('reg-doctor-id').value:null } } });
+            if (error) { alert(error.message); b.innerText = 'SIGN UP'; } else { alert("Check email!"); navigateTo('start'); }
         }
 
         function logout() { supabaseClient.auth.signOut(); }
-        async function syncNow() { if (!userData) return; await loadUserProfile(userData.id); alert("Synced! ⭐"); }
+        async function syncNow() { await loadUserProfile(userData.id); alert("Data Synced! ⭐"); }
 
         // CHILD DASHBOARD
         function setupChildDashboard() {
             document.getElementById('child-welcome-msg').innerText = `Hi, ${userData.name}!`;
             document.getElementById('child-streak').innerText = `${userData.streak || 0} Days`;
             document.getElementById('points-display').innerText = `${userData.points || 0} PTS`;
-
-            // Check threshold for icons
-            const p = userData.points || 0;
             const thresholds = [100, 200, 300, 500];
-            for (let i = 1; i <= 4; i++) {
-                const el = document.getElementById(`rew-${i}`);
-                if (p >= thresholds[i-1]) { el.classList.remove('opacity-30'); el.classList.add('opacity-100'); }
-                else { el.classList.add('opacity-30'); el.classList.remove('opacity-100'); }
-            }
-
-            // Warning Note
-            const warnCard = document.getElementById('warning-card');
-            if (userData.warning_note) {
-                document.getElementById('warning-text').innerText = userData.warning_note;
-                warnCard.classList.remove('hidden');
-            } else { warnCard.classList.add('hidden'); }
-
+            for (let i=1; i<=4; i++) document.getElementById(`rew-${i}`).classList.toggle('opacity-30', (userData.points||0) < thresholds[i-1]);
+            const wc = document.getElementById('warning-card');
+            if (userData.warning_note) { wc.classList.remove('hidden'); document.getElementById('warning-text').innerText = userData.warning_note; }
+            else wc.classList.add('hidden');
             fetchChildAppts();
         }
 
         async function fetchChildAppts() {
             const { data } = await supabaseClient.from('appointments').select('*').eq('child_id', userData.id).eq('status', 'upcoming').order('appt_date', { ascending: true }).limit(1);
-            if (data?.length) {
-                document.getElementById('notif-appt').classList.remove('hidden');
-                document.getElementById('notif-appt-text').innerText = `${data[0].type}: ${new Date(data[0].appt_date).toLocaleString([], {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'})}`;
-            } else { document.getElementById('notif-appt').classList.add('hidden'); }
+            if (data?.length) { document.getElementById('notif-appt').classList.remove('hidden'); document.getElementById('notif-appt-text').innerText = `${data[0].type}: ${new Date(data[0].appt_date).toLocaleString([], {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'})}`; }
+            else document.getElementById('notif-appt').classList.add('hidden');
         }
 
         function showAllPatientAppts() {
-            const modal = document.getElementById('modal-subpage');
-            const content = document.getElementById('subpage-content');
-            modal.classList.remove('hidden');
-            document.getElementById('subpage-title').innerText = "My Appointments";
-            content.innerHTML = '<div class="loader mx-auto"></div>';
+            navigateToSubPage("My Appointments", true);
             supabaseClient.from('appointments').select('*').eq('child_id', userData.id).order('appt_date', { ascending: false }).then(({data}) => {
-                content.innerHTML = data?.length ? '' : 'No appointments found.';
-                data?.forEach(v => {
-                    const statusColor = v.status === 'present' ? 'text-green-500' : (v.status === 'absent' ? 'text-red-500' : 'text-blue-500');
-                    content.innerHTML += `<div class="bg-white p-6 rounded-3xl border shadow-sm flex justify-between items-center">
-                        <div><p class="font-bold text-slate-800 text-lg">${v.type}</p><p class="text-xs opacity-50">${new Date(v.appt_date).toLocaleString()}</p></div>
-                        <p class="font-black uppercase text-xs ${statusColor}">${v.status}</p>
-                    </div>`;
-                });
+                const c = document.getElementById('subpage-content'); c.innerHTML = '';
+                data?.forEach(v => c.innerHTML += `<div class="bg-slate-50 p-6 rounded-3xl flex justify-between items-center"><div><p class="font-bold">${v.type}</p><p class="text-xs opacity-50">${new Date(v.appt_date).toLocaleString()}</p></div><p class="font-black uppercase text-xs">${v.status}</p></div>`);
             });
         }
 
-        function showRewardStore() {
-            document.getElementById('modal-rewards-store').classList.remove('hidden');
-            document.getElementById('store-points-val').innerText = `⭐ ${userData.points || 0}`;
-        }
-
-        async function handlePurchase(name, cost) {
-            if ((userData.points || 0) < cost) return alert("Not enough points!");
-            if (!confirm(`Use ${cost} points for ${name}?`)) return;
-            const newPoints = userData.points - cost;
-            const { error } = await supabaseClient.from('profiles').update({ points: newPoints }).eq('id', userData.id);
-            if (!error) {
-                alert(`SUCCESS! 🎉 CODE: ${Math.random().toString(36).substring(7).toUpperCase()}`);
-                userData.points = newPoints; setupChildDashboard(); showRewardStore();
-            }
-        }
-
-        // BRUSHING
-        let brushStream = null; let brushTimer = null;
-        async function openBrushingModal() {
-            document.getElementById('modal-brushing').classList.remove('hidden');
-            try { brushStream = await navigator.mediaDevices.getUserMedia({ video: true }); document.getElementById('brush-video').srcObject = brushStream; }
-            catch (e) { alert("Camera error!"); closeBrushingModal(); }
-        }
-        function startBrushingTimer() {
-            let time = 120; document.getElementById('btn-start-brush').classList.add('hidden');
-            brushTimer = setInterval(() => {
-                time--; let m = Math.floor(time/60), s = time%60;
-                document.getElementById('timer-val').innerText = `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
-                if (time <= 0) { clearInterval(brushTimer); finishMission(); }
-            }, 1000);
-        }
-        async function finishMission() {
-            alert("Goal Reached! 🎉");
-            await supabaseClient.from('brushing_logs').insert({ child_id: userData.id, child_name: userData.name, doctor_id: userData.doctor_id, created_at: Date.now(), video_url: "web_log" });
-            closeBrushingModal();
-        }
-        function closeBrushingModal() {
-            document.getElementById('modal-brushing').classList.add('hidden');
-            if (brushStream) brushStream.getTracks().forEach(t => t.stop());
-            clearInterval(brushTimer); document.getElementById('btn-start-brush').classList.remove('hidden'); document.getElementById('timer-val').innerText = "02:00";
-        }
-
-        // DOCTOR
+        // DOCTOR DASHBOARD
         async function setupDoctorDashboard() {
             document.getElementById('doctor-welcome-msg').innerText = `Dr. ${userData.name}`;
-            document.getElementById('doctor-id-display').innerText = `Doctor ID: ${userData.doctor_id}`;
-            fetchDoctorStats(); fetchDoctorAppointmentsMini();
+            document.getElementById('doctor-id-display').innerText = `Doctor ID: ${userData.doctor_id || 'Not Set'}`;
+            fetchDoctorStats(); fetchDoctorAppointmentsMini(); fetchRecentPatientsMini();
         }
 
         async function fetchDoctorStats() {
-            if (!userData || !userData.doctor_id) return;
-            const sid = userData.doctor_id;
-
-            // Parallel fetch to speed up loading
-            const [patientsRes, revCountRes, apptCountRes] = await Promise.all([
+            const sid = userData.doctor_id; if (!sid) return;
+            const [pr, rc, ac] = await Promise.all([
                 supabaseClient.from('profiles').select('*').eq('doctor_id', sid).eq('role', 'child'),
                 supabaseClient.from('brushing_logs').select('*', { count: 'exact', head: true }).eq('doctor_id', sid).eq('approved', false),
                 supabaseClient.from('appointments').select('*', { count: 'exact', head: true }).eq('doctor_id', sid).eq('status', 'upcoming')
             ]);
-
-            const p = patientsRes.data;
-            const r = revCountRes.count;
-            const a = apptCountRes.count;
-
-            document.getElementById('stat-patients').innerText = p?.filter(x => x.is_approved).length || 0;
-            document.getElementById('stat-approvals').innerText = p?.filter(x => !x.is_approved).length || 0;
-            document.getElementById('stat-reviews').innerText = r || 0;
-            document.getElementById('stat-appts').innerText = a || 0;
+            document.getElementById('stat-patients').innerText = pr.data?.filter(x => x.is_approved).length || 0;
+            document.getElementById('stat-approvals').innerText = pr.data?.filter(x => !x.is_approved).length || 0;
+            document.getElementById('stat-reviews').innerText = rc.count || 0;
+            document.getElementById('stat-appts').innerText = ac.count || 0;
         }
 
         async function fetchDoctorAppointmentsMini() {
             const { data } = await supabaseClient.from('appointments').select('*').eq('doctor_id', userData.doctor_id).eq('status', 'upcoming').order('appt_date', { ascending: true }).limit(3);
-            const list = document.getElementById('doc-mini-appointments');
-            list.innerHTML = data?.length ? '' : '<p class="text-slate-400 italic">No visits today.</p>';
-            data?.forEach(v => {
-                const date = new Date(v.appt_date).toLocaleString([], {hour:'2-digit', minute:'2-digit'});
-                list.innerHTML += `<div onclick="viewPatientDetail('${v.child_id}', '${v.id}')" class="bg-slate-50 p-4 rounded-2xl flex justify-between items-center cursor-pointer hover:bg-slate-100 transition-colors">
-                    <div><p class="font-bold text-slate-800">${v.child_name}</p><p class="text-[10px] text-teal-600 font-bold uppercase">${v.type}</p></div>
-                    <p class="font-bold text-slate-400 text-sm">${date}</p>
-                </div>`;
-            });
+            const l = document.getElementById('doc-mini-appointments'); l.innerHTML = data?.length ? '' : 'No visits today.';
+            data?.forEach(v => l.innerHTML += `<div onclick="viewPatientDetail('${v.child_id}', '${v.id}')" class="bg-slate-50 p-4 rounded-2xl flex justify-between items-center cursor-pointer hover:bg-slate-100 transition-all"><div><p class="font-bold">${v.child_name}</p><p class="text-[10px] text-teal-600 font-black uppercase">${v.type}</p></div><p class="font-bold text-slate-400 text-sm">${new Date(v.appt_date).toLocaleString([], {hour:'2-digit', minute:'2-digit'})}</p></div>`);
+        }
+
+        async function fetchRecentPatientsMini() {
+            const { data } = await supabaseClient.from('profiles').select('*').eq('doctor_id', userData.doctor_id).eq('role', 'child').eq('is_approved', true).limit(3);
+            const l = document.getElementById('doc-mini-patients'); l.innerHTML = data?.length ? '' : 'No patients yet.';
+            data?.forEach(p => l.innerHTML += `<div onclick="viewPatientDetail('${p.id}')" class="bg-slate-50 p-4 rounded-2xl flex justify-between items-center cursor-pointer hover:bg-slate-100 transition-all"><div><p class="font-bold">${p.name}</p><p class="text-[10px] text-blue-400 font-bold uppercase">${p.email}</p></div><p class="text-teal-600 font-black">${p.points || 0} PTS</p></div>`);
         }
 
         async function viewPatientDetail(uid, aid = null) {
             selectedPatientId = uid; selectedAppt = null;
-            const modal = document.getElementById('modal-patient-detail');
-            modal.classList.remove('hidden');
-
+            document.getElementById('modal-patient-detail').classList.remove('hidden');
             const { data: p } = await supabaseClient.from('profiles').select('*').eq('id', uid).single();
             document.getElementById('det-name').innerText = p.name;
             document.getElementById('det-email').innerText = p.email;
             document.getElementById('det-points').innerText = p.points || 0;
             document.getElementById('det-streak').innerText = p.streak || 0;
-
-            const attSection = document.getElementById('det-attendance-section');
             if (aid) {
                 const { data: a } = await supabaseClient.from('appointments').select('*').eq('id', aid).single();
-                selectedAppt = a;
-                document.getElementById('det-appt-type').innerText = a.type;
-                document.getElementById('det-appt-date').innerText = new Date(a.appt_date).toLocaleString();
-                attSection.classList.remove('hidden');
-            } else { attSection.classList.add('hidden'); }
-
-            const histList = document.getElementById('det-history');
-            histList.innerHTML = '<div class="loader mx-auto"></div>';
+                selectedAppt = a; document.getElementById('det-appt-date').innerText = new Date(a.appt_date).toLocaleString(); document.getElementById('det-attendance-section').classList.remove('hidden');
+            } else document.getElementById('det-attendance-section').classList.add('hidden');
+            const hl = document.getElementById('det-history'); hl.innerHTML = '<div class="loader mx-auto"></div>';
             const { data: logs } = await supabaseClient.from('brushing_logs').select('*').eq('child_id', uid).order('created_at', { ascending: false }).limit(5);
-            histList.innerHTML = logs?.length ? '' : 'No history yet.';
-            logs?.forEach(l => {
-                histList.innerHTML += `<div class="flex justify-between text-sm py-2 border-b">
-                    <p class="text-slate-600">${new Date(l.created_at).toLocaleDateString()}</p>
-                    <p class="font-bold ${l.approved ? 'text-green-500' : 'text-orange-500'}">${l.approved ? 'Approved' : 'Pending'}</p>
-                </div>`;
-            });
+            hl.innerHTML = logs?.length ? '' : 'No history.';
+            logs?.forEach(l => hl.innerHTML += `<div class="flex justify-between border-b py-2 text-xs"><span>${new Date(l.created_at).toLocaleDateString()}</span><span class="font-bold">${l.approved?'Approved':'Pending'}</span></div>`);
         }
 
-        async function markWebAttendance(status) {
-            if (!selectedAppt) return;
-            const { error } = await supabaseClient.from('appointments').update({ status: status }).eq('id', selectedAppt.id);
+        async function markWebAttendance(s) {
+            const { error } = await supabaseClient.from('appointments').update({ status: s }).eq('id', selectedAppt.id);
             if (!error) {
-                if (status === 'absent') {
-                    const note = `Missed appointment on ${new Date(selectedAppt.appt_date).toLocaleDateString()}. Please contact us.`;
-                    await supabaseClient.from('profiles').update({ warning_note: note }).eq('id', selectedPatientId);
-                } else {
-                    await supabaseClient.from('profiles').update({ warning_note: null }).eq('id', selectedPatientId);
-                }
-                alert(`Marked as ${status}!`);
-                document.getElementById('modal-patient-detail').classList.add('hidden');
-                fetchDoctorStats(); fetchDoctorAppointmentsMini();
+                if (s === 'absent') await supabaseClient.from('profiles').update({ warning_note: `Missed appointment on ${new Date(selectedAppt.appt_date).toLocaleDateString()}` }).eq('id', selectedPatientId);
+                else await supabaseClient.from('profiles').update({ warning_note: null }).eq('id', selectedPatientId);
+                alert(`Marked ${s}!`); document.getElementById('modal-patient-detail').classList.add('hidden'); setupDoctorDashboard();
             }
         }
 
-        async function showSubPage(type) {
-            const modal = document.getElementById('modal-subpage');
-            const content = document.getElementById('subpage-content');
-            modal.classList.remove('hidden');
-            content.innerHTML = '<div class="loader mx-auto"></div>';
-            if (type === 'patients') {
-                document.getElementById('subpage-title').innerText = "Patients";
-                const { data } = await supabaseClient.from('profiles').select('*').eq('doctor_id', userData.doctor_id).eq('is_approved', true);
-                content.innerHTML = '';
-                data?.forEach(u => {
-                    content.innerHTML += `<div onclick="viewPatientDetail('${u.id}')" class="bg-white p-6 rounded-3xl border shadow-sm flex justify-between items-center cursor-pointer hover:bg-slate-50 transition-colors">
-                        <div><p class="font-bold text-slate-800">${u.name}</p><p class="text-xs opacity-50">${u.email}</p></div>
-                        <div class="text-teal-600 font-bold">${u.points || 0} PTS</div>
-                    </div>`;
-                });
-            } else if (type === 'approvals') {
-                document.getElementById('subpage-title').innerText = "Approvals";
-                const { data } = await supabaseClient.from('profiles').select('*').eq('doctor_id', userData.doctor_id).eq('is_approved', false);
-                content.innerHTML = data?.length ? '' : 'No requests.';
-                data?.forEach(u => {
-                    content.innerHTML += `<div class="bg-white p-6 rounded-3xl flex justify-between items-center border shadow-sm">
-                        <div><p class="font-bold text-slate-800">${u.name}</p><p class="text-xs opacity-50">${u.email}</p></div>
-                        <button onclick="approveUser('${u.id}')" class="bg-orange-500 text-white px-6 py-2 rounded-xl font-bold">APPROVE</button>
-                    </div>`;
-                });
-            } else if (type === 'appointments') {
-                document.getElementById('subpage-title').innerText = "All Appointments";
-                const { data } = await supabaseClient.from('appointments').select('*').eq('doctor_id', userData.doctor_id).order('appt_date', { ascending: false });
-                content.innerHTML = data?.length ? '' : 'No appointments.';
-                data?.forEach(v => {
-                    content.innerHTML += `<div onclick="viewPatientDetail('${v.child_id}', '${v.id}')" class="bg-white p-6 rounded-3xl border shadow-sm flex justify-between items-center cursor-pointer hover:bg-slate-50">
-                        <div><p class="font-bold text-slate-800">${v.child_name}</p><p class="text-xs text-teal-600 font-bold uppercase">${v.type}</p></div>
-                        <div class="text-right"><p class="text-xs text-slate-400 font-bold">${v.status.toUpperCase()}</p><p class="font-bold text-slate-600">${new Date(v.appt_date).toLocaleDateString()}</p></div>
-                    </div>`;
-                });
-            } else if (type === 'reviews') {
-                document.getElementById('subpage-title').innerText = "Brushing Reviews";
-                const { data } = await supabaseClient.from('brushing_logs').select('*').eq('doctor_id', userData.doctor_id).eq('approved', false);
-                content.innerHTML = data?.length ? '' : 'No videos.';
-                data?.forEach(l => {
-                    content.innerHTML += `<div class="bg-white p-6 rounded-3xl flex justify-between items-center border shadow-sm">
-                        <div><p class="font-bold text-slate-800">${l.child_name}</p><p class="text-xs text-slate-400">${new Date(l.created_at).toLocaleString()}</p></div>
-                        <button onclick="quickApproveLog('${l.id}')" class="bg-blue-600 text-white px-6 py-2 rounded-xl font-bold">AWARD 10 PTS</button>
-                    </div>`;
-                });
+        function openDoctorProfile() { document.getElementById('modal-doctor-profile').classList.remove('hidden'); document.getElementById('prof-clinic').value = userData.clinic_name || ''; document.getElementById('prof-id').value = userData.doctor_id || ''; }
+        async function saveDoctorProfile() {
+            const b = document.getElementById('btn-save-profile'); b.innerHTML = '<div class="loader mx-auto"></div>';
+            const c = document.getElementById('prof-clinic').value; const id = document.getElementById('prof-id').value;
+            const { error } = await supabaseClient.from('profiles').update({ clinic_name: c, doctor_id: id }).eq('id', userData.id);
+            if (!error) { alert("Profile Updated!"); document.getElementById('modal-doctor-profile').classList.add('hidden'); loadUserProfile(userData.id); } else alert(error.message);
+            b.innerText = 'SAVE CHANGES';
+        }
+
+        async function showSubPage(t) {
+            navigateToSubPage(t.charAt(0).toUpperCase() + t.slice(1), true);
+            const c = document.getElementById('subpage-content'); const sid = userData.doctor_id;
+            if (t === 'patients') {
+                const { data } = await supabaseClient.from('profiles').select('*').eq('doctor_id', sid).eq('is_approved', true);
+                c.innerHTML = ''; data?.forEach(u => c.innerHTML += `<div onclick="viewPatientDetail('${u.id}')" class="bg-slate-50 p-6 rounded-3xl flex justify-between items-center cursor-pointer hover:bg-white border transition-all"><div><p class="font-bold">${u.name}</p><p class="text-xs opacity-50">${u.email}</p></div><p class="text-teal-600 font-black">${u.points||0} PTS</p></div>`);
+            } else if (t === 'approvals') {
+                const { data } = await supabaseClient.from('profiles').select('*').eq('doctor_id', sid).eq('is_approved', false);
+                c.innerHTML = data?.length ? '' : 'No requests.';
+                data?.forEach(u => c.innerHTML += `<div class="bg-slate-50 p-6 rounded-3xl flex justify-between items-center border"><div><p class="font-bold">${u.name}</p><p class="text-xs opacity-50">${u.email}</p></div><button onclick="approveUser('${u.id}')" class="bg-orange-500 text-white px-6 py-2 rounded-xl font-bold">APPROVE</button></div>`);
+            } else if (t === 'appointments') {
+                const { data } = await supabaseClient.from('appointments').select('*').eq('doctor_id', sid).order('appt_date', { ascending: false });
+                c.innerHTML = ''; data?.forEach(v => c.innerHTML += `<div onclick="viewPatientDetail('${v.child_id}', '${v.id}')" class="bg-slate-50 p-6 rounded-3xl flex justify-between items-center cursor-pointer hover:bg-white border transition-all"><div><p class="font-bold">${v.child_name}</p><p class="text-[10px] font-black text-teal-600 uppercase">${v.type}</p></div><div class="text-right"><p class="text-xs opacity-40 font-bold uppercase">${v.status}</p><p class="font-bold text-slate-500">${new Date(v.appt_date).toLocaleDateString()}</p></div></div>`);
+            } else if (t === 'reviews') {
+                const { data } = await supabaseClient.from('brushing_logs').select('*').eq('doctor_id', sid).eq('approved', false);
+                c.innerHTML = data?.length ? '' : 'No videos.';
+                data?.forEach(l => c.innerHTML += `<div class="bg-slate-50 p-6 rounded-3xl flex justify-between items-center border"><div><p class="font-bold">${l.child_name}</p><p class="text-xs opacity-50">${new Date(l.created_at).toLocaleString()}</p></div><div class="flex space-x-2"><button onclick="quickApproveLog('${l.id}')" class="bg-blue-600 text-white px-6 py-2 rounded-xl font-bold text-xs uppercase">Award 10 Pts</button></div></div>`);
             }
         }
 
-        async function approveUser(uid) { await supabaseClient.from('profiles').update({ is_approved: true }).eq('id', uid); alert("Approved!"); closeSubPage(); fetchDoctorStats(); }
+        async function approveUser(uid) { await supabaseClient.from('profiles').update({ is_approved: true }).eq('id', uid); alert("Approved!"); closeSubPage(); setupDoctorDashboard(); }
         async function quickApproveLog(lid) {
-            const { data: log } = await supabaseClient.from('brushing_logs').select('*').eq('id', lid).single();
-            if (log) {
-                const { data: p } = await supabaseClient.from('profiles').select('*').eq('id', log.child_id).single();
-                if (p) {
-                    await supabaseClient.from('profiles').update({ points: (p.points || 0) + 10, streak: (p.streak || 0) + 1 }).eq('id', log.child_id);
-                    await supabaseClient.from('brushing_logs').update({ approved: true }).eq('id', lid);
-                    alert("Points Awarded! 🎉"); closeSubPage(); fetchDoctorStats();
-                }
-            }
+            const { data: l } = await supabaseClient.from('brushing_logs').select('*').eq('id', lid).single();
+            const { data: p } = await supabaseClient.from('profiles').select('*').eq('id', l.child_id).single();
+            await supabaseClient.from('profiles').update({ points: (p.points||0)+10, streak: (p.streak||0)+1 }).eq('id', l.child_id);
+            await supabaseClient.from('brushing_logs').update({ approved: true }).eq('id', lid);
+            alert("Points Awarded! 🎉"); closeSubPage(); setupDoctorDashboard();
         }
 
         function closeSubPage() { document.getElementById('modal-subpage').classList.add('hidden'); }
+        function navigateToSubPage(t, show) { document.getElementById('modal-subpage').classList.toggle('hidden', !show); if(show) document.getElementById('subpage-title').innerText = t; }
+
         function openAppointmentModal() {
-            document.getElementById('modal-add-appt').classList.remove('hidden');
-            const sel = document.getElementById('appt-patient'); sel.innerHTML = '<option>Loading...</option>';
-            supabaseClient.from('profiles').select('*').eq('doctor_id', userData.doctor_id).eq('is_approved', true).then(({data}) => {
-                sel.innerHTML = '<option value="">Select Patient...</option>';
-                data?.forEach(u => sel.innerHTML += `<option value="${u.id}|${u.name}">${u.name}</option>`);
-            });
+            document.getElementById('modal-add-appt').classList.remove('hidden'); const sel = document.getElementById('appt-patient'); sel.innerHTML = '<option>Loading...</option>';
+            supabaseClient.from('profiles').select('*').eq('doctor_id', userData.doctor_id).eq('is_approved', true).then(({data}) => { sel.innerHTML = '<option value="">Select Patient...</option>'; data?.forEach(u => sel.innerHTML += `<option value="${u.id}|${u.name}">${u.name}</option>`); });
         }
         async function saveAppointment() {
-            const p = document.getElementById('appt-patient').value.split('|'); const t = document.getElementById('appt-type').value; const d = document.getElementById('appt-date').value;
-            if (!p[0] || !t || !d) return alert("Fill all fields");
-            const btn = document.getElementById('btn-save-appt'); btn.innerHTML = '<div class="loader mx-auto"></div>';
-            const { error } = await supabaseClient.from('appointments').insert({ child_id: p[0], child_name: p[1], doctor_id: userData.doctor_id, type: t, appt_date: new Date(d).getTime(), status: 'upcoming' });
-            if (error) alert(error.message); else { alert("Scheduled!"); document.getElementById('modal-add-appt').classList.add('hidden'); fetchDoctorStats(); fetchDoctorAppointmentsMini(); }
-            btn.innerText = 'CONFIRM';
+            const p = document.getElementById('appt-patient').value.split('|'); const b = document.getElementById('btn-save-appt'); b.innerHTML = '<div class="loader mx-auto"></div>';
+            const { error } = await supabaseClient.from('appointments').insert({ child_id: p[0], child_name: p[1], doctor_id: userData.doctor_id, type: document.getElementById('appt-type').value, appt_date: new Date(document.getElementById('appt-date').value).getTime(), status: 'upcoming' });
+            if (error) alert(error.message); else { alert("Scheduled!"); document.getElementById('modal-add-appt').classList.add('hidden'); setupDoctorDashboard(); }
+            b.innerText = 'CONFIRM';
+        }
+
+        // BRUSHING TIMER (WEB)
+        let brushTimerInterval = null;
+        function startBrushingTimer() {
+            let time = 120; document.getElementById('btn-start-brush').classList.add('hidden');
+            brushTimerInterval = setInterval(() => {
+                time--; let m = Math.floor(time/60), s = time%60;
+                document.getElementById('timer-val').innerText = `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+                if (time <= 0) { clearInterval(brushTimerInterval); finishMission(); }
+            }, 1000);
         }
     </script>
 </body>
