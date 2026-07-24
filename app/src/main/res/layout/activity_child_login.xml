@@ -4,21 +4,23 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/bg_app_standard"
-    android:paddingTop="60dp">
+    android:fitsSystemWindows="true">
 
     <ImageView
         android:id="@+id/login_icon"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        android:layout_marginTop="100dp"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
         android:contentDescription="@string/app_name"
-        android:src="@android:drawable/btn_star_big_on"
+        android:src="@drawable/ic_smile_logo"
+        app:layout_constraintBottom_toTopOf="@+id/login_card"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
         app:tint="@color/white" />
 
     <com.google.android.material.card.MaterialCardView
+        android:id="@+id/login_card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="24dp"
@@ -27,6 +29,7 @@
         app:cardElevation="12dp"
         app:strokeColor="@color/white"
         app:strokeWidth="1dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/login_icon">
 
         <LinearLayout

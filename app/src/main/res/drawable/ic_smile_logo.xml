@@ -1,0 +1,43 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="100dp"
+    android:height="100dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- Face Circle (Yellow) -->
+    <path
+        android:fillColor="#FFD54F"
+        android:pathData="M12,2C6.48,2 2,6.48 2,12s4.48,10 10,10s10,-4.48 10,-10S17.52,2 12,2z" />
+
+    <!-- Left Eye (Happy Arch) -->
+    <path
+        android:strokeColor="#333333"
+        android:strokeWidth="1.2"
+        android:strokeLineCap="round"
+        android:pathData="M7,10c0.5,-1 1.5,-1 2,0" />
+
+    <!-- Right Eye (Happy Arch) -->
+    <path
+        android:strokeColor="#333333"
+        android:strokeWidth="1.2"
+        android:strokeLineCap="round"
+        android:pathData="M15,10c0.5,-1 1.5,-1 2,0" />
+
+    <!-- Bright White Smile (The Teeth) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M7,14c0,0 2,4 5,4s5,-4 5,-4H7z" />
+
+    <!-- Smile Outline/Lip -->
+    <path
+        android:strokeColor="#333333"
+        android:strokeWidth="0.8"
+        android:strokeLineJoin="round"
+        android:pathData="M7,14c0,0 2,4 5,4s5,-4 5,-4" />
+
+    <!-- Sparkle/Shine (Optional extra for "Clean" look) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M18,6l0.5,1.5l1.5,0.5l-1.5,0.5l-0.5,1.5l-0.5,-1.5l-1.5,-0.5l1.5,-0.5z" />
+
+</vector>
