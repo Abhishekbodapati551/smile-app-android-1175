@@ -342,12 +342,30 @@
 
         async function loadUserProfile(uid) {
             try {
-                const { data: profile, error } = await supabaseClient.from('profiles').select('*').eq('id', uid).single();
+                let { data: profile, error } = await supabaseClient.from('profiles').select('*').eq('id', uid).single();
 
                 if (error || !profile) {
-                    alert("Account found but profile is missing. Please contact support or register again.");
-                    await supabaseClient.auth.signOut();
-                    return;
+                    // AUTO-RECOVERY: If profile is missing but Auth exists
+                    const { data: { user } } = await supabaseClient.auth.getUser();
+                    const meta = user?.user_metadata;
+
+                    if (meta && meta.role) {
+                        const newProfile = {
+                            id: uid,
+                            email: user.email,
+                            name: meta.name || user.email.split('@')[0],
+                            role: meta.role,
+                            is_approved: meta.role === 'doctor',
+                            doctor_id: meta.doctor_id || (meta.role === 'doctor' ? Math.floor(1000 + Math.random() * 9000).toString() : null)
+                        };
+
+                        await supabaseClient.from('profiles').insert(newProfile);
+                        profile = newProfile;
+                    } else {
+                        alert("Profile data is missing. Please register a new account.");
+                        await supabaseClient.auth.signOut();
+                        return;
+                    }
                 }
 
                 userData = profile;
@@ -369,6 +387,7 @@
                     await supabaseClient.auth.signOut();
                 }
             } catch (err) {
+                console.error("Login detail error:", err);
                 alert("Login Error: " + err.message);
                 resetLoginButtons();
             }
