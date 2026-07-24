@@ -9,6 +9,7 @@ import kotlinx.serialization.Serializable
 @Entity(tableName = "appointments")
 data class Appointment(
     @PrimaryKey(autoGenerate = true)
+    @SerialName("id")
     @JvmField var id: Int = 0,
     
     @SerialName("child_id")
@@ -23,7 +24,10 @@ data class Appointment(
     @SerialName("appt_date")
     @JvmField var date: Long = 0,
     
+    @SerialName("type")
     @JvmField var type: String = "",
+
+    @SerialName("status")
     @JvmField var status: String = "upcoming"
 ) {
     // Constructor for Java compatibility

@@ -190,62 +190,79 @@ public class DoctorDashboardActivity extends AppCompatActivity {
     }
 
     private void loadStats() {
+        if (doctorId == null) return;
+        
         SupabaseManager.execute(() -> {
             User doctor = db.appDao().getUserById(doctorId);
             if (doctor == null || doctor.doctorId == null) return;
             
             String seqId = doctor.doctorId;
 
-            try {
-                // Fetch fresh data from cloud
-                List<User> latestPatients = SupabaseAuthHelper.fetchPatientsBlocking(seqId);
-                for (User p : latestPatients) db.appDao().insertUser(p);
+            // Fetch in separate parallel threads to save time
+            new Thread(() -> {
+                try {
+                    List<User> latestPatients = SupabaseAuthHelper.fetchPatientsBlocking(seqId);
+                    for (User p : latestPatients) db.appDao().insertUser(p);
+                    refreshUIFromLocal(seqId);
+                } catch (Exception e) { Log.e("DoctorDashboard", "Patient sync failed", e); }
+            }).start();
 
-                List<BrushingLog> latestLogs = SupabaseAuthHelper.fetchPendingBrushingLogsBlocking(seqId);
-                for (BrushingLog log : latestLogs) {
-                    log.doctorId = seqId;
-                    db.appDao().insertBrushingLog(log);
-                }
-                
-                List<Appointment> latestApps = SupabaseAuthHelper.fetchAppointmentsBlocking(seqId);
-                for (Appointment a : latestApps) db.appDao().insertAppointment(a);
-            } catch (Exception e) {
-                Log.e("DoctorDashboard", "Stats force sync failed", e);
-            }
-            
-            // Reload from local DB for final UI update
-            List<User> patients = db.appDao().getPatientsByDoctor(seqId);
-            List<Appointment> apps = db.appDao().getAppointmentsForDoctor(seqId);
-            List<User> pendingAppr = db.appDao().getPendingChildren();
-            List<BrushingLog> pendingRev = db.appDao().getPendingBrushingLogsForDoctor(seqId);
-
-            runOnUiThread(() -> {
-                totalPatientsText.setText(String.valueOf(patients.size()));
-                todaysApptsText.setText(String.valueOf(apps.size()));
-                
-                // Unique reviews only
-                List<BrushingLog> uniquePending = new ArrayList<>();
-                for (BrushingLog log : pendingRev) {
-                    boolean found = false;
-                    for (BrushingLog unique : uniquePending) {
-                        if (unique.id == log.id) { found = true; break; }
+            new Thread(() -> {
+                try {
+                    List<BrushingLog> latestLogs = SupabaseAuthHelper.fetchPendingBrushingLogsBlocking(seqId);
+                    for (BrushingLog log : latestLogs) {
+                        log.doctorId = seqId;
+                        db.appDao().insertBrushingLog(log);
                     }
-                    if (!found) uniquePending.add(log);
+                    refreshUIFromLocal(seqId);
+                } catch (Exception e) { Log.e("DoctorDashboard", "Logs sync failed", e); }
+            }).start();
+
+            new Thread(() -> {
+                try {
+                    List<Appointment> latestApps = SupabaseAuthHelper.fetchAppointmentsBlocking(seqId);
+                    for (Appointment a : latestApps) db.appDao().insertAppointment(a);
+                    refreshUIFromLocal(seqId);
+                } catch (Exception e) { Log.e("DoctorDashboard", "Appts sync failed", e); }
+            }).start();
+
+            // Initial load from local
+            refreshUIFromLocal(seqId);
+        });
+    }
+
+    private void refreshUIFromLocal(String seqId) {
+        List<User> patients = db.appDao().getPatientsByDoctor(seqId);
+        List<Appointment> apps = db.appDao().getAppointmentsForDoctor(seqId);
+        List<User> pendingAppr = db.appDao().getPendingChildren();
+        List<BrushingLog> pendingRev = db.appDao().getPendingBrushingLogsForDoctor(seqId);
+
+        runOnUiThread(() -> {
+            totalPatientsText.setText(String.valueOf(patients.size()));
+            todaysApptsText.setText(String.valueOf(apps.size()));
+            
+            // Unique reviews only
+            List<BrushingLog> uniquePending = new ArrayList<>();
+            for (BrushingLog log : pendingRev) {
+                boolean found = false;
+                for (BrushingLog unique : uniquePending) {
+                    if (unique.id == log.id) { found = true; break; }
                 }
-                pendingReviewsText.setText(String.valueOf(uniquePending.size()));
-                
-                int pendingApprCount = 0;
-                for (User u : pendingAppr) if (seqId.equals(u.doctorId)) pendingApprCount++;
-                pendingApprovalsText.setText(String.valueOf(pendingApprCount));
+                if (!found) uniquePending.add(log);
+            }
+            pendingReviewsText.setText(String.valueOf(uniquePending.size()));
+            
+            int pendingApprCount = 0;
+            for (User u : pendingAppr) if (seqId.equals(u.doctorId)) pendingApprCount++;
+            pendingApprovalsText.setText(String.valueOf(pendingApprCount));
 
-                dashboardApps.clear();
-                dashboardApps.addAll(apps);
-                appointmentsAdapter.notifyDataSetChanged();
+            dashboardApps.clear();
+            dashboardApps.addAll(apps);
+            appointmentsAdapter.notifyDataSetChanged();
 
-                dashboardPatients.clear();
-                dashboardPatients.addAll(patients);
-                patientsAdapter.notifyDataSetChanged();
-            });
+            dashboardPatients.clear();
+            dashboardPatients.addAll(patients);
+            patientsAdapter.notifyDataSetChanged();
         });
     }
 

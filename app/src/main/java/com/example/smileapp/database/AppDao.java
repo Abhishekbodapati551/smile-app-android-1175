@@ -24,7 +24,7 @@ public interface AppDao {
     @Update
     void updateUser(User user);
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertAppointment(Appointment appointment);
 
     @Update

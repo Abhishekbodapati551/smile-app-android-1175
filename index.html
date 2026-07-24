@@ -490,10 +490,20 @@
         }
 
         async function fetchDoctorStats() {
+            if (!userData || !userData.doctor_id) return;
             const sid = userData.doctor_id;
-            const { data: p } = await supabaseClient.from('profiles').select('*').eq('doctor_id', sid).eq('role', 'child');
-            const { count: r } = await supabaseClient.from('brushing_logs').select('*', { count: 'exact', head: true }).eq('doctor_id', sid).eq('approved', false);
-            const { count: a } = await supabaseClient.from('appointments').select('*', { count: 'exact', head: true }).eq('doctor_id', sid).eq('status', 'upcoming');
+
+            // Parallel fetch to speed up loading
+            const [patientsRes, revCountRes, apptCountRes] = await Promise.all([
+                supabaseClient.from('profiles').select('*').eq('doctor_id', sid).eq('role', 'child'),
+                supabaseClient.from('brushing_logs').select('*', { count: 'exact', head: true }).eq('doctor_id', sid).eq('approved', false),
+                supabaseClient.from('appointments').select('*', { count: 'exact', head: true }).eq('doctor_id', sid).eq('status', 'upcoming')
+            ]);
+
+            const p = patientsRes.data;
+            const r = revCountRes.count;
+            const a = apptCountRes.count;
+
             document.getElementById('stat-patients').innerText = p?.filter(x => x.is_approved).length || 0;
             document.getElementById('stat-approvals').innerText = p?.filter(x => !x.is_approved).length || 0;
             document.getElementById('stat-reviews').innerText = r || 0;

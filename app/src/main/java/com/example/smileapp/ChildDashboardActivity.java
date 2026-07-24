@@ -191,9 +191,8 @@ public class ChildDashboardActivity extends AppCompatActivity {
                 
                 // Show the most recent upcoming one on the dashboard
                 Appointment latest = null;
-                long now = System.currentTimeMillis();
                 for (Appointment a : freshAppts) {
-                    if (a.date > now) {
+                    if ("upcoming".equals(a.status)) {
                         if (latest == null || a.date < latest.date) latest = a;
                     }
                 }

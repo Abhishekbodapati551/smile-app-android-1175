@@ -1,6 +1,7 @@
 package com.example.smileapp;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -51,10 +52,29 @@ public class DoctorProfileActivity extends AppCompatActivity {
 
     private void loadDoctorData() {
         if (userUid == null) return;
+        saveProgress.setVisibility(View.VISIBLE);
+        
         new Thread(() -> {
+            // 1. Load Local
             doctor = db.appDao().getUserById(userUid);
+            
+            if (doctor == null || doctor.doctorId == null || doctor.doctorId.equals("null")) {
+                // 2. Fetch from Supabase if local is empty
+                try {
+                    SessionManager sm = new SessionManager(this);
+                    User fresh = SupabaseAuthHelper.signInBlocking(sm.getSavedEmail(), sm.getSavedPassword());
+                    if (fresh != null) {
+                        doctor = fresh;
+                        db.appDao().insertUser(fresh);
+                    }
+                } catch (Exception e) {
+                    Log.e("DoctorProfile", "Remote fetch failed", e);
+                }
+            }
+
             if (doctor != null) {
                 runOnUiThread(() -> {
+                    saveProgress.setVisibility(View.GONE);
                     profileName.setText("Dr. " + doctor.name);
                     profileSpecialization.setText(doctor.specialization != null ? doctor.specialization : "Specialist");
                     if (doctorIdText != null) {
@@ -65,6 +85,11 @@ public class DoctorProfileActivity extends AppCompatActivity {
                     }
                     clinicNameEdit.setText(doctor.clinicName != null ? doctor.clinicName : "");
                     emailEdit.setText(doctor.email);
+                });
+            } else {
+                runOnUiThread(() -> {
+                    saveProgress.setVisibility(View.GONE);
+                    Toast.makeText(this, "Failed to load profile data", Toast.LENGTH_SHORT).show();
                 });
             }
         }).start();

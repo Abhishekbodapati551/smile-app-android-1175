@@ -56,9 +56,8 @@ public class ChildAppointmentsActivity extends AppCompatActivity {
             // 2. Get most recent upcoming appointment from local DB (now synced)
             List<Appointment> appts = db.appDao().getAppointmentsForChild(userId);
             Appointment latest = null;
-            long now = System.currentTimeMillis();
             for (Appointment a : appts) {
-                if (a.date > now) {
+                if ("upcoming".equals(a.status)) {
                     if (latest == null || a.date < latest.date) {
                         latest = a;
                     }
