@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smile App - Live E2E Automation Execution Report</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Outfit', sans-serif; background-color: #0f172a; color: #f8fafc; }
+        .card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
+    </style>
+</head>
+<body class="p-6">
+    <div class="max-w-7xl mx-auto space-y-6">
+        <!-- Header -->
+        <div class="card p-6 rounded-3xl flex justify-between items-center">
+            <div>
+                <h1 class="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-teal-300">
+                    Live GitHub Pages E2E Execution Report
+                </h1>
+                <p class="text-slate-400 text-sm mt-1">Deployment URL: <a href="file:///C:/Users/bodap/AndroidStudioProjects/smileapp/index.html/" target="_blank" class="text-blue-400 underline">file:///C:/Users/bodap/AndroidStudioProjects/smileapp/index.html/</a></p>
+                <p class="text-slate-400 text-xs mt-1">Timestamp: 2026-07-25 10:38:00 UTC</p>
+            </div>
+            <div class="text-right">
+                <span class="inline-block px-4 py-2 rounded-full font-bold text-sm bg-rose-500/20 text-rose-400 border border-rose-500/40">
+                    Quality Gate: FAILED (<95%)
+                </span>
+            </div>
+        </div>
+
+        <!-- Metrics Grid -->
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+            <div class="card p-5 rounded-2xl text-center">
+                <p class="text-slate-400 text-xs font-semibold uppercase tracking-wider">Total Tests</p>
+                <p class="text-3xl font-black text-white mt-1">0</p>
+            </div>
+            <div class="card p-5 rounded-2xl text-center">
+                <p class="text-slate-400 text-xs font-semibold uppercase tracking-wider">Passed</p>
+                <p class="text-3xl font-black text-emerald-400 mt-1">0</p>
+            </div>
+            <div class="card p-5 rounded-2xl text-center">
+                <p class="text-slate-400 text-xs font-semibold uppercase tracking-wider">Failed</p>
+                <p class="text-3xl font-black text-rose-400 mt-1">0</p>
+            </div>
+            <div class="card p-5 rounded-2xl text-center">
+                <p class="text-slate-400 text-xs font-semibold uppercase tracking-wider">Skipped</p>
+                <p class="text-3xl font-black text-amber-400 mt-1">0</p>
+            </div>
+            <div class="card p-5 rounded-2xl text-center">
+                <p class="text-slate-400 text-xs font-semibold uppercase tracking-wider">Pass Rate</p>
+                <p class="text-3xl font-black text-blue-400 mt-1">0.0%</p>
+            </div>
+        </div>
+
+        <!-- Chart Section -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="card p-6 rounded-3xl">
+                <h3 class="text-lg font-bold text-slate-200 mb-4">Test Execution Breakdown</h3>
+                <div class="w-64 h-64 mx-auto">
+                    <canvas id="chartStatus"></canvas>
+                </div>
+            </div>
+            <div class="card p-6 rounded-3xl">
+                <h3 class="text-lg font-bold text-slate-200 mb-4">Execution Summary Info</h3>
+                <div class="space-y-3 text-sm">
+                    <div class="flex justify-between border-b border-slate-700/50 pb-2">
+                        <span class="text-slate-400">Total Duration:</span>
+                        <span class="font-semibold text-white">1.87 seconds</span>
+                    </div>
+                    <div class="flex justify-between border-b border-slate-700/50 pb-2">
+                        <span class="text-slate-400">Target Pass Threshold:</span>
+                        <span class="font-semibold text-white">95.0%</span>
+                    </div>
+                    <div class="flex justify-between border-b border-slate-700/50 pb-2">
+                        <span class="text-slate-400">Headless Chrome Version:</span>
+                        <span class="font-semibold text-white">Latest Stable</span>
+                    </div>
+                    <div class="flex justify-between border-b border-slate-700/50 pb-2">
+                        <span class="text-slate-400">Framework:</span>
+                        <span class="font-semibold text-white">Selenium WebDriver + Python</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Test Results Table -->
+        <div class="card p-6 rounded-3xl">
+            <h3 class="text-lg font-bold text-slate-200 mb-4">Test Cases Execution Log (0 Total)</h3>
+            <div class="overflow-x-auto max-h-[500px]">
+                <table class="w-full text-left text-xs">
+                    <thead class="bg-slate-800 text-slate-400 uppercase sticky top-0">
+                        <tr>
+                            <th class="p-3">Test ID</th>
+                            <th class="p-3">Module</th>
+                            <th class="p-3">Test Name</th>
+                            <th class="p-3">Priority</th>
+                            <th class="p-3">Status</th>
+                            <th class="p-3">Time (s)</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-800">
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const ctx = document.getElementById('chartStatus').getContext('2d');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Passed', 'Failed', 'Skipped'],
+                datasets: [{
+                    data: [0, 0, 0],
+                    backgroundColor: ['#10b981', '#f43f5e', '#f59e0b'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom', labels: { color: '#cbd5e1' } }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+{
+  "summary": {
+    "total_tests": 0,
+    "passed": 0,
+    "failed": 0,
+    "skipped": 0,
+    "pass_rate_percentage": 0.0,
+    "duration_seconds": 1.87,
+    "quality_gate_passed": false
+  },
+  "test_cases": []
+}
