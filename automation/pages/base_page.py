@@ -51,7 +51,7 @@ class BasePage:
         except Exception:
             return False
 
-    def is_visible(self, by: By, value: str, timeout: int = 3) -> bool:
+    def is_visible(self, by: By, value: str, timeout: int = 10) -> bool:
         try:
             WebDriverWait(self.driver, timeout).until(EC.visibility_of_element_located((by, value)))
             return True

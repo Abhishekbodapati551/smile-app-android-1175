@@ -14,6 +14,7 @@ class TestForms:
         register_page = RegisterPage(driver)
 
         start_page.navigate_to_app()
+        assert start_page.is_loaded() is True
         start_page.click_patient_login()
         login_page.click_signup("child")
         register_page.register(f"Test User {idx}", f"user{idx}@smile.com", "Secret123!")

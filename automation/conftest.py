@@ -5,8 +5,10 @@ from automation.drivers.driver_factory import DriverFactory
 from automation.utils.screenshot_util import ScreenshotUtil
 from automation.utils.logger import logger
 
-# Global container for collected execution results
 GLOBAL_RESULTS = []
+
+def pytest_sessionstart(session):
+    GLOBAL_RESULTS.clear()
 
 @pytest.fixture(scope="function")
 def driver(request):
@@ -26,11 +28,9 @@ def pytest_runtest_makereport(item, call):
         duration = round(report.duration, 3)
         test_name = item.name
         
-        # Extract module name from class or module
         module_name = getattr(item.cls, "MODULE", "General") if item.cls else "General"
         test_id = item.name.split("[")[-1].replace("]", "") if "[" in item.name else item.name
 
-        # Format ID clean if numerical
         if test_id.isdigit():
             if "Authentication" in module_name: test_id = f"TC_AUTH_{int(test_id):03d}"
             elif "Authorization" in module_name: test_id = f"TC_AZN_{int(test_id):03d}"

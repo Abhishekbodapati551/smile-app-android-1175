@@ -8,7 +8,7 @@ class StartPage(BasePage):
     APP_HEADER = (By.XPATH, "//h1[contains(text(), 'Smile App')]")
 
     def is_loaded(self) -> bool:
-        return self.is_visible(*self.START_SCREEN)
+        return self.is_visible(*self.START_SCREEN, timeout=10)
 
     def click_patient_login(self):
         self.js_click(*self.PATIENT_BTN)
