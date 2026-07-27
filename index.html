@@ -345,12 +345,53 @@
         supabaseClient.auth.onAuthStateChange(async (e, s) => { if (s) await loadUserProfile(s.user.id); else navigateTo('start'); });
 
         async function loadUserProfile(uid) {
-            const { data: profile } = await supabaseClient.from('profiles').select('*').eq('id', uid).single();
-            if (profile) {
+            try {
+                let { data: profile, error } = await supabaseClient.from('profiles').select('*').eq('id', uid).single();
+
+                if (error || !profile) {
+                    console.log("Profile missing, checking Auth session...");
+                    const { data: { session } } = await supabaseClient.auth.getSession();
+                    const user = session?.user;
+                    const meta = user?.user_metadata;
+
+                    if (meta && meta.role) {
+                        console.log("Found metadata, creating profile...");
+                        const newProfile = {
+                            id: uid,
+                            email: user.email,
+                            name: meta.name || user.email.split('@')[0],
+                            role: meta.role,
+                            is_approved: meta.role === 'doctor',
+                            doctor_id: meta.doctor_id || (meta.role === 'doctor' ? Math.floor(1000 + Math.random() * 9000).toString() : null)
+                        };
+
+                        const { error: insError } = await supabaseClient.from('profiles').insert(newProfile);
+                        if (insError) throw insError;
+                        profile = newProfile;
+                    } else {
+                        alert("Account found but profile details are missing. Please register again.");
+                        await supabaseClient.auth.signOut();
+                        return;
+                    }
+                }
+
                 userData = profile;
-                if (profile.role === 'child' && profile.is_approved) { navigateTo('dashboard-child'); setupChildDashboard(); }
-                else if (profile.role === 'doctor') { navigateTo('dashboard-doctor'); setupDoctorDashboard(); }
-                else { alert("Pending approval!"); supabaseClient.auth.signOut(); }
+                if (profile.role === 'child') {
+                    if (profile.is_approved) {
+                        navigateTo('dashboard-child');
+                        setupChildDashboard();
+                    } else {
+                        alert("Patient Account Created! Now wait for Doctor approval.");
+                        await supabaseClient.auth.signOut();
+                    }
+                } else if (profile.role === 'doctor') {
+                    navigateTo('dashboard-doctor');
+                    setupDoctorDashboard();
+                }
+            } catch (err) {
+                console.error("Critical login error:", err);
+                alert("Login Error: " + err.message);
+                resetLoginButtons();
             }
         }
 
