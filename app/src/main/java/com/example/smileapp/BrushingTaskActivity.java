@@ -190,7 +190,7 @@ public class BrushingTaskActivity extends AppCompatActivity {
 
     private void saveLog(String localUriStr) {
         uploadProgress.setVisibility(View.VISIBLE);
-        Log.d(TAG, "Starting Supabase upload for user: " + userId);
+        Log.d(TAG, "Starting upload process for user: " + userId);
         
         new Thread(() -> {
             try {
@@ -200,17 +200,14 @@ public class BrushingTaskActivity extends AppCompatActivity {
                 if (inputStream != null) {
                     // 1. Upload to Supabase Storage
                     String cloudUrl = SupabaseAuthHelper.uploadVideoBlocking(userId, inputStream);
-                    Log.d(TAG, "Uploaded to Supabase: " + cloudUrl);
-
-                    if (cloudUrl.equals("error_upload_failed")) {
-                        runOnUiThread(() -> {
-                            uploadProgress.setVisibility(View.GONE);
-                            Toast.makeText(this, "Video upload failed. Check your internet or Supabase storage limits.", Toast.LENGTH_LONG).show();
-                        });
-                        return;
+                    
+                    if (cloudUrl.startsWith("error_")) {
+                        throw new Exception("Storage upload failed. Please check internet connection.");
                     }
 
-                    // 2. Fetch fresh user data to get correct Doctor ID and Current Streak
+                    Log.d(TAG, "Uploaded to Supabase: " + cloudUrl);
+                    
+                    // 2. Fetch fresh user data
                     SessionManager sm = new SessionManager(this);
                     User freshUser = SupabaseAuthHelper.signInBlocking(sm.getSavedEmail(), sm.getSavedPassword());
                     
@@ -219,29 +216,24 @@ public class BrushingTaskActivity extends AppCompatActivity {
                         log.doctorId = freshUser.doctorId;
                         log.childName = freshUser.name;
                         
-                        // 3. Save to Supabase (Video Log ONLY)
-                        try {
-                            boolean success = SupabaseAuthHelper.saveLogBlocking(log, freshUser);
-                            if (success) {
-                                db.appDao().insertBrushingLog(log);
-                                
-                                runOnUiThread(() -> {
-                                    uploadProgress.setVisibility(View.GONE);
-                                    Toast.makeText(this, "Mission Accomplished! Video submitted for doctor review.", Toast.LENGTH_LONG).show();
-                                    finish();
-                                });
-                            }
-                        } catch (Exception dbErr) {
-                            Log.e(TAG, "DB Save Detailed Error", dbErr);
+                        // 3. Save to Supabase DB
+                        boolean success = SupabaseAuthHelper.saveLogBlocking(log, freshUser);
+                        if (success) {
+                            db.appDao().insertBrushingLog(log);
                             runOnUiThread(() -> {
                                 uploadProgress.setVisibility(View.GONE);
-                                Toast.makeText(this, "Database Save Failed: " + dbErr.getMessage(), Toast.LENGTH_LONG).show();
+                                Toast.makeText(this, "Mission Accomplished! Video submitted for review.", Toast.LENGTH_LONG).show();
+                                finish();
                             });
+                        } else {
+                            throw new Exception("Database entry failed.");
                         }
+                    } else {
+                        throw new Exception("User verification failed.");
                     }
                 }
             } catch (Exception e) {
-                Log.e(TAG, "Upload/Save Error", e);
+                Log.e(TAG, "Full Process Error", e);
                 runOnUiThread(() -> {
                     uploadProgress.setVisibility(View.GONE);
                     Toast.makeText(this, "Process Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
