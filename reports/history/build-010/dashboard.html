@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SmileApp E2E Executive Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-light">
+    <div class="container my-4">
+        <h2 class="fw-bold text-primary mb-4">SmileApp Mobile E2E Automation Executive Dashboard</h2>
+        <div class="row g-4 mb-4">
+            <div class="col-md-6">
+                <div class="card p-3 shadow-sm">
+                    <h5>Execution Pass/Fail Distribution</h5>
+                    <canvas id="statusChart"></canvas>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card p-3 shadow-sm">
+                    <h5>Module Health Breakdown</h5>
+                    <canvas id="moduleChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        const ctxStatus = document.getElementById('statusChart').getContext('2d');
+        new Chart(ctxStatus, {
+            type: 'doughnut',
+            data: {
+                labels: ['Passed', 'Failed', 'Skipped'],
+                datasets: [{
+                    data: [510, 0, 0],
+                    backgroundColor: ['#059669', '#dc2626', '#d97706']
+                }]
+            }
+        });
+
+        const ctxMod = document.getElementById('moduleChart').getContext('2d');
+        new Chart(ctxMod, {
+            type: 'bar',
+            data: {
+                labels: ['Accessibility', 'Authentication', 'Authorization', 'CRUD Operations', 'Dashboard', 'Error Handling', 'File Upload', 'Filters', 'Forms', 'Input Validation', 'Navigation', 'Notifications', 'Offline Handling', 'Performance Smoke Tests', 'Profile Management', 'Registration', 'Regression Suite', 'Responsive UI', 'Search', 'Session Management'],
+                datasets: [
+                    { label: 'Passed', data: [20, 40, 30, 40, 20, 20, 20, 20, 40, 40, 30, 20, 10, 20, 20, 20, 50, 10, 20, 20], backgroundColor: '#059669' },
+                    { label: 'Failed', data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], backgroundColor: '#dc2626' },
+                    { label: 'Skipped', data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], backgroundColor: '#d97706' }
+                ]
+            },
+            options: { responsive: true, scales: { x: { stacked: true }, y: { stacked: true } } }
+        });
+    </script>
+</body>
+</html>
