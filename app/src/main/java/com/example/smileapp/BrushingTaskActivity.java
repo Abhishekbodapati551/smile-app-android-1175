@@ -201,7 +201,15 @@ public class BrushingTaskActivity extends AppCompatActivity {
                     // 1. Upload to Supabase Storage
                     String cloudUrl = SupabaseAuthHelper.uploadVideoBlocking(userId, inputStream);
                     Log.d(TAG, "Uploaded to Supabase: " + cloudUrl);
-                    
+
+                    if (cloudUrl.equals("error_upload_failed")) {
+                        runOnUiThread(() -> {
+                            uploadProgress.setVisibility(View.GONE);
+                            Toast.makeText(this, "Video upload failed. Check your internet or Supabase storage limits.", Toast.LENGTH_LONG).show();
+                        });
+                        return;
+                    }
+
                     // 2. Fetch fresh user data to get correct Doctor ID and Current Streak
                     SessionManager sm = new SessionManager(this);
                     User freshUser = SupabaseAuthHelper.signInBlocking(sm.getSavedEmail(), sm.getSavedPassword());

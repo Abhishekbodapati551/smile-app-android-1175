@@ -73,5 +73,9 @@ BEGIN;
   CREATE PUBLICATION supabase_realtime FOR TABLE public.profiles, public.brushing_logs, public.appointments;
 COMMIT;
 
+-- 9. STORAGE SETUP
+-- Create the bucket if it doesn't exist (Run this in Supabase UI or SQL Editor)
+-- INSERT INTO storage.buckets (id, name, public) VALUES ('brushing_videos', 'brushing_videos', true);
+
 DROP POLICY IF EXISTS "Public Access" ON storage.objects;
 CREATE POLICY "Public Access" ON storage.objects FOR ALL USING (true) WITH CHECK (true);

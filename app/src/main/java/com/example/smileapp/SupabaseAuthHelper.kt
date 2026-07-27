@@ -59,12 +59,22 @@ object SupabaseAuthHelper {
     @JvmStatic
     fun uploadVideoBlocking(userId: String, inputStream: InputStream): String {
         return runBlocking {
-            val client = SupabaseManager.getClient()
-            val fileName = "${userId}_${System.currentTimeMillis()}.mp4"
-            val bucket = client.storage["brushing_videos"]
-            val bytes = inputStream.readBytes()
-            bucket.upload(fileName, bytes)
-            bucket.publicUrl(fileName)
+            try {
+                val client = SupabaseManager.getClient()
+                val fileName = "${userId}_${System.currentTimeMillis()}.mp4"
+                val bucket = client.storage["brushing_videos"]
+                val bytes = inputStream.readBytes()
+                
+                Log.d("SupabaseAuth", "Uploading bytes: ${bytes.size}")
+                bucket.upload(fileName, bytes)
+                
+                val url = bucket.publicUrl(fileName)
+                Log.d("SupabaseAuth", "Upload successful, URL: $url")
+                url
+            } catch (e: Exception) {
+                Log.e("SupabaseAuth", "Upload failed: ${e.message}", e)
+                "error_upload_failed"
+            }
         }
     }
     
