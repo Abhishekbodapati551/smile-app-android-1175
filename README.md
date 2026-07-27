@@ -2,52 +2,45 @@
 
 Smile App is a comprehensive dental care management system featuring an Android application for patients (children) and a web dashboard for doctors. The project uses **Supabase** for real-time data, authentication, and storage.
 
-## 🚀 Live Web Application
-The doctor dashboard and patient web entry are hosted on GitHub Pages:
-[https://abhishekbodapati551.github.io/smile-app-android-1175/web/index.html](https://abhishekbodapati551.github.io/smile-app-android-1175/web/index.html)
+## 📁 Repository Structure
+The repository is organized into the following clear categories:
 
-## ✨ Features
+### 1. 📱 Frontend (Mobile)
+- **Folder**: [`app/`](app/)
+- Contains the complete Android source code (Java/Kotlin/XML).
 
-### 👦 For Patients (Android App & Web)
-- **Brushing Timer**: A 2-minute interactive timer with camera verification.
-- **Streak System**: Track daily brushing habits to earn points.
-- **Rewards**: Redeem earned points for digital rewards like teddy bears and trophies.
-- **Appointments**: View upcoming dental check-ups scheduled by your doctor.
-- **Secure Login**: Personalized accounts with doctor-linkage via unique Doctor IDs.
+### 2. 🌐 Frontend (Web)
+- **Main File**: [`index.html`](index.html) (Located at root for GitHub Pages)
+- **Mirror Folder**: [`Web_Dashboard/`](Web_Dashboard/)
+- Contains the Doctor's Dashboard and Patient Web Entry.
 
-### 👩‍⚕️ For Doctors (Web Dashboard)
-- **Patient Management**: View all linked patients and their progress.
-- **Approval System**: Review and approve new patient registrations.
-- **Video Reviews**: Verify patient brushing sessions and award points.
-- **Appointment Scheduler**: Manage clinic visits and notify patients in real-time.
-- **Unique Doctor ID**: Every doctor gets a unique 4-digit code (starting from 1176) to share with patients.
+### 3. 🛠️ Backend & Database
+- **Folder**: [`Database_Backend/`](Database_Backend/)
+- Contains [`database_setup.sql`](Database_Backend/database_setup.sql) for initializing the Supabase/PostgreSQL schema.
 
-## 🛠️ Tech Stack
-- **Frontend (Mobile)**: Android (Java/Kotlin), XML Layouts.
-- **Frontend (Web)**: HTML5, Tailwind CSS, JavaScript.
-- **Backend**: Supabase (PostgreSQL, Auth, Realtime, Storage).
-- **Database**: Room (Local Android persistence) & Supabase (Remote synchronization).
+### 4. 🧪 Automation & Testing
+- **Folder**: [`Automation_Testing/`](Automation_Testing/)
+    - **Web**: [`Web_Selenium_Tests/`](Automation_Testing/Web_Selenium_Tests/) (Selenium tests for the dashboard).
+    - **Mobile**: [`Mobile_Appium_Tests/`](Automation_Testing/Mobile_Appium_Tests/) (Appium E2E tests for the Android app).
 
-## 📦 Setup & Installation
-
-### Android App
-1. Open the project in **Android Studio**.
-2. Ensure you have the `google-services.json` (if using GMS) or verify the `SupabaseManager.java` config.
-3. Sync Gradle and run the `:app` module.
-
-### Web Application
-1. The web files are located in the `/web` directory.
-2. Open `web/index.html` in any modern browser for local testing.
-
-### Backend (Supabase)
-The database schema can be initialized using the `database_setup.sql` file provided in the root directory.
-
-## 🌐 Deploying to GitHub Pages
-1. Push your code to the `main` branch.
-2. Go to **Settings > Pages** in your GitHub repository.
-3. Select **Branch: main** and folder **/(root)**.
-4. Click **Save**.
-5. Your app will be live at `https://<your-username>.github.io/smile-app-android-1175/web/index.html`.
+### 5. 📖 Documentation & Scripts
+- **Documentation**: [`Documentation_and_Diagrams/`](Documentation_and_Diagrams/) (System architecture and diagrams).
+- **Scripts**: [`Scripts_and_Tools/`](Scripts_and_Tools/) (Deployment and utility scripts).
 
 ---
-*Created with ❤️ for better dental health.*
+
+## 🚀 Live Web Application
+Hosted on GitHub Pages:
+[https://abhishekbodapati551.github.io/smile-app-android-1175/](https://abhishekbodapati551.github.io/smile-app-android-1175/)
+
+## ✨ Key Features
+- **Mirror Synchronization**: Real-time data sync between Mobile and Web.
+- **Brushing Mission**: Interactive 2-minute timer with camera verification.
+- **Attendance Tracking**: Doctor-controlled attendance with automatic warning notes.
+- **Reward Store**: Digital prize collection using earned points.
+
+## 📦 Setup & Installation
+Refer to the individual folders for specific setup instructions for the Android app, Web portal, and Automated tests.
+
+---
+*Developed for excellence in pediatric dental management.*

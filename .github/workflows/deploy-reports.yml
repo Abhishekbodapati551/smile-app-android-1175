@@ -33,9 +33,9 @@ jobs:
 
       - name: Regenerate and Structure Latest Reports
         run: |
-          python app/appium-test/generate_400_test_data.py
-          python app/appium-test/generate_enterprise_reports.py
-          python scripts/publish_gh_pages.py
+          python Automated_Testing_Suite/Mobile_Appium_Tests/generate_400_test_data.py
+          python Automated_Testing_Suite/Mobile_Appium_Tests/generate_enterprise_reports.py
+          python Scripts_and_Tools/publish_gh_pages.py
 
       - name: Publish to GitHub Pages Branch
         uses: peaceiris/actions-gh-pages@v4
