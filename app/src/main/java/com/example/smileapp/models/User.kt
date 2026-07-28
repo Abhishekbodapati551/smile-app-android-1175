@@ -4,6 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 @Serializable
 @Entity(tableName = "users")
@@ -14,6 +15,8 @@ data class User(
     
     @JvmField var name: String = "",
     @JvmField var email: String = "",
+    
+    @Transient
     @JvmField var password: String = "",
     @JvmField var role: String = "",
     
