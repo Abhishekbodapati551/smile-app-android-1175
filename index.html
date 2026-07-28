@@ -159,7 +159,7 @@
                 </div>
                 <p id="mission-status-text" class="text-[10px] text-slate-400 mt-2 font-bold uppercase text-right">Not started yet</p>
                 <div class="mt-4 flex justify-center">
-                    <button onclick="openBrushingModal(); event.stopPropagation();" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-2xl font-black text-xs uppercase shadow-lg transition-all hover:scale-105">📹 START RECORDING MISSION</button>
+                    <button id="btn-start-recording-main" onclick="openBrushingModal(); event.stopPropagation();" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-2xl font-black text-xs uppercase shadow-lg transition-all hover:scale-105">📹 START RECORDING MISSION</button>
                 </div>
             </div>
 
@@ -558,25 +558,41 @@
             const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
             const endOfDay = startOfDay + 86400000;
 
-            const approvedToday = logs?.filter(l => l.approved && l.created_at >= startOfDay && l.created_at < endOfDay) || [];
-            const count = approvedToday.length;
+            const logsToday = logs?.filter(l => l.created_at >= startOfDay && l.created_at < endOfDay) || [];
+            const count = logsToday.length;
 
             const bar = document.getElementById('mission-progress-bar');
             const status = document.getElementById('mission-status-text');
             const icon = document.getElementById('mission-icon');
+            const startBtn = document.getElementById('btn-start-recording-main');
 
             if (count === 0) {
                 bar.style.width = "0%";
-                status.innerText = "0/2 sessions completed";
+                status.innerText = "0/2 sessions completed today (0/10 pts)";
                 icon.innerText = "⬜";
+                if (startBtn) {
+                    startBtn.innerText = "📹 START RECORDING MISSION (1/2)";
+                    startBtn.disabled = false;
+                    startBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                }
             } else if (count === 1) {
                 bar.style.width = "50%";
-                status.innerText = "1/2 sessions completed (50%)";
+                status.innerText = "1/2 sessions completed today (+5 pts earned!)";
                 icon.innerText = "🌗";
+                if (startBtn) {
+                    startBtn.innerText = "📹 START SECOND MISSION (2/2)";
+                    startBtn.disabled = false;
+                    startBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                }
             } else {
                 bar.style.width = "100%";
-                status.innerText = "All missions done! (100%)";
+                status.innerText = "2/2 sessions completed today! (+10 pts max earned 🎉)";
                 icon.innerText = "✅";
+                if (startBtn) {
+                    startBtn.innerText = "✅ DAILY LIMIT REACHED (2/2)";
+                    startBtn.disabled = true;
+                    startBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                }
             }
         }
 
@@ -907,7 +923,29 @@
         let recordedChunks = [];
         let currentDeviceId = null;
 
+        async function checkDailyBrushingLimit() {
+            if (!userData || !userData.id) return 0;
+            const now = new Date();
+            const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+            const endOfDay = startOfDay + 86400000;
+
+            const { data: todayLogs, error } = await supabaseClient
+                .from('brushing_logs')
+                .select('id')
+                .eq('child_id', userData.id)
+                .gte('created_at', startOfDay)
+                .lt('created_at', endOfDay);
+
+            return todayLogs?.length || 0;
+        }
+
         async function openBrushingModal() {
+            const count = await checkDailyBrushingLimit();
+            if (count >= 2) {
+                alert("🎉 Mission Limit Reached!\n\nYou have already recorded 2 brushing missions today (max 2 per day). Great job keeping your teeth clean! Come back tomorrow for your next mission.");
+                return;
+            }
+
             document.getElementById('modal-brushing').classList.remove('hidden');
             await setupCamera(currentDeviceId);
             await populateCameraList();
