@@ -175,6 +175,7 @@ public class ChildDashboardActivity extends AppCompatActivity {
             // 3. Sync Brushing Logs to update Progress Bar accurately
             try {
                 List<BrushingLog> latestLogs = SupabaseAuthHelper.fetchBrushingLogsForChildBlocking(userId);
+                db.appDao().clearBrushingLogsForChild(userId);
                 for (BrushingLog log : latestLogs) {
                     db.appDao().insertBrushingLog(log);
                 }
@@ -255,7 +256,10 @@ public class ChildDashboardActivity extends AppCompatActivity {
 
     private void updateChildUI(User user) {
         welcomeText.setText("Hi, " + user.name + "!");
-        if (streakText != null) streakText.setText(user.streak + " Days");
+        if (streakText != null) {
+            String streakDisplay = (user.streak % 1 == 0) ? String.format(Locale.getDefault(), "%.0f", user.streak) : String.format(Locale.getDefault(), "%.1f", user.streak);
+            streakText.setText(streakDisplay + " Days");
+        }
         
         if (user.warningNote != null && !user.warningNote.isEmpty()) {
             warningText.setText(user.warningNote);
@@ -320,11 +324,13 @@ public class ChildDashboardActivity extends AppCompatActivity {
         cal.set(Calendar.HOUR_OF_DAY, 0);
         cal.set(Calendar.MINUTE, 0);
         cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
         long startOfDay = cal.getTimeInMillis();
         
         cal.set(Calendar.HOUR_OF_DAY, 23);
         cal.set(Calendar.MINUTE, 59);
         cal.set(Calendar.SECOND, 59);
+        cal.set(Calendar.MILLISECOND, 999);
         long endOfDay = cal.getTimeInMillis();
 
         List<BrushingLog> logsToday = db.appDao().getBrushingLogsForChildToday(userId, startOfDay, endOfDay);

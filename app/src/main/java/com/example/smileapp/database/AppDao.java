@@ -99,4 +99,7 @@ public interface AppDao {
 
     @Query("DELETE FROM appointments")
     void clearAllAppointments();
+
+    @Query("DELETE FROM brushing_logs WHERE childId = :childId")
+    void clearBrushingLogsForChild(String childId);
 }
