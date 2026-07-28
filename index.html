@@ -254,7 +254,7 @@
         <h3 class="text-3xl font-black mb-2 text-center">Brushing Mission!</h3>
         <p class="text-slate-400 mb-6 text-sm">Recording will start automatically</p>
 
-        <div class="relative w-full max-w-md aspect-video bg-black rounded-[40px] overflow-hidden border-4 border-white/20 mb-8 shadow-2xl">
+        <div class="relative w-full max-w-md aspect-video bg-black rounded-[40px] overflow-hidden border-4 border-white/20 mb-4 shadow-2xl">
             <video id="brush-video" autoplay muted playsinline class="w-full h-full object-cover -scale-x-100"></video>
             <div class="absolute top-6 right-6 bg-black/50 px-4 py-2 rounded-full backdrop-blur-md border border-white/20">
                 <div id="timer-val" class="text-2xl font-black text-white">02:00</div>
@@ -262,6 +262,15 @@
             <div id="recording-indicator" class="absolute top-6 left-6 flex items-center space-x-2 bg-red-500/80 px-4 py-2 rounded-full hidden">
                 <div class="w-2 h-2 bg-white rounded-full animate-pulse"></div>
                 <span class="text-[10px] font-black uppercase tracking-widest">REC</span>
+            </div>
+        </div>
+
+        <div id="camera-select-container" class="w-full max-w-md mb-6 hidden">
+            <div class="flex items-center space-x-3 bg-white/10 p-3 rounded-2xl border border-white/20">
+                <span class="text-lg">📷</span>
+                <select id="camera-select" onchange="switchCamera(this.value)" class="bg-transparent text-white font-bold text-xs outline-none w-full cursor-pointer">
+                    <option value="" class="text-slate-800">Laptop / Front Camera</option>
+                </select>
             </div>
         </div>
 
@@ -316,13 +325,48 @@
 
     <!-- Doctor Profile Modal -->
     <div id="modal-doctor-profile" class="fixed inset-0 bg-slate-900/90 backdrop-blur-md z-[160] hidden flex items-center justify-center p-4 text-slate-800">
-        <div class="bg-white w-full max-w-lg rounded-[40px] shadow-2xl p-10 relative">
-            <button onclick="document.getElementById('modal-doctor-profile').classList.add('hidden')" class="absolute top-8 right-8 text-slate-400 text-2xl">✕</button>
-            <h3 class="text-3xl font-black text-center mb-8">Edit Profile</h3>
-            <div class="space-y-4">
-                <div><label class="text-[10px] font-bold text-slate-400 ml-2 uppercase">Clinic Name</label><input type="text" id="prof-clinic" class="w-full p-4 bg-slate-50 border-2 rounded-2xl outline-none focus:border-teal-500"></div>
-                <div><label class="text-[10px] font-bold text-slate-400 ml-2 uppercase">Doctor ID (4 Digits)</label><input type="text" id="prof-id" maxlength="4" class="w-full p-4 bg-slate-50 border-2 rounded-2xl outline-none focus:border-teal-500"></div>
-                <button id="btn-save-profile" onclick="saveDoctorProfile()" class="w-full bg-teal-600 text-white p-5 rounded-3xl font-black shadow-xl mt-6">SAVE CHANGES</button>
+        <div class="bg-white w-full max-w-lg rounded-[40px] shadow-2xl p-8 relative overflow-hidden">
+            <button onclick="document.getElementById('modal-doctor-profile').classList.add('hidden')" class="absolute top-6 right-6 text-slate-400 text-2xl hover:text-slate-600">✕</button>
+
+            <!-- Header Info -->
+            <div class="text-center mb-6">
+                <div class="w-20 h-20 bg-teal-500 text-white rounded-full mx-auto flex items-center justify-center text-3xl font-black mb-3 shadow-lg">🩺</div>
+                <h3 id="prof-doc-name" class="text-2xl font-black text-slate-800">Doctor Profile</h3>
+                <p id="prof-doc-email" class="text-xs font-bold text-slate-400"></p>
+            </div>
+
+            <!-- Stats Bar -->
+            <div class="grid grid-cols-3 gap-2 bg-slate-50 p-4 rounded-3xl mb-6 border border-slate-100 text-center">
+                <div onclick="document.getElementById('modal-doctor-profile').classList.add('hidden'); showSubPage('patients');" class="cursor-pointer hover:opacity-80">
+                    <p id="prof-stat-patients" class="text-xl font-black text-blue-900">0</p>
+                    <p class="text-[9px] font-black text-slate-400 uppercase">Patients</p>
+                </div>
+                <div onclick="document.getElementById('modal-doctor-profile').classList.add('hidden'); showSubPage('approvals');" class="cursor-pointer hover:opacity-80">
+                    <p id="prof-stat-approvals" class="text-xl font-black text-orange-500">0</p>
+                    <p class="text-[9px] font-black text-slate-400 uppercase">Pending</p>
+                </div>
+                <div onclick="document.getElementById('modal-doctor-profile').classList.add('hidden'); showSubPage('reviews');" class="cursor-pointer hover:opacity-80">
+                    <p id="prof-stat-reviews" class="text-xl font-black text-purple-600">0</p>
+                    <p class="text-[9px] font-black text-slate-400 uppercase">Reviews</p>
+                </div>
+            </div>
+
+            <!-- Quick Review Shortcut -->
+            <button onclick="document.getElementById('modal-doctor-profile').classList.add('hidden'); showSubPage('reviews');" class="w-full bg-purple-600 hover:bg-purple-700 text-white p-4 rounded-2xl font-black text-xs uppercase tracking-wider shadow-lg mb-6 flex items-center justify-center space-x-2">
+                <span>📹</span><span>Review Brushing Submissions</span>
+            </button>
+
+            <!-- Edit Details -->
+            <div class="space-y-4 pt-2 border-t border-slate-100">
+                <div>
+                    <label class="text-[10px] font-black text-slate-400 ml-2 uppercase">Clinic Name</label>
+                    <input type="text" id="prof-clinic" placeholder="Enter Clinic Name" class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold outline-none focus:border-teal-500">
+                </div>
+                <div>
+                    <label class="text-[10px] font-black text-slate-400 ml-2 uppercase">Doctor Access ID (4 Digits)</label>
+                    <input type="text" id="prof-id" maxlength="4" placeholder="e.g. 1234" class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold outline-none focus:border-teal-500">
+                </div>
+                <button id="btn-save-profile" onclick="saveDoctorProfile()" class="w-full bg-teal-600 hover:bg-teal-700 text-white p-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl">SAVE CHANGES</button>
             </div>
         </div>
     </div>
@@ -643,7 +687,27 @@
             }
         }
 
-        function openDoctorProfile() { document.getElementById('modal-doctor-profile').classList.remove('hidden'); document.getElementById('prof-clinic').value = userData.clinic_name || ''; document.getElementById('prof-id').value = userData.doctor_id || ''; }
+        async function openDoctorProfile() {
+            document.getElementById('modal-doctor-profile').classList.remove('hidden');
+            document.getElementById('prof-doc-name').innerText = userData.name || "Doctor";
+            document.getElementById('prof-doc-email').innerText = userData.email || "";
+            document.getElementById('prof-clinic').value = userData.clinic_name || '';
+            document.getElementById('prof-id').value = userData.doctor_id || '';
+            
+            const sid = userData.doctor_id;
+            try {
+                const { data: patients } = await supabaseClient.from('profiles').select('id').eq('doctor_id', sid).eq('is_approved', true);
+                const { data: approvals } = await supabaseClient.from('profiles').select('id').eq('doctor_id', sid).eq('is_approved', false);
+                const { data: reviews } = await supabaseClient.from('brushing_logs').select('id').eq('doctor_id', sid).eq('approved', false);
+                
+                document.getElementById('prof-stat-patients').innerText = patients?.length || 0;
+                document.getElementById('prof-stat-approvals').innerText = approvals?.length || 0;
+                document.getElementById('prof-stat-reviews').innerText = reviews?.length || 0;
+            } catch (err) {
+                console.error("Error fetching doctor profile stats:", err);
+            }
+        }
+
         async function saveDoctorProfile() {
             const b = document.getElementById('btn-save-profile'); b.innerHTML = '<div class="loader mx-auto"></div>';
             const c = document.getElementById('prof-clinic').value; const id = document.getElementById('prof-id').value;
@@ -660,15 +724,101 @@
                 c.innerHTML = ''; data?.forEach(u => c.innerHTML += `<div onclick="viewPatientDetail('${u.id}')" class="bg-slate-50 p-6 rounded-3xl flex justify-between items-center cursor-pointer hover:bg-white border transition-all mb-4"><div><p class="font-bold">${u.name}</p><p class="text-xs opacity-50">${u.email}</p></div><p class="text-teal-600 font-black">${u.points||0} PTS</p></div>`);
             } else if (t === 'approvals') {
                 const { data } = await supabaseClient.from('profiles').select('*').eq('doctor_id', sid).eq('is_approved', false);
-                c.innerHTML = data?.length ? '' : 'No requests.';
+                c.innerHTML = data?.length ? '' : '<p class="text-slate-400 font-bold italic py-8 text-center">No pending registration approvals.</p>';
                 data?.forEach(u => c.innerHTML += `<div class="bg-slate-50 p-6 rounded-3xl flex justify-between items-center border mb-4"><div><p class="font-bold">${u.name}</p><p class="text-xs opacity-50">${u.email}</p></div><button onclick="approveUser('${u.id}')" class="bg-orange-500 text-white px-6 py-2 rounded-xl font-bold">APPROVE</button></div>`);
             } else if (t === 'appointments') {
                 const { data } = await supabaseClient.from('appointments').select('*').eq('doctor_id', sid).order('appt_date', { ascending: false });
                 c.innerHTML = ''; data?.forEach(v => c.innerHTML += `<div class="bg-slate-50 p-6 rounded-3xl flex justify-between items-center mb-4 border hover:bg-white transition-all"><div><p class="font-bold text-slate-800">${v.child_name}</p><p class="text-[10px] font-black text-teal-600 uppercase">${v.type}</p></div><div class="flex items-center space-x-4"><div class="text-right"><p class="text-xs font-bold ${v.status==='upcoming'?'text-blue-500':(v.status==='present'?'text-green-500':'text-red-500')} uppercase">${v.status}</p><p class="font-bold text-slate-500">${new Date(v.appt_date).toLocaleDateString()}</p></div><button onclick="openRescheduleModal('${v.id}', '${v.child_id}', '${v.child_name}', '${v.type}', ${v.appt_date})" class="text-blue-500 font-black text-[10px] uppercase hover:underline">Reschedule</button></div></div>`);
             } else if (t === 'reviews') {
-                const { data } = await supabaseClient.from('brushing_logs').select('*').eq('doctor_id', sid).eq('approved', false);
-                c.innerHTML = data?.length ? '' : 'No videos.';
-                data?.forEach(l => c.innerHTML += `<div class="bg-slate-50 p-6 rounded-3xl flex justify-between items-center border mb-4"><div><p class="font-bold">${l.child_name}</p><p class="text-xs opacity-50">${new Date(l.created_at).toLocaleString()}</p></div><button onclick="quickApproveLog('${l.id}')" class="bg-blue-600 text-white px-6 py-2 rounded-xl font-bold text-xs uppercase">Award 10 Pts</button></div>`);
+                const { data } = await supabaseClient.from('brushing_logs').select('*').eq('doctor_id', sid).order('created_at', { ascending: false });
+                c.innerHTML = data?.length ? '' : '<div class="text-center py-12"><p class="text-5xl mb-3">📹</p><p class="text-slate-400 font-bold">No brushing submissions found.</p></div>';
+                
+                data?.forEach(l => {
+                    const dateStr = new Date(l.created_at).toLocaleString();
+                    const isApproved = l.approved;
+                    
+                    c.innerHTML += `
+                        <div class="bg-slate-50 p-6 rounded-3xl border border-slate-200 mb-6 shadow-sm">
+                            <div class="flex justify-between items-start mb-4">
+                                <div>
+                                    <h4 class="font-black text-xl text-blue-900">${l.child_name || 'Patient'}</h4>
+                                    <p class="text-xs text-slate-400 font-bold">Submitted: ${dateStr}</p>
+                                </div>
+                                <span class="px-3 py-1.5 rounded-full text-xs font-black uppercase ${isApproved ? 'bg-green-100 text-green-700 border border-green-300' : 'bg-orange-100 text-orange-700 border border-orange-300'}">
+                                    ${isApproved ? '✅ Approved' : '⏳ Pending Review'}
+                                </span>
+                            </div>
+
+                            ${l.video_url ? `
+                                <div class="mb-4 rounded-2xl overflow-hidden bg-black aspect-video max-h-80 flex items-center justify-center shadow-inner">
+                                    <video controls src="${l.video_url}" class="w-full h-full object-contain"></video>
+                                </div>
+                            ` : `
+                                <div class="mb-4 p-6 bg-slate-100 rounded-2xl text-center text-slate-500 italic text-xs">
+                                    No video recording attached to this submission.
+                                </div>
+                            `}
+
+                            <div class="space-y-3">
+                                <input type="text" id="feedback-${l.id}" placeholder="Enter doctor feedback (e.g. Excellent front teeth brushing technique!)..." class="w-full p-3.5 bg-white border border-slate-200 rounded-2xl text-xs outline-none focus:border-teal-500 font-medium" value="${l.doctor_feedback || ''}" ${isApproved ? 'disabled' : ''}>
+                                
+                                ${!isApproved ? `
+                                    <div class="flex space-x-3">
+                                        <button onclick="approveLogWithFeedback('${l.id}')" class="flex-1 bg-teal-500 hover:bg-teal-600 text-white py-3.5 rounded-2xl font-black text-xs uppercase shadow-md transition-all">
+                                            🎉 Approve & Award 10 Points
+                                        </button>
+                                        <button onclick="rejectLogWithFeedback('${l.id}')" class="bg-red-500 hover:bg-red-600 text-white px-5 py-3.5 rounded-2xl font-black text-xs uppercase shadow-md transition-all">
+                                            ❌ Request Retry
+                                        </button>
+                                    </div>
+                                ` : `
+                                    <div class="text-right text-xs font-black text-teal-600">
+                                        Approved & Points Awarded ✨
+                                    </div>
+                                `}
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+        }
+
+        async function approveLogWithFeedback(lid) {
+            const feedbackInput = document.getElementById(`feedback-${lid}`);
+            const feedback = feedbackInput?.value || "Great brushing technique!";
+            try {
+                const { data: l } = await supabaseClient.from('brushing_logs').select('*').eq('id', lid).single();
+                if (l) {
+                    await supabaseClient.from('brushing_logs').update({ approved: true, doctor_feedback: feedback }).eq('id', lid);
+                    const { data: p } = await supabaseClient.from('profiles').select('*').eq('id', l.child_id).single();
+                    if (p) {
+                        await supabaseClient.from('profiles').update({ points: (p.points||0) + 10, streak: (p.streak||0) + 1 }).eq('id', l.child_id);
+                    }
+                    alert("Mission Approved & 10 Points Awarded to Patient! 🎉");
+                    closeSubPage();
+                    setupDoctorDashboard();
+                }
+            } catch (err) {
+                console.error("Error approving log:", err);
+                alert("Error approving log: " + err.message);
+            }
+        }
+
+        async function rejectLogWithFeedback(lid) {
+            const feedbackInput = document.getElementById(`feedback-${lid}`);
+            const feedback = feedbackInput?.value || "Please record your brushing mission again focusing on all sides.";
+            try {
+                const { data: l } = await supabaseClient.from('brushing_logs').select('*').eq('id', lid).single();
+                if (l) {
+                    await supabaseClient.from('brushing_logs').update({ approved: false, doctor_feedback: feedback }).eq('id', lid);
+                    await supabaseClient.from('profiles').update({ warning_note: `Mission Retry Requested: ${feedback}` }).eq('id', l.child_id);
+                    alert("Retry requested for Patient! 📩");
+                    closeSubPage();
+                    setupDoctorDashboard();
+                }
+            } catch (err) {
+                console.error("Error requesting retry:", err);
+                alert("Error: " + err.message);
             }
         }
 
@@ -755,16 +905,66 @@
         let brushStream = null;
         let mediaRecorder = null;
         let recordedChunks = [];
+        let currentDeviceId = null;
 
         async function openBrushingModal() {
             document.getElementById('modal-brushing').classList.remove('hidden');
+            await setupCamera(currentDeviceId);
+            await populateCameraList();
+        }
+
+        async function setupCamera(deviceId = null) {
+            if (brushStream) {
+                brushStream.getTracks().forEach(t => t.stop());
+                brushStream = null;
+            }
             try {
-                brushStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                const videoConstraints = deviceId 
+                    ? { deviceId: { exact: deviceId } } 
+                    : { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } };
+                
+                brushStream = await navigator.mediaDevices.getUserMedia({ 
+                    video: videoConstraints, 
+                    audio: true 
+                });
                 document.getElementById('brush-video').srcObject = brushStream;
             } catch (err) {
-                alert("Camera access denied! Please enable camera to record your brushing mission.");
-                closeBrushingModal();
+                console.warn("Front camera preference failed, trying fallback:", err);
+                try {
+                    brushStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                    document.getElementById('brush-video').srcObject = brushStream;
+                } catch (e) {
+                    alert("Camera access denied! Please enable camera permission in your browser settings.");
+                    closeBrushingModal();
+                }
             }
+        }
+
+        async function populateCameraList() {
+            try {
+                const devices = await navigator.mediaDevices.enumerateDevices();
+                const videoDevices = devices.filter(d => d.kind === 'videoinput');
+                const container = document.getElementById('camera-select-container');
+                const select = document.getElementById('camera-select');
+                
+                if (videoDevices.length > 0) {
+                    select.innerHTML = videoDevices.map((d, i) => 
+                        `<option value="${d.deviceId}" class="text-slate-800" ${d.deviceId === currentDeviceId ? 'selected' : ''}>${d.label || 'Camera ' + (i+1)}</option>`
+                    ).join('');
+                    if (videoDevices.length > 1) {
+                        container.classList.remove('hidden');
+                    } else {
+                        container.classList.add('hidden');
+                    }
+                }
+            } catch (e) {
+                console.error("Could not enumerate camera devices:", e);
+            }
+        }
+
+        async function switchCamera(deviceId) {
+            currentDeviceId = deviceId;
+            await setupCamera(deviceId);
         }
 
         async function startBrushingTimer() {
