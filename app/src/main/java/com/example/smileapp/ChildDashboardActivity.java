@@ -24,12 +24,13 @@ public class ChildDashboardActivity extends AppCompatActivity {
 
     private AppDatabase db;
     private String userId;
-    private TextView welcomeText, streakText, taskStatusText;
+    private TextView welcomeText, streakText, pointsText, taskStatusText;
     private MaterialCardView apptNotificationCard, feedbackCard, rejectionCard, taskCard, warningCard;
     private TextView apptDetailsText, feedbackText, rejectionReasonText, warningText;
     private ProgressBar taskProgressBar;
     private MaterialCardView r1Card, r2Card, r3Card, r4Card;
     private View r1Check, r2Check, r3Check, r4Check;
+    private android.content.SharedPreferences prefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,9 +39,11 @@ public class ChildDashboardActivity extends AppCompatActivity {
 
         db = AppDatabase.getInstance(this);
         userId = getIntent().getStringExtra("USER_ID");
+        prefs = getSharedPreferences("dismissals_" + (userId != null ? userId : "guest"), MODE_PRIVATE);
         
         welcomeText = findViewById(R.id.welcome_user);
         streakText = findViewById(R.id.streak_val);
+        pointsText = findViewById(R.id.points_val);
         taskProgressBar = findViewById(R.id.task_progress);
         taskStatusText = findViewById(R.id.task_status);
         
@@ -72,10 +75,22 @@ public class ChildDashboardActivity extends AppCompatActivity {
         r3Check = findViewById(R.id.reward_3_check);
         r4Check = findViewById(R.id.reward_4_check);
 
-        if (closeNotificationBtn != null) closeNotificationBtn.setOnClickListener(v -> apptNotificationCard.setVisibility(View.GONE));
-        if (closeFeedbackBtn != null) closeFeedbackBtn.setOnClickListener(v -> feedbackCard.setVisibility(View.GONE));
-        if (closeRejectionBtn != null) closeRejectionBtn.setOnClickListener(v -> rejectionCard.setVisibility(View.GONE));
-        if (closeWarningBtn != null) closeWarningBtn.setOnClickListener(v -> warningCard.setVisibility(View.GONE));
+        if (closeNotificationBtn != null) closeNotificationBtn.setOnClickListener(v -> {
+            prefs.edit().putBoolean("dismissed_appt", true).apply();
+            apptNotificationCard.setVisibility(View.GONE);
+        });
+        if (closeFeedbackBtn != null) closeFeedbackBtn.setOnClickListener(v -> {
+            prefs.edit().putBoolean("dismissed_feedback", true).apply();
+            feedbackCard.setVisibility(View.GONE);
+        });
+        if (closeRejectionBtn != null) closeRejectionBtn.setOnClickListener(v -> {
+            prefs.edit().putBoolean("dismissed_rejection", true).apply();
+            rejectionCard.setVisibility(View.GONE);
+        });
+        if (closeWarningBtn != null) closeWarningBtn.setOnClickListener(v -> {
+            prefs.edit().putBoolean("dismissed_warning", true).apply();
+            warningCard.setVisibility(View.GONE);
+        });
 
         // Make Feedback and Rejection cards interactive
         if (feedbackCard != null) feedbackCard.setOnClickListener(v -> {
@@ -136,7 +151,7 @@ public class ChildDashboardActivity extends AppCompatActivity {
         if (userId == null) return;
         SupabaseAuthHelper.listenForAppointments(userId, appt -> {
             // Notification for UPCOMING appointments
-            if (appt.date > System.currentTimeMillis()) {
+            if (appt.date > System.currentTimeMillis() && !prefs.getBoolean("dismissed_appt", false)) {
                 SimpleDateFormat sdf = new SimpleDateFormat("MMM dd 'at' hh:mm a", Locale.getDefault());
                 String formattedDate = sdf.format(new Date(appt.date));
                 runOnUiThread(() -> {
@@ -198,7 +213,8 @@ public class ChildDashboardActivity extends AppCompatActivity {
                     }
                 }
                 
-                if (latest != null) {
+                boolean isApptDismissed = prefs.getBoolean("dismissed_appt", false);
+                if (latest != null && !isApptDismissed) {
                     Appointment finalLatest = latest;
                     SimpleDateFormat sdf = new SimpleDateFormat("MMM dd 'at' hh:mm a", Locale.getDefault());
                     String formattedDate = sdf.format(new Date(finalLatest.date));
@@ -230,16 +246,18 @@ public class ChildDashboardActivity extends AppCompatActivity {
                 
                 final BrushingLog finalRejected = latestRejected;
                 final BrushingLog finalFeedback = latestFeedback;
+                boolean isRejectionDismissed = prefs.getBoolean("dismissed_rejection", false);
+                boolean isFeedbackDismissed = prefs.getBoolean("dismissed_feedback", false);
                 
                 runOnUiThread(() -> {
-                    if (finalRejected != null) {
+                    if (finalRejected != null && !isRejectionDismissed) {
                         rejectionReasonText.setText("Please try again. Reason: " + finalRejected.doctorFeedback);
                         rejectionCard.setVisibility(View.VISIBLE);
                     } else {
                         rejectionCard.setVisibility(View.GONE);
                     }
                     
-                    if (finalFeedback != null) {
+                    if (finalFeedback != null && !isFeedbackDismissed) {
                         feedbackText.setText(finalFeedback.doctorFeedback);
                         feedbackCard.setVisibility(View.VISIBLE);
                     } else {
@@ -260,8 +278,12 @@ public class ChildDashboardActivity extends AppCompatActivity {
             String streakDisplay = (user.streak % 1 == 0) ? String.format(Locale.getDefault(), "%.0f", user.streak) : String.format(Locale.getDefault(), "%.1f", user.streak);
             streakText.setText(streakDisplay + " Days");
         }
+        if (pointsText != null) {
+            pointsText.setText(user.points + " Pts");
+        }
         
-        if (user.warningNote != null && !user.warningNote.isEmpty()) {
+        boolean isWarningDismissed = prefs.getBoolean("dismissed_warning", false);
+        if (user.warningNote != null && !user.warningNote.isEmpty() && !isWarningDismissed) {
             warningText.setText(user.warningNote);
             warningCard.setVisibility(View.VISIBLE);
         } else {
