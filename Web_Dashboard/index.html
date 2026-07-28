@@ -96,7 +96,10 @@
                 <h2 id="child-welcome-msg" class="text-3xl font-black">Hi, Friend!</h2>
                 <p id="child-subtitle" class="opacity-80">Ready for your mission?</p>
             </div>
-            <button onclick="logout()" class="w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center text-xl shadow-lg border-2 border-white text-white">⭐</button>
+            <div class="flex items-center space-x-4">
+                <button onclick="syncNow()" class="bg-white/20 px-4 py-2 rounded-xl text-[10px] font-black border border-white/20">SYNC</button>
+                <button onclick="logout()" class="w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center text-xl shadow-lg border-2 border-white text-white">⭐</button>
+            </div>
         </nav>
 
         <div class="px-6 space-y-6 max-w-2xl mx-auto">
@@ -107,6 +110,28 @@
                     <div class="flex-1">
                         <p class="font-black text-white">Message from Doctor</p>
                         <p id="warning-text" class="text-white/90 text-sm italic"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Doctor Feedback -->
+            <div id="feedback-card" class="bg-teal-500 border-2 border-white/30 p-6 rounded-[32px] hidden cursor-pointer shadow-lg" onclick="showFeedbackPopup()">
+                <div class="flex items-center space-x-4">
+                    <div class="text-3xl">💬</div>
+                    <div class="flex-1">
+                        <p class="font-black text-white">New Feedback!</p>
+                        <p id="feedback-text" class="text-white/90 text-sm truncate"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rejection Card -->
+            <div id="rejection-card" class="bg-red-500 border-2 border-white/30 p-6 rounded-[32px] hidden cursor-pointer shadow-lg">
+                <div class="flex items-center space-x-4">
+                    <div class="text-3xl">❌</div>
+                    <div class="flex-1">
+                        <p class="font-black text-white">Mission Needs Retry</p>
+                        <p id="rejection-reason" class="text-white/90 text-sm italic"></p>
                     </div>
                 </div>
             </div>
@@ -124,12 +149,18 @@
             <div onclick="openBrushingModal()" class="bg-white p-6 rounded-[32px] shadow-xl cursor-pointer hover:scale-[1.02] transition-all text-slate-800">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-xl font-black text-blue-900">Today's Mission</h3>
-                    <span id="mission-icon" class="text-2xl opacity-20">⬜</span>
+                    <div class="flex items-center space-x-2">
+                        <span id="mission-icon" class="text-2xl opacity-20">⬜</span>
+                        <div id="recording-dot" class="w-3 h-3 bg-red-500 rounded-full animate-pulse hidden"></div>
+                    </div>
                 </div>
                 <div class="w-full bg-slate-100 h-2 rounded-full">
                     <div id="mission-progress-bar" class="bg-blue-500 w-[0%] h-full rounded-full transition-all duration-500"></div>
                 </div>
                 <p id="mission-status-text" class="text-[10px] text-slate-400 mt-2 font-bold uppercase text-right">Not started yet</p>
+                <div class="mt-4 flex justify-center">
+                    <button onclick="openBrushingModal(); event.stopPropagation();" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-2xl font-black text-xs uppercase shadow-lg transition-all hover:scale-105">📹 START RECORDING MISSION</button>
+                </div>
             </div>
 
             <!-- Appointment -->
@@ -221,14 +252,28 @@
     <!-- Brushing Modal -->
     <div id="modal-brushing" class="fixed inset-0 bg-slate-900/95 backdrop-blur-xl z-[200] hidden flex flex-col items-center justify-center p-6 text-white">
         <h3 class="text-3xl font-black mb-2 text-center">Brushing Mission!</h3>
-        <div class="relative w-full max-w-md aspect-square bg-black rounded-[40px] overflow-hidden border-4 border-white/20 mb-8 shadow-2xl">
-            <video id="brush-video" autoplay muted playsinline class="w-full h-full object-cover"></video>
-            <div class="absolute inset-0 flex items-center justify-center">
-                <div id="timer-val" class="text-8xl font-black drop-shadow-2xl">02:00</div>
+        <p class="text-slate-400 mb-6 text-sm">Recording will start automatically</p>
+
+        <div class="relative w-full max-w-md aspect-video bg-black rounded-[40px] overflow-hidden border-4 border-white/20 mb-8 shadow-2xl">
+            <video id="brush-video" autoplay muted playsinline class="w-full h-full object-cover -scale-x-100"></video>
+            <div class="absolute top-6 right-6 bg-black/50 px-4 py-2 rounded-full backdrop-blur-md border border-white/20">
+                <div id="timer-val" class="text-2xl font-black text-white">02:00</div>
+            </div>
+            <div id="recording-indicator" class="absolute top-6 left-6 flex items-center space-x-2 bg-red-500/80 px-4 py-2 rounded-full hidden">
+                <div class="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                <span class="text-[10px] font-black uppercase tracking-widest">REC</span>
             </div>
         </div>
-        <button id="btn-start-brush" onclick="startBrushingTimer()" class="w-full max-w-sm bg-white text-blue-900 p-6 rounded-3xl font-black text-xl shadow-xl">START MISSION</button>
-        <button onclick="closeBrushingModal()" class="mt-6 text-slate-400 font-bold">Cancel Mission</button>
+
+        <div class="w-full max-w-sm space-y-4">
+            <button id="btn-start-brush" onclick="startBrushingTimer()" class="w-full bg-white text-blue-900 p-6 rounded-3xl font-black text-xl shadow-xl hover:scale-105 transition-all">START MISSION</button>
+            <button id="btn-finish-brush" onclick="stopRecordingManually()" class="w-full bg-red-500 text-white p-6 rounded-3xl font-black text-xl shadow-xl hover:scale-105 transition-all hidden">FINISH EARLY</button>
+            <div id="upload-status" class="hidden text-center space-y-4">
+                <div class="loader mx-auto"></div>
+                <p class="font-black text-blue-400 uppercase tracking-widest text-xs">Uploading Mission Data...</p>
+            </div>
+            <button id="btn-cancel-brush" onclick="closeBrushingModal()" class="w-full text-slate-400 font-bold py-2">Cancel Mission</button>
+        </div>
     </div>
 
     <!-- Generic SubPage -->
@@ -411,16 +456,84 @@
         async function syncNow() { await loadUserProfile(userData.id); alert("Data Synced! ⭐"); }
 
         // CHILD DASHBOARD
-        function setupChildDashboard() {
-            document.getElementById('child-welcome-msg').innerText = `Hi, ${userData.name}!`;
-            document.getElementById('child-streak').innerText = `${userData.streak || 0} Days`;
-            document.getElementById('points-display').innerText = `${userData.points || 0} PTS`;
-            const thresholds = [100, 200, 300, 500];
-            for (let i=1; i<=4; i++) document.getElementById(`rew-${i}`).classList.toggle('opacity-30', (userData.points||0) < thresholds[i-1]);
-            const wc = document.getElementById('warning-card');
-            if (userData.warning_note) { wc.classList.remove('hidden'); document.getElementById('warning-text').innerText = userData.warning_note; }
-            else wc.classList.add('hidden');
-            fetchChildAppts();
+        async function setupChildDashboard() {
+            try {
+                document.getElementById('child-welcome-msg').innerText = `Hi, ${userData.name}!`;
+                document.getElementById('child-streak').innerText = `${userData.streak || 0} Days`;
+                document.getElementById('points-display').innerText = `${userData.points || 0} PTS`;
+
+                const thresholds = [100, 200, 300, 500];
+                for (let i=1; i<=4; i++) {
+                    const rew = document.getElementById(`rew-${i}`);
+                    if (rew) rew.classList.toggle('opacity-30', (userData.points||0) < thresholds[i-1]);
+                }
+
+                const wc = document.getElementById('warning-card');
+                if (userData.warning_note) {
+                    wc.classList.remove('hidden');
+                    document.getElementById('warning-text').innerText = userData.warning_note;
+                } else {
+                    wc.classList.add('hidden');
+                }
+
+                // Fetch Logs for Feedback/Rejections/Progress
+                let logs = [];
+                try {
+                    const { data, error } = await supabaseClient.from('brushing_logs').select('*').eq('child_id', userData.id).order('created_at', { ascending: false });
+                    if (!error) logs = data || [];
+                } catch (e) { console.error("Log fetch failed", e); }
+
+                let latestRejected = logs.find(l => l.is_rejected);
+                let latestFeedback = logs.find(l => l.doctor_feedback && !l.is_rejected);
+
+                const rc = document.getElementById('rejection-card');
+                if (latestRejected) {
+                    rc.classList.remove('hidden');
+                    document.getElementById('rejection-reason').innerText = latestRejected.doctor_feedback;
+                } else rc.classList.add('hidden');
+
+                const fc = document.getElementById('feedback-card');
+                if (latestFeedback) {
+                    fc.classList.remove('hidden');
+                    document.getElementById('feedback-text').innerText = latestFeedback.doctor_feedback;
+                } else fc.classList.add('hidden');
+
+                fetchChildAppts();
+                refreshDailyProgress(logs);
+            } catch (err) {
+                console.error("Dashboard Setup Error:", err);
+            }
+        }
+
+        function showFeedbackPopup() {
+            alert("Doctor's Feedback:\n\n" + document.getElementById('feedback-text').innerText);
+        }
+
+        function refreshDailyProgress(logs) {
+            const now = new Date();
+            const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+            const endOfDay = startOfDay + 86400000;
+
+            const approvedToday = logs?.filter(l => l.approved && l.created_at >= startOfDay && l.created_at < endOfDay) || [];
+            const count = approvedToday.length;
+
+            const bar = document.getElementById('mission-progress-bar');
+            const status = document.getElementById('mission-status-text');
+            const icon = document.getElementById('mission-icon');
+
+            if (count === 0) {
+                bar.style.width = "0%";
+                status.innerText = "0/2 sessions completed";
+                icon.innerText = "⬜";
+            } else if (count === 1) {
+                bar.style.width = "50%";
+                status.innerText = "1/2 sessions completed (50%)";
+                icon.innerText = "🌗";
+            } else {
+                bar.style.width = "100%";
+                status.innerText = "All missions done! (100%)";
+                icon.innerText = "✅";
+            }
         }
 
         async function fetchChildAppts() {
@@ -561,11 +674,29 @@
 
         async function approveUser(uid) { await supabaseClient.from('profiles').update({ is_approved: true }).eq('id', uid); alert("Approved!"); closeSubPage(); setupDoctorDashboard(); }
         async function quickApproveLog(lid) {
-            const { data: l } = await supabaseClient.from('brushing_logs').select('*').eq('id', lid).single();
-            const { data: p } = await supabaseClient.from('profiles').select('*').eq('id', l.child_id).single();
-            await supabaseClient.from('profiles').update({ points: (p.points||0)+10, streak: (p.streak||0)+1 }).eq('id', l.child_id);
-            await supabaseClient.from('brushing_logs').update({ approved: true }).eq('id', lid);
-            alert("Points Awarded! 🎉"); closeSubPage(); setupDoctorDashboard();
+            const btn = event.target;
+            const originalText = btn.innerText;
+            btn.innerHTML = '<div class="loader mx-auto"></div>';
+            btn.disabled = true;
+
+            try {
+                const { data, error } = await supabaseClient.rpc('approve_and_reward', {
+                    p_log_id: parseInt(lid),
+                    p_feedback: "Excellent brushing! Keep it up!",
+                    p_points_to_add: 5
+                });
+
+                if (error) throw error;
+
+                alert("Approved & Reward Issued! 🎉");
+                closeSubPage();
+                setupDoctorDashboard();
+            } catch (err) {
+                console.error("Approval failed:", err);
+                alert("Approval Error: " + err.message);
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
         }
 
         function closeSubPage() { document.getElementById('modal-subpage').classList.add('hidden'); }
@@ -619,21 +750,110 @@
             b.innerText = 'Confirm Appointment';
         }
 
-        // BRUSHING TIMER (WEB)
+        // BRUSHING TIMER & RECORDING (WEB)
         let brushTimerInterval = null;
+        let brushStream = null;
+        let mediaRecorder = null;
+        let recordedChunks = [];
+
+        async function openBrushingModal() {
+            document.getElementById('modal-brushing').classList.remove('hidden');
+            try {
+                brushStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                document.getElementById('brush-video').srcObject = brushStream;
+            } catch (err) {
+                alert("Camera access denied! Please enable camera to record your brushing mission.");
+                closeBrushingModal();
+            }
+        }
+
         async function startBrushingTimer() {
-            let time = 120; document.getElementById('btn-start-brush').classList.add('hidden');
+            document.getElementById('btn-start-brush').classList.add('hidden');
+            document.getElementById('btn-cancel-brush').classList.add('hidden');
+            document.getElementById('btn-finish-brush').classList.remove('hidden');
+            document.getElementById('recording-indicator').classList.remove('hidden');
+
+            // Start Recording
+            recordedChunks = [];
+            mediaRecorder = new MediaRecorder(brushStream);
+            mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) recordedChunks.push(e.data); };
+            mediaRecorder.onstop = uploadVideo;
+            mediaRecorder.start();
+
+            let time = 120;
             brushTimerInterval = setInterval(() => {
-                time--; let m = Math.floor(time/60), s = time%60;
+                time--;
+                let m = Math.floor(time/60), s = time%60;
                 document.getElementById('timer-val').innerText = `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
-                if (time <= 0) { clearInterval(brushTimerInterval); finishMission(); }
+                if (time <= 0) {
+                    clearInterval(brushTimerInterval);
+                    stopRecordingManually();
+                }
             }, 1000);
+        }
+
+        function stopRecordingManually() {
+            if (mediaRecorder && mediaRecorder.state !== "inactive") {
+                mediaRecorder.stop();
+            }
+            clearInterval(brushTimerInterval);
+            document.getElementById('recording-indicator').classList.add('hidden');
+            document.getElementById('btn-finish-brush').classList.add('hidden');
+            document.getElementById('upload-status').classList.remove('hidden');
+        }
+
+        async function uploadVideo() {
+            const blob = new Blob(recordedChunks, { type: 'video/mp4' });
+            const fileName = `${userData.id}_${Date.now()}.mp4`;
+
+            try {
+                // 1. Upload to Supabase Storage
+                const { data: uploadData, error: uploadError } = await supabaseClient.storage
+                    .from('brushing_videos')
+                    .upload(fileName, blob);
+
+                if (uploadError) throw uploadError;
+
+                const videoUrl = supabaseClient.storage.from('brushing_videos').getPublicUrl(fileName).data.publicUrl;
+
+                // 2. Save Log to Database
+                const { error: dbError } = await supabaseClient.from('brushing_logs').insert({
+                    child_id: userData.id,
+                    child_name: userData.name,
+                    doctor_id: userData.doctor_id,
+                    video_url: videoUrl,
+                    created_at: Date.now(),
+                    approved: false
+                });
+
+                if (dbError) throw dbError;
+
+                alert("Mission Accomplished! 🎉 Video sent to your doctor for review.");
+                closeBrushingModal();
+                setupChildDashboard();
+            } catch (err) {
+                console.error("Upload failed:", err);
+                alert("Upload failed: " + err.message);
+                document.getElementById('upload-status').classList.add('hidden');
+                document.getElementById('btn-start-brush').classList.remove('hidden');
+                document.getElementById('btn-cancel-brush').classList.remove('hidden');
+            }
         }
 
         function closeBrushingModal() {
             document.getElementById('modal-brushing').classList.add('hidden');
-            if (brushStream) brushStream.getTracks().forEach(t => t.stop());
-            clearInterval(brushTimerInterval); document.getElementById('btn-start-brush').classList.remove('hidden'); document.getElementById('timer-val').innerText = "02:00";
+            document.getElementById('upload-status').classList.add('hidden');
+            document.getElementById('btn-start-brush').classList.remove('hidden');
+            document.getElementById('btn-cancel-brush').classList.remove('hidden');
+            document.getElementById('btn-finish-brush').classList.add('hidden');
+            document.getElementById('recording-indicator').classList.add('hidden');
+            document.getElementById('timer-val').innerText = "02:00";
+
+            if (brushStream) {
+                brushStream.getTracks().forEach(t => t.stop());
+                brushStream = null;
+            }
+            if (brushTimerInterval) clearInterval(brushTimerInterval);
         }
     </script>
 </body>
