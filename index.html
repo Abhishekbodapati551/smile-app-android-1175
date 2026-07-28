@@ -429,6 +429,19 @@
         let editApptId = null; // Used for rescheduling
 
         function navigateTo(id) { document.querySelectorAll('[id^="screen-"]').forEach(s => s.classList.add('hidden')); document.getElementById(`screen-${id}`).classList.remove('hidden'); window.scrollTo(0,0); }
+        function navigateToSubPage(title, show) {
+            const tEl = document.getElementById('subpage-title');
+            if (tEl) tEl.innerText = title;
+            const modal = document.getElementById('modal-subpage');
+            if (modal) {
+                if (show) modal.classList.remove('hidden');
+                else modal.classList.add('hidden');
+            }
+        }
+        function closeSubPage() {
+            const modal = document.getElementById('modal-subpage');
+            if (modal) modal.classList.add('hidden');
+        }
         function setRegRole(r) { regRole = r; document.getElementById('reg-role-child').classList.toggle('bg-white', r==='child'); document.getElementById('reg-role-doctor').classList.toggle('bg-white', r==='doctor'); document.getElementById('doctor-id-field').classList.toggle('hidden', r==='doctor'); }
 
         supabaseClient.auth.onAuthStateChange(async (e, s) => { if (s) await loadUserProfile(s.user.id); else navigateTo('start'); });
@@ -908,8 +921,10 @@
 
         async function loadDoctorAppointmentsSubPage(filter = 'all') {
             activeApptFilter = filter;
-            const sid = userData.doctor_id;
-            const { data, error } = await supabaseClient.from('appointments').select('*').eq('doctor_id', sid).order('appt_date', { ascending: false });
+            const docIds = [userData.id];
+            if (userData.doctor_id) docIds.push(userData.doctor_id);
+
+            const { data, error } = await supabaseClient.from('appointments').select('*').in('doctor_id', docIds).order('appt_date', { ascending: false });
             if (error) console.error("Error fetching appointments:", error);
             cachedAppointments = data || [];
             renderAppointmentsSubPage();
@@ -1069,19 +1084,26 @@
 
         // APPOINTMENT LOGIC
         function openAppointmentModal() {
-            editApptId = null; document.getElementById('appt-modal-title').innerText = "Schedule New Visit";
+            editApptId = null; 
+            document.getElementById('appt-modal-title').innerText = "Schedule New Visit";
             document.getElementById('appt-patient-select-container').classList.remove('hidden');
             document.getElementById('appt-patient-name-display').classList.add('hidden');
-            const sel = document.getElementById('appt-patient'); sel.innerHTML = '<option>Loading...</option>';
+            const sel = document.getElementById('appt-patient'); 
+            sel.innerHTML = '<option>Loading...</option>';
             document.getElementById('modal-add-appt').classList.remove('hidden');
-            supabaseClient.from('profiles').select('*').eq('doctor_id', userData.doctor_id).eq('is_approved', true).then(({data}) => {
+
+            const docIds = [userData.id];
+            if (userData.doctor_id) docIds.push(userData.doctor_id);
+
+            supabaseClient.from('profiles').select('*').in('doctor_id', docIds).eq('role', 'child').eq('is_approved', true).then(({data}) => {
                 sel.innerHTML = '<option value="">Select Patient...</option>';
                 data?.forEach(u => sel.innerHTML += `<option value="${u.id}|${u.name}">${u.name}</option>`);
             });
         }
 
         function openRescheduleModal(aid, cid, cname, type, adate) {
-            editApptId = aid; document.getElementById('appt-modal-title').innerText = "Reschedule Visit";
+            editApptId = aid; 
+            document.getElementById('appt-modal-title').innerText = "Reschedule Visit";
             document.getElementById('appt-patient-select-container').classList.add('hidden');
             document.getElementById('appt-patient-name-display').classList.remove('hidden');
             document.getElementById('reschedule-patient-name').innerText = cname;
@@ -1093,7 +1115,8 @@
         }
 
         async function saveAppointment() {
-            const b = document.getElementById('btn-save-appt'); b.innerHTML = '<div class="loader mx-auto"></div>';
+            const b = document.getElementById('btn-save-appt'); 
+            b.innerHTML = '<div class="loader mx-auto"></div>';
             const type = document.getElementById('appt-type').value;
             const dateStr = document.getElementById('appt-date').value;
             if (!dateStr || !type) return alert("Fill all fields");
@@ -1106,12 +1129,19 @@
             } else {
                 const p = document.getElementById('appt-patient').value.split('|');
                 if (!p[0]) return alert("Select a patient");
-                updateData.child_id = p[0]; updateData.child_name = p[1]; updateData.doctor_id = userData.doctor_id;
+                updateData.child_id = p[0]; 
+                updateData.child_name = p[1]; 
+                updateData.doctor_id = userData.doctor_id || userData.id;
                 result = await supabaseClient.from('appointments').insert(updateData);
             }
 
             if (result.error) alert(result.error.message);
-            else { alert(editApptId ? "Rescheduled!" : "Scheduled!"); document.getElementById('modal-add-appt').classList.add('hidden'); setupDoctorDashboard(); showSubPage('appointments'); }
+            else { 
+                alert(editApptId ? "Rescheduled!" : "Scheduled!"); 
+                document.getElementById('modal-add-appt').classList.add('hidden'); 
+                setupDoctorDashboard(); 
+                showSubPage('appointments'); 
+            }
             b.innerText = 'Confirm Appointment';
         }
 
