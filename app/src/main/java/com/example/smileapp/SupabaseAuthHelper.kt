@@ -109,6 +109,20 @@ object SupabaseAuthHelper {
     }
 
     @JvmStatic
+    fun fetchUserByIdBlocking(uid: String): User? {
+        return runBlocking {
+            try {
+                SupabaseManager.getClient().postgrest["profiles"].select {
+                    filter { eq("id", uid) }
+                }.decodeList<User>().firstOrNull()
+            } catch (e: Exception) {
+                Log.e("SupabaseAuth", "Fetch user by id failed: ${e.message}")
+                null
+            }
+        }
+    }
+
+    @JvmStatic
     fun fetchPatientsBlocking(doctorId: String): List<User> {
         return runBlocking {
             try {

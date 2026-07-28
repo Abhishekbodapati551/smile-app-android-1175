@@ -105,22 +105,23 @@ public class PatientProfileActivity extends AppCompatActivity {
     private void loadPatientData() {
         if (patientUid == null) return;
         SupabaseManager.execute(() -> {
-            User patient = db.appDao().getUserById(patientUid);
-            List<BrushingLog> logs = db.appDao().getBrushingLogsForChild(patientUid);
-            
-            // Fetch appointment if needed
+            // 1. Show local patient data instantly
+            User localPatient = db.appDao().getUserById(patientUid);
+            List<BrushingLog> localLogs = db.appDao().getBrushingLogsForChild(patientUid);
+
             if (specificApptId != -1) {
-                activeAppt = null; // Reset
+                activeAppt = null;
                 List<Appointment> allAppts = db.appDao().getAppointmentsForChild(patientUid);
                 for (Appointment a : allAppts) if (a.id == specificApptId) { activeAppt = a; break; }
             }
 
             runOnUiThread(() -> {
-                if (patient != null) {
-                    nameText.setText(patient.name);
-                    emailText.setText(patient.email);
-                    pointsText.setText("⭐ " + patient.points);
-                    streakText.setText("🔥 " + patient.streak);
+                if (localPatient != null) {
+                    nameText.setText(localPatient.name);
+                    emailText.setText(localPatient.email);
+                    pointsText.setText("⭐ " + localPatient.points);
+                    String streakDisplay = (localPatient.streak % 1 == 0) ? String.format(Locale.getDefault(), "%.0f", localPatient.streak) : String.format(Locale.getDefault(), "%.1f", localPatient.streak);
+                    streakText.setText("🔥 " + streakDisplay);
                 }
                 
                 if (activeAppt != null && "upcoming".equals(activeAppt.status)) {
@@ -134,9 +135,41 @@ public class PatientProfileActivity extends AppCompatActivity {
                 }
 
                 historyList.clear();
-                historyList.addAll(logs);
+                historyList.addAll(localLogs);
                 adapter.notifyDataSetChanged();
             });
+
+            // 2. Fetch fresh patient profile & points from Supabase in background
+            try {
+                User freshPatient = SupabaseAuthHelper.fetchUserByIdBlocking(patientUid);
+                if (freshPatient != null) {
+                    db.appDao().insertUser(freshPatient);
+                    runOnUiThread(() -> {
+                        nameText.setText(freshPatient.name);
+                        emailText.setText(freshPatient.email);
+                        pointsText.setText("⭐ " + freshPatient.points);
+                        String streakDisplay = (freshPatient.streak % 1 == 0) ? String.format(Locale.getDefault(), "%.0f", freshPatient.streak) : String.format(Locale.getDefault(), "%.1f", freshPatient.streak);
+                        streakText.setText("🔥 " + streakDisplay);
+                    });
+                }
+            } catch (Exception e) {
+                android.util.Log.e("PatientProfile", "Failed to refresh patient profile from Supabase", e);
+            }
+
+            // 3. Sync fresh brushing logs from Supabase
+            try {
+                List<BrushingLog> freshLogs = SupabaseAuthHelper.fetchBrushingLogsForChildBlocking(patientUid);
+                db.appDao().clearBrushingLogsForChild(patientUid);
+                for (BrushingLog l : freshLogs) db.appDao().insertBrushingLog(l);
+                
+                runOnUiThread(() -> {
+                    historyList.clear();
+                    historyList.addAll(freshLogs);
+                    adapter.notifyDataSetChanged();
+                });
+            } catch (Exception e) {
+                android.util.Log.e("PatientProfile", "Failed to refresh logs from Supabase", e);
+            }
         });
     }
 
