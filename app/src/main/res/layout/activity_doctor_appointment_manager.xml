@@ -68,9 +68,10 @@
                             android:textSize="10sp" />
 
                         <TextView
+                            android:id="@+id/total_mgmt_text"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="5"
+                            android:text="0"
                             android:textColor="#1976D2"
                             android:textSize="20sp"
                             android:textStyle="bold" />
@@ -100,9 +101,10 @@
                             android:textSize="10sp" />
 
                         <TextView
+                            android:id="@+id/confirmed_mgmt_text"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="3"
+                            android:text="0"
                             android:textColor="#388E3C"
                             android:textSize="20sp"
                             android:textStyle="bold" />
@@ -131,9 +133,10 @@
                             android:textSize="10sp" />
 
                         <TextView
+                            android:id="@+id/pending_mgmt_text"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="2"
+                            android:text="0"
                             android:textColor="#F57C00"
                             android:textSize="20sp"
                             android:textStyle="bold" />

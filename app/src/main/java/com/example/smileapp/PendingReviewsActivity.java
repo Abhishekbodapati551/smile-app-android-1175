@@ -141,7 +141,7 @@ public class PendingReviewsActivity extends AppCompatActivity {
                             if (success) {
                                 db.appDao().approveBrushingLog(l.id);
                                 runOnUiThread(() -> {
-                                    Toast.makeText(PendingReviewsActivity.this, "Approved Successfully!", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(PendingReviewsActivity.this, "Approved Successfully! 5 Points Awarded 🎉", Toast.LENGTH_SHORT).show();
                                 });
                             } else {
                                 runOnUiThread(() -> {

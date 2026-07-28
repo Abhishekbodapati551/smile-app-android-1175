@@ -327,18 +327,18 @@ public class ChildDashboardActivity extends AppCompatActivity {
         cal.set(Calendar.SECOND, 59);
         long endOfDay = cal.getTimeInMillis();
 
-        List<BrushingLog> logsToday = db.appDao().getApprovedBrushingLogsForChildToday(userId, startOfDay, endOfDay);
-        int sessionsDone = logsToday.size();
+        List<BrushingLog> logsToday = db.appDao().getBrushingLogsForChildToday(userId, startOfDay, endOfDay);
+        int sessionsDone = logsToday != null ? logsToday.size() : 0;
 
         runOnUiThread(() -> {
             if (taskProgressBar != null) {
                 taskProgressBar.setMax(2);
-                taskProgressBar.setProgress(sessionsDone);
+                taskProgressBar.setProgress(Math.min(sessionsDone, 2));
             }
             if (taskStatusText != null) {
-                if (sessionsDone == 0) taskStatusText.setText("0/2 sessions completed");
-                else if (sessionsDone == 1) taskStatusText.setText("1/2 sessions completed (50%)");
-                else taskStatusText.setText("All tasks done! (100%)");
+                if (sessionsDone == 0) taskStatusText.setText("0/2 sessions completed today (0/10 pts)");
+                else if (sessionsDone == 1) taskStatusText.setText("1/2 sessions completed today (+5 pts earned!)");
+                else taskStatusText.setText("2/2 sessions completed today! (+10 pts max earned 🎉)");
             }
         });
     }

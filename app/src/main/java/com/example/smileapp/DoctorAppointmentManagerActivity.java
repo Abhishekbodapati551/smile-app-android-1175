@@ -40,6 +40,8 @@ public class DoctorAppointmentManagerActivity extends AppCompatActivity {
     private List<Appointment> appointmentList = new ArrayList<>();
     private List<User> myPatients = new ArrayList<>();
 
+    private TextView totalMgmtText, confirmedMgmtText, pendingMgmtText;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,6 +49,10 @@ public class DoctorAppointmentManagerActivity extends AppCompatActivity {
 
         db = AppDatabase.getInstance(this);
         doctorUid = getIntent().getStringExtra("USER_ID");
+
+        totalMgmtText = findViewById(R.id.total_mgmt_text);
+        confirmedMgmtText = findViewById(R.id.confirmed_mgmt_text);
+        pendingMgmtText = findViewById(R.id.pending_mgmt_text);
 
         recyclerView = findViewById(R.id.appointments_recycler);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -92,6 +98,7 @@ public class DoctorAppointmentManagerActivity extends AppCompatActivity {
                     appointmentList.clear();
                     appointmentList.addAll(latestApps);
                     adapter.notifyDataSetChanged();
+                    updateAppointmentStatsUI(latestApps);
                 });
             } catch (Exception e) {
                 Log.e("AppointmentManager", "Fetch failed", e);
@@ -102,9 +109,29 @@ public class DoctorAppointmentManagerActivity extends AppCompatActivity {
                     appointmentList.clear();
                     appointmentList.addAll(apps);
                     adapter.notifyDataSetChanged();
+                    updateAppointmentStatsUI(apps);
                 });
             }
         });
+    }
+
+    private void updateAppointmentStatsUI(List<Appointment> apps) {
+        int total = apps.size();
+        int confirmed = 0;
+        int pending = 0;
+
+        for (Appointment a : apps) {
+            String s = a.status != null ? a.status.toLowerCase() : "upcoming";
+            if (s.equals("confirmed") || s.equals("present") || s.equals("completed")) {
+                confirmed++;
+            } else {
+                pending++;
+            }
+        }
+
+        if (totalMgmtText != null) totalMgmtText.setText(String.valueOf(total));
+        if (confirmedMgmtText != null) confirmedMgmtText.setText(String.valueOf(confirmed));
+        if (pendingMgmtText != null) pendingMgmtText.setText(String.valueOf(pending));
     }
 
     private void showAddAppointmentDialog() {

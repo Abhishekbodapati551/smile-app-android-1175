@@ -83,7 +83,7 @@ public class BrushingTaskActivity extends AppCompatActivity {
         uploadProgress = findViewById(R.id.upload_progress);
 
         if (allPermissionsGranted()) {
-            startCamera();
+            checkDailyLimitAndStartCamera();
         } else {
             ActivityCompat.requestPermissions(this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS);
         }
@@ -91,6 +91,28 @@ public class BrushingTaskActivity extends AppCompatActivity {
         recordButton.setOnClickListener(v -> toggleRecording());
 
         cameraExecutor = Executors.newSingleThreadExecutor();
+    }
+
+    private void checkDailyLimitAndStartCamera() {
+        new Thread(() -> {
+            java.util.Calendar cal = java.util.Calendar.getInstance();
+            cal.set(java.util.Calendar.HOUR_OF_DAY, 0);
+            cal.set(java.util.Calendar.MINUTE, 0);
+            cal.set(java.util.Calendar.SECOND, 0);
+            cal.set(java.util.Calendar.MILLISECOND, 0);
+            long startOfDay = cal.getTimeInMillis();
+            long endOfDay = startOfDay + 86400000;
+
+            java.util.List<BrushingLog> logsToday = db.appDao().getBrushingLogsForChildToday(userId, startOfDay, endOfDay);
+            if (logsToday != null && logsToday.size() >= 2) {
+                runOnUiThread(() -> {
+                    Toast.makeText(this, "🎉 Daily Limit Reached! You have already recorded 2 brushing missions today (max 2 per day).", Toast.LENGTH_LONG).show();
+                    finish();
+                });
+            } else {
+                runOnUiThread(this::startCamera);
+            }
+        }).start();
     }
 
     private void startCamera() {

@@ -10,8 +10,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.smileapp.database.AppDatabase;
+import com.example.smileapp.models.Appointment;
 import com.example.smileapp.models.User;
 import com.google.android.material.button.MaterialButton;
+import java.util.List;
 
 public class DoctorProfileActivity extends AppCompatActivity {
 
@@ -20,6 +22,7 @@ public class DoctorProfileActivity extends AppCompatActivity {
     private User doctor;
 
     private TextView profileName, profileSpecialization, doctorIdText;
+    private TextView totalApptsText, confirmedApptsText, pendingApptsText;
     private EditText clinicNameEdit, emailEdit, doctorIdEdit;
     private MaterialButton saveButton;
     private ImageButton backButton;
@@ -36,6 +39,9 @@ public class DoctorProfileActivity extends AppCompatActivity {
         profileName = findViewById(R.id.profile_name);
         profileSpecialization = findViewById(R.id.profile_specialization);
         doctorIdText = findViewById(R.id.doctor_id_text);
+        totalApptsText = findViewById(R.id.total_appointments_text);
+        confirmedApptsText = findViewById(R.id.confirmed_appointments_text);
+        pendingApptsText = findViewById(R.id.pending_appointments_text);
         clinicNameEdit = findViewById(R.id.clinic_name_edit);
         emailEdit = findViewById(R.id.email_edit);
         doctorIdEdit = findViewById(R.id.doctor_id_edit);
@@ -85,6 +91,8 @@ public class DoctorProfileActivity extends AppCompatActivity {
                     }
                     clinicNameEdit.setText(doctor.clinicName != null ? doctor.clinicName : "");
                     emailEdit.setText(doctor.email);
+
+                    loadAppointmentStats();
                 });
             } else {
                 runOnUiThread(() -> {
@@ -92,6 +100,35 @@ public class DoctorProfileActivity extends AppCompatActivity {
                     Toast.makeText(this, "Failed to load profile data", Toast.LENGTH_SHORT).show();
                 });
             }
+        }).start();
+    }
+
+    private void loadAppointmentStats() {
+        if (doctor == null || doctor.doctorId == null || doctor.doctorId.isEmpty() || doctor.doctorId.equals("null")) return;
+
+        new Thread(() -> {
+            List<Appointment> apps = db.appDao().getAppointmentsForDoctor(doctor.doctorId);
+            int total = apps.size();
+            int confirmed = 0;
+            int pending = 0;
+
+            for (Appointment a : apps) {
+                if ("confirmed".equalsIgnoreCase(a.status)) {
+                    confirmed++;
+                } else if ("pending".equalsIgnoreCase(a.status) || "upcoming".equalsIgnoreCase(a.status)) {
+                    pending++;
+                }
+            }
+
+            final int fTotal = total;
+            final int fConfirmed = confirmed;
+            final int fPending = pending;
+
+            runOnUiThread(() -> {
+                totalApptsText.setText(String.valueOf(fTotal));
+                confirmedApptsText.setText(String.valueOf(fConfirmed));
+                pendingApptsText.setText(String.valueOf(fPending));
+            });
         }).start();
     }
 

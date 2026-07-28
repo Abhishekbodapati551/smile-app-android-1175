@@ -78,6 +78,18 @@
                     app:layout_constraintStart_toEndOf="@id/doc_avatar_bg"
                     app:layout_constraintTop_toBottomOf="@id/doctor_name" />
 
+                <TextView
+                    android:id="@+id/doctor_subtitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="2dp"
+                    android:text="Clinic Name"
+                    android:textColor="#5C6BC0"
+                    android:textSize="13sp"
+                    app:layout_constraintStart_toEndOf="@id/doc_avatar_bg"
+                    app:layout_constraintTop_toBottomOf="@id/doctor_id_display" />
+
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_edit_profile"
                     style="@style/Widget.MaterialComponents.Button.TextButton"
@@ -281,6 +293,39 @@
                     android:gravity="center"
                     android:layout_margin="20dp"
                     android:visibility="gone"/>
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Recent Patients Section -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:cardBackgroundColor="@color/white"
+            app:cardCornerRadius="32dp"
+            app:cardElevation="4dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Recent Patients"
+                    android:textColor="#1A237E"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recent_patients_recycler"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:minHeight="100dp" />
 
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
