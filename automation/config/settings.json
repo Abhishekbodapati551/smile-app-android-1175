@@ -1,0 +1,25 @@
+{
+  "framework_name": "SmileApp Selenium E2E Automation Framework",
+  "version": "1.0.0",
+  "browser": "chrome",
+  "headless": true,
+  "implicit_wait": 10,
+  "explicit_wait": 15,
+  "pass_threshold_percent": 95.0,
+  "categories": [
+    "Authentication",
+    "Authorization",
+    "Navigation",
+    "UI Validation",
+    "Forms",
+    "CRUD Operations",
+    "Input Validation",
+    "Error Handling",
+    "Session Management",
+    "File Upload",
+    "Accessibility",
+    "Responsive Design",
+    "Performance Smoke Tests",
+    "Regression"
+  ]
+}

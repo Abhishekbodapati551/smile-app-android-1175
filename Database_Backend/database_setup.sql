@@ -17,7 +17,7 @@ CREATE SEQUENCE doctor_id_seq START 1176;
 CREATE TABLE public.profiles (
   id uuid REFERENCES auth.users NOT NULL PRIMARY KEY,
   name text, email text, role text, doctor_id text, clinic_name text,
-  is_approved boolean DEFAULT false, points int DEFAULT 0, streak int DEFAULT 0, stars int DEFAULT 0
+  is_approved boolean DEFAULT false, points int DEFAULT 0, streak float DEFAULT 0, stars int DEFAULT 0
 );
 
 -- 4. BRUSHING LOGS TABLE
@@ -51,11 +51,48 @@ CREATE TRIGGER on_auth_user_created AFTER INSERT ON auth.users FOR EACH ROW EXEC
 
 -- 7. APPROVAL POWER FUNCTION
 CREATE OR REPLACE FUNCTION public.approve_and_reward(p_log_id int, p_feedback text, p_points_to_add int) RETURNS void AS $$
-DECLARE v_child_id uuid;
+DECLARE
+  v_child_id uuid;
+  v_today_start bigint;
+  v_today_end bigint;
+  v_sessions_today int;
+  v_streak_increment float;
 BEGIN
+  -- 1. Get child info
   SELECT child_id INTO v_child_id FROM public.brushing_logs WHERE id = p_log_id;
+
+  -- 2. Mark log as approved
   UPDATE public.brushing_logs SET approved = true, is_rejected = false, doctor_feedback = p_feedback WHERE id = p_log_id;
-  UPDATE public.profiles SET points = COALESCE(points, 0) + p_points_to_add, streak = COALESCE(streak, 0) + 1 WHERE id = v_child_id;
+
+  -- 3. Calculate today's time range (UTC)
+  v_today_start := (extract(epoch from (current_date at time zone 'UTC')) * 1000)::bigint;
+  v_today_end := v_today_start + 86399999;
+
+  -- 4. Count how many logs have already been approved for this child TODAY
+  -- Note: We exclude the one we just approved to see what the count WAS
+  SELECT count(*) INTO v_sessions_today
+  FROM public.brushing_logs
+  WHERE child_id = v_child_id
+    AND approved = true
+    AND created_at >= v_today_start
+    AND created_at <= v_today_end
+    AND id != p_log_id;
+
+  -- 5. Determine streak increment (Max 1.0 per day, 0.5 per session)
+  IF v_sessions_today = 0 THEN
+    v_streak_increment := 0.5; -- First session of the day
+  ELSIF v_sessions_today = 1 THEN
+    v_streak_increment := 0.5; -- Second session of the day
+  ELSE
+    v_streak_increment := 0;   -- Already completed daily goal
+  END IF;
+
+  -- 6. Update Profile
+  UPDATE public.profiles
+  SET
+    points = COALESCE(points, 0) + p_points_to_add,
+    streak = COALESCE(streak, 0) + v_streak_increment
+  WHERE id = v_child_id;
 END; $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- 8. PERMISSIONS & REALTIME

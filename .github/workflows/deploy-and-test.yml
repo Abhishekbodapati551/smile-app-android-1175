@@ -1,4 +1,4 @@
-name: Phase 7 - Deploy & Live Selenium E2E Testing
+name: Phase 7 - Complete CI/CD Deployment & Live E2E Testing
 
 on:
   push:
@@ -25,57 +25,57 @@ jobs:
         uses: actions/checkout@v4
 
       # Stage 2: Dependency Installation
-      - name: Stage 2 - Set up Python & Dependencies
+      - name: Stage 2 - Set up Python & Automation Dependencies
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - name: Stage 2 - Install Chrome & Automation Requirements
+      - name: Stage 2 - Install Chrome & Python Packages
         run: |
           python -m pip install --upgrade pip
           pip install -r automation/requirements.txt
 
       # Stage 3: Build Application
-      - name: Stage 3 - Build Application
+      - name: Stage 3 - Build Application Assets
         run: |
-          echo "Building static web application..."
-          test -f index.html || (echo "index.html missing!" && exit 1)
+          echo "Building static Web Dashboard application..."
+          test -f index.html || (echo "index.html is missing!" && exit 1)
 
       # Stage 4: Static Analysis
-      - name: Stage 4 - Static Analysis & Linting
+      - name: Stage 4 - Static Analysis & HTML Linting
         run: |
-          echo "Executing Static Analysis on application assets..."
-          python -c "import html.parser; html.parser.HTMLParser().feed(open('index.html').read())"
+          echo "Performing Static Analysis..."
+          python -c "import html.parser; html.parser.HTMLParser().feed(open('index.html', encoding='utf-8').read())"
 
       # Stage 5: Deploy to GitHub Pages
-      - name: Setup Pages
+      - name: Setup GitHub Pages Environment
         uses: actions/configure-pages@v5
 
-      - name: Upload Pages Artifact
+      - name: Upload GitHub Pages Artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: '.'
 
-      - name: Stage 5 - Deploy to GitHub Pages
+      - name: Stage 5 - Deploy Application to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
 
       # Stage 6: Wait for Deployment
-      - name: Stage 6 - Wait for Deployment Availability
+      - name: Stage 6 - Wait for Deployment Propagation
         run: |
-          echo "Waiting 15 seconds for GitHub Pages DNS & static asset caching..."
+          echo "Waiting 15 seconds for DNS propagation and static asset deployment..."
           sleep 15
 
       # Stage 7: Deployment Verification
-      - name: Stage 7 - Deployment Verification
+      - name: Stage 7 - Deployment Verification (HTTP 200 & Asset Check)
         env:
           BASE_URL: ${{ steps.deployment.outputs.page_url }}
         run: |
-          echo "Verifying live deployment at: $BASE_URL"
+          echo "Verifying live deployment availability at: $BASE_URL"
           python automation/utils/deployment_verifier.py
 
       # Stage 8: Run Selenium E2E Tests
-      - name: Stage 8 - Run Selenium E2E Tests (Headless Chrome)
+      - name: Stage 8 - Execute Headless Selenium E2E Test Suite (400+ Test Cases)
         env:
           BASE_URL: ${{ steps.deployment.outputs.page_url }}
           HEADLESS: "true"
@@ -83,17 +83,18 @@ jobs:
         run: |
           python automation/run_tests.py
 
-      # Stage 9 & 10: Generate Reports & Excel Reports (Executed inside run_tests.py)
-      - name: Stage 9 & 10 - Verify Generated Reports
+      # Stage 9 & 10: Generate Reports & Excel Reports (Executed during run_tests.py)
+      - name: Stage 9 & 10 - Verify Generated Multi-Format Reports
         if: always()
         run: |
+          echo "Verifying generated report directories..."
           ls -la automation/reports/Excel/
           ls -la automation/reports/HTML/
           ls -la automation/reports/JSON/
           ls -la automation/reports/Summary/
 
       # Stage 11: Upload Artifacts
-      - name: Stage 11 - Upload Automation & Execution Artifacts
+      - name: Stage 11 - Upload Automation Reports & Evidence Artifacts
         uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -114,7 +115,7 @@ jobs:
           fi
 
       # Stage 13: Store Historical Results
-      - name: Stage 13 - Store Historical Execution Results
+      - name: Stage 13 - Store Historical Test Execution Results
         if: always()
         run: |
-          echo "Execution results archived in workflow artifacts and step summary."
+          echo "Test execution results successfully stored in workflow artifacts and step summaries."
