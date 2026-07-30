@@ -257,32 +257,42 @@
 
             <!-- Rewards Card -->
             <div class="bg-white p-6 rounded-[28px] shadow-xl border border-slate-100/80 text-slate-800">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-xl font-extrabold text-slate-900 flex items-center space-x-2">
-                        <span>🎁</span>
-                        <span>My Rewards</span>
-                    </h3>
+                <div class="flex justify-between items-center mb-5">
+                    <div>
+                        <h3 class="text-xl font-extrabold text-slate-900 flex items-center space-x-2">
+                            <span>🎁</span>
+                            <span>My Rewards</span>
+                        </h3>
+                        <p class="text-xs text-slate-400 font-medium">Unlock badges & prizes by brushing daily!</p>
+                    </div>
                     <div class="flex items-center space-x-2">
                         <span class="text-xs font-bold bg-slate-100 text-slate-600 px-3 py-1 rounded-full hidden" id="points-display">0 PTS</span>
-                        <span class="text-blue-600 font-bold text-sm cursor-pointer hover:underline" onclick="showRewardStore()">View All</span>
+                        <button onclick="showRewardStore()" class="text-xs font-extrabold bg-blue-50 text-blue-600 hover:bg-blue-100 px-3.5 py-1.5 rounded-full transition-all flex items-center space-x-1">
+                            <span>View Store</span>
+                            <span>→</span>
+                        </button>
                     </div>
                 </div>
-                <div class="grid grid-cols-4 gap-3 text-center">
-                    <div id="rew-1" class="flex flex-col items-center opacity-30 transition-opacity">
-                        <div class="w-full aspect-square bg-slate-100/90 rounded-2xl flex items-center justify-center text-2xl sm:text-3xl mb-1.5 shadow-inner text-amber-400 border border-slate-200/50">⭐</div>
-                        <span class="text-[11px] font-semibold text-slate-500">Star Badge</span>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+                    <div id="rew-1" onclick="showRewardStore()" class="cursor-pointer bg-gradient-to-b from-amber-50 to-orange-50/40 p-3.5 rounded-2xl border border-amber-200/60 card-hover opacity-40 transition-all flex flex-col items-center">
+                        <div class="w-14 h-14 bg-gradient-to-tr from-amber-300 to-yellow-400 rounded-2xl flex items-center justify-center text-3xl shadow-md text-white mb-2 border border-white/60">⭐</div>
+                        <span class="text-xs font-extrabold text-slate-800">Star Badge</span>
+                        <span class="text-[10px] font-bold text-amber-600 bg-amber-100/80 px-2 py-0.5 rounded-md mt-1">100 PTS</span>
                     </div>
-                    <div id="rew-2" class="flex flex-col items-center opacity-30 transition-opacity">
-                        <div class="w-full aspect-square bg-slate-100/90 rounded-2xl flex items-center justify-center text-2xl sm:text-3xl mb-1.5 shadow-inner text-pink-400 border border-slate-200/50">🖋️</div>
-                        <span class="text-[11px] font-semibold text-slate-500">Pens Set</span>
+                    <div id="rew-2" onclick="showRewardStore()" class="cursor-pointer bg-gradient-to-b from-pink-50 to-rose-50/40 p-3.5 rounded-2xl border border-pink-200/60 card-hover opacity-40 transition-all flex flex-col items-center">
+                        <div class="w-14 h-14 bg-gradient-to-tr from-pink-400 to-rose-400 rounded-2xl flex items-center justify-center text-3xl shadow-md text-white mb-2 border border-white/60">🖋️</div>
+                        <span class="text-xs font-extrabold text-slate-800">Pens Set</span>
+                        <span class="text-[10px] font-bold text-pink-600 bg-pink-100/80 px-2 py-0.5 rounded-md mt-1">200 PTS</span>
                     </div>
-                    <div id="rew-3" class="flex flex-col items-center opacity-30 transition-opacity">
-                        <div class="w-full aspect-square bg-slate-100/90 rounded-2xl flex items-center justify-center text-2xl sm:text-3xl mb-1.5 shadow-inner text-purple-400 border border-slate-200/50">🧸</div>
-                        <span class="text-[11px] font-semibold text-slate-500">Teddy Bear</span>
+                    <div id="rew-3" onclick="showRewardStore()" class="cursor-pointer bg-gradient-to-b from-purple-50 to-indigo-50/40 p-3.5 rounded-2xl border border-purple-200/60 card-hover opacity-40 transition-all flex flex-col items-center">
+                        <div class="w-14 h-14 bg-gradient-to-tr from-purple-400 to-indigo-400 rounded-2xl flex items-center justify-center text-3xl shadow-md text-white mb-2 border border-white/60">🧸</div>
+                        <span class="text-xs font-extrabold text-slate-800">Teddy Bear</span>
+                        <span class="text-[10px] font-bold text-purple-600 bg-purple-100/80 px-2 py-0.5 rounded-md mt-1">300 PTS</span>
                     </div>
-                    <div id="rew-4" class="flex flex-col items-center opacity-30 transition-opacity">
-                        <div class="w-full aspect-square bg-slate-100/90 rounded-2xl flex items-center justify-center text-2xl sm:text-3xl mb-1.5 shadow-inner text-yellow-500 border border-slate-200/50">🏆</div>
-                        <span class="text-[11px] font-semibold text-slate-500">Trophy</span>
+                    <div id="rew-4" onclick="showRewardStore()" class="cursor-pointer bg-gradient-to-b from-yellow-50 to-amber-50/40 p-3.5 rounded-2xl border border-yellow-200/60 card-hover opacity-40 transition-all flex flex-col items-center">
+                        <div class="w-14 h-14 bg-gradient-to-tr from-amber-400 to-yellow-500 rounded-2xl flex items-center justify-center text-3xl shadow-md text-white mb-2 border border-white/60">🏆</div>
+                        <span class="text-xs font-extrabold text-slate-800">Trophy</span>
+                        <span class="text-[10px] font-bold text-amber-700 bg-amber-100/80 px-2 py-0.5 rounded-md mt-1">500 PTS</span>
                     </div>
                 </div>
             </div>
@@ -501,20 +511,87 @@
     </div>
 
     <!-- Reward Store -->
-    <div id="modal-rewards-store" class="fixed inset-0 bg-slate-900/90 backdrop-blur-md z-[130] hidden overflow-y-auto p-4 md:p-10 text-slate-800">
-        <div class="w-full max-w-4xl mx-auto glass-card rounded-[40px] shadow-2xl p-10 relative">
-            <button onclick="document.getElementById('modal-rewards-store').classList.add('hidden')" class="absolute top-8 right-8 text-slate-400 text-3xl">✕</button>
-            <h2 class="text-4xl font-black mb-2">🎁 Reward Store</h2>
-            <p class="text-slate-400 mb-8 font-bold uppercase tracking-widest text-xs">Mirror of Mobile Version</p>
-            <div class="bg-pink-500 text-white p-8 rounded-[32px] mb-10 flex justify-between items-center shadow-xl">
-                <div><p class="text-xs opacity-80 font-bold uppercase">Your Points</p><p id="store-points-val" class="text-4xl font-black mt-1">⭐ Loading...</p></div>
-                <div class="text-5xl">🏦</div>
+    <div id="modal-rewards-store" class="fixed inset-0 bg-slate-950/80 backdrop-blur-xl z-[130] hidden overflow-y-auto p-4 md:p-10 text-slate-800">
+        <div class="w-full max-w-4xl mx-auto glass-card-premium rounded-[36px] p-8 md:p-10 relative">
+            <button onclick="document.getElementById('modal-rewards-store').classList.add('hidden')" class="absolute top-6 right-6 w-10 h-10 bg-slate-100 hover:bg-slate-200 rounded-full flex items-center justify-center text-slate-500 font-bold text-xl transition-colors">✕</button>
+            
+            <div class="flex items-center space-x-3 mb-2">
+                <div class="w-12 h-12 bg-gradient-to-tr from-amber-300 to-yellow-400 rounded-2xl flex items-center justify-center text-2xl shadow-md">🎁</div>
+                <div>
+                    <h2 class="text-3xl font-black text-slate-900 tracking-tight">Reward Store</h2>
+                    <p class="text-slate-500 text-xs font-semibold">Collect prizes with your earned brushing points!</p>
+                </div>
             </div>
+
+            <div class="bg-gradient-to-r from-amber-500 via-yellow-500 to-orange-500 text-white p-6 sm:p-8 rounded-[28px] my-6 flex justify-between items-center shadow-[0_15px_30px_rgba(245,158,11,0.3)]">
+                <div>
+                    <p class="text-xs opacity-90 font-extrabold uppercase tracking-wider">Your Balance</p>
+                    <p id="store-points-val" class="text-4xl font-black mt-1 drop-shadow-sm">⭐ 0 Pts</p>
+                </div>
+                <div class="text-5xl animate-pulse">🏦</div>
+            </div>
+
+            <!-- Reward Items Diagram & Cards Grid -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="bg-white p-6 rounded-[32px] border shadow-sm text-center"><p class="text-5xl mb-4">⭐</p><h3 class="text-xl font-black">Star Badge</h3><p class="text-slate-400 font-bold text-sm mb-6">100 Pts</p><button onclick="handlePurchase('Star Badge', 100)" class="w-full bg-blue-600 text-white p-4 rounded-2xl font-black hover:bg-blue-700">COLLECT</button></div>
-                <div class="bg-white p-6 rounded-[32px] border shadow-sm text-center"><p class="text-5xl mb-4">🖋️</p><h3 class="text-xl font-black">Pens Set</h3><p class="text-slate-400 font-bold text-sm mb-6">200 Pts</p><button onclick="handlePurchase('Pens Set', 200)" class="w-full bg-blue-600 text-white p-4 rounded-2xl font-black hover:bg-blue-700">COLLECT</button></div>
-                <div class="bg-white p-6 rounded-[32px] border shadow-sm text-center"><p class="text-5xl mb-4">🧸</p><h3 class="text-xl font-black">Teddy Bear</h3><p class="text-slate-400 font-bold text-sm mb-6">300 Pts</p><button onclick="handlePurchase('Teddy Bear', 300)" class="w-full bg-blue-600 text-white p-4 rounded-2xl font-black hover:bg-blue-700">COLLECT</button></div>
-                <div class="bg-white p-6 rounded-[32px] border shadow-sm text-center"><p class="text-5xl mb-4">🏆</p><h3 class="text-xl font-black">Trophy</h3><p class="text-slate-400 font-bold text-sm mb-6">500 Pts</p><button onclick="handlePurchase('Trophy', 500)" class="w-full bg-blue-600 text-white p-4 rounded-2xl font-black hover:bg-blue-700">COLLECT</button></div>
+                <!-- Reward Item 1 -->
+                <div class="bg-white p-6 rounded-[28px] border-2 border-amber-100 shadow-lg flex flex-col justify-between card-hover">
+                    <div>
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="w-16 h-16 bg-gradient-to-tr from-amber-300 to-yellow-400 rounded-2xl flex items-center justify-center text-4xl shadow-md border-2 border-white">⭐</div>
+                            <span class="bg-amber-100 text-amber-800 font-extrabold text-xs px-3.5 py-1.5 rounded-full border border-amber-300">100 PTS</span>
+                        </div>
+                        <h3 class="text-xl font-extrabold text-slate-900">Star Badge 🌟</h3>
+                        <p class="text-slate-500 text-xs mt-1 font-medium">Official Dental Champion Badge. Awarded for completing your first 10 brushing missions!</p>
+                    </div>
+                    <button onclick="handlePurchase('Star Badge', 100)" class="w-full mt-6 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white p-4 rounded-2xl font-black text-sm uppercase shadow-md transition-all active:scale-95 flex items-center justify-center space-x-2">
+                        <span>✨</span><span>COLLECT STAR BADGE</span>
+                    </button>
+                </div>
+
+                <!-- Reward Item 2 -->
+                <div class="bg-white p-6 rounded-[28px] border-2 border-pink-100 shadow-lg flex flex-col justify-between card-hover">
+                    <div>
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="w-16 h-16 bg-gradient-to-tr from-pink-400 to-rose-400 rounded-2xl flex items-center justify-center text-4xl shadow-md border-2 border-white">🖋️</div>
+                            <span class="bg-pink-100 text-pink-800 font-extrabold text-xs px-3.5 py-1.5 rounded-full border border-pink-300">200 PTS</span>
+                        </div>
+                        <h3 class="text-xl font-extrabold text-slate-900">Pens Set ✏️</h3>
+                        <p class="text-slate-500 text-xs mt-1 font-medium">Smile App Colored Drawing & Writing Kit. Includes 5 vibrant colors!</p>
+                    </div>
+                    <button onclick="handlePurchase('Pens Set', 200)" class="w-full mt-6 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white p-4 rounded-2xl font-black text-sm uppercase shadow-md transition-all active:scale-95 flex items-center justify-center space-x-2">
+                        <span>✨</span><span>COLLECT PENS SET</span>
+                    </button>
+                </div>
+
+                <!-- Reward Item 3 -->
+                <div class="bg-white p-6 rounded-[28px] border-2 border-purple-100 shadow-lg flex flex-col justify-between card-hover">
+                    <div>
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="w-16 h-16 bg-gradient-to-tr from-purple-400 to-indigo-400 rounded-2xl flex items-center justify-center text-4xl shadow-md border-2 border-white">🧸</div>
+                            <span class="bg-purple-100 text-purple-800 font-extrabold text-xs px-3.5 py-1.5 rounded-full border border-purple-300">300 PTS</span>
+                        </div>
+                        <h3 class="text-xl font-extrabold text-slate-900">Teddy Bear 🧸</h3>
+                        <p class="text-slate-500 text-xs mt-1 font-medium">Soft & Plush Smile Companion Toy. Keeps you company during dental visits!</p>
+                    </div>
+                    <button onclick="handlePurchase('Teddy Bear', 300)" class="w-full mt-6 bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white p-4 rounded-2xl font-black text-sm uppercase shadow-md transition-all active:scale-95 flex items-center justify-center space-x-2">
+                        <span>✨</span><span>COLLECT TEDDY BEAR</span>
+                    </button>
+                </div>
+
+                <!-- Reward Item 4 -->
+                <div class="bg-white p-6 rounded-[28px] border-2 border-yellow-100 shadow-lg flex flex-col justify-between card-hover">
+                    <div>
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="w-16 h-16 bg-gradient-to-tr from-amber-400 to-yellow-500 rounded-2xl flex items-center justify-center text-4xl shadow-md border-2 border-white">🏆</div>
+                            <span class="bg-yellow-100 text-amber-900 font-extrabold text-xs px-3.5 py-1.5 rounded-full border border-yellow-300">500 PTS</span>
+                        </div>
+                        <h3 class="text-xl font-extrabold text-slate-900">Golden Trophy 🏆</h3>
+                        <p class="text-slate-500 text-xs mt-1 font-medium">Ultimate Dental Health Championship Trophy. The highest achievement reward!</p>
+                    </div>
+                    <button onclick="handlePurchase('Trophy', 500)" class="w-full mt-6 bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-600 hover:to-yellow-700 text-white p-4 rounded-2xl font-black text-sm uppercase shadow-md transition-all active:scale-95 flex items-center justify-center space-x-2">
+                        <span>✨</span><span>COLLECT GOLDEN TROPHY</span>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
