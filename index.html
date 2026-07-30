@@ -161,10 +161,11 @@
 
         <div class="px-6 space-y-5 max-w-2xl mx-auto mt-4">
             <!-- Warning Note from Doctor -->
-            <div id="warning-card" class="bg-gradient-to-r from-orange-500 to-amber-600 border-2 border-white/30 p-6 rounded-[28px] hidden animate-pulse shadow-lg">
+            <div id="warning-card" class="bg-gradient-to-r from-orange-500 to-amber-600 border-2 border-white/30 p-6 rounded-[28px] hidden animate-pulse shadow-lg relative">
+                <button onclick="dismissWarningCard(event)" title="Close" class="absolute top-4 right-4 text-white/80 hover:text-white text-lg font-bold">✕</button>
                 <div class="flex items-center space-x-4">
                     <div class="text-3xl">⚠️</div>
-                    <div class="flex-1">
+                    <div class="flex-1 pr-6">
                         <p class="font-extrabold text-white text-lg">Message from Doctor</p>
                         <p id="warning-text" class="text-white/90 text-sm italic mt-0.5"></p>
                     </div>
@@ -172,10 +173,11 @@
             </div>
 
             <!-- Doctor Feedback -->
-            <div id="feedback-card" class="bg-gradient-to-r from-teal-500 to-emerald-600 border-2 border-white/30 p-6 rounded-[28px] hidden cursor-pointer shadow-lg hover:scale-[1.01] transition-transform" onclick="showFeedbackPopup()">
+            <div id="feedback-card" class="bg-gradient-to-r from-teal-500 to-emerald-600 border-2 border-white/30 p-6 rounded-[28px] hidden cursor-pointer shadow-lg hover:scale-[1.01] transition-transform relative" onclick="showFeedbackPopup()">
+                <button onclick="dismissFeedbackCard(event)" title="Close" class="absolute top-4 right-4 text-white/80 hover:text-white text-lg font-bold z-10">✕</button>
                 <div class="flex items-center space-x-4">
                     <div class="text-3xl">💬</div>
-                    <div class="flex-1">
+                    <div class="flex-1 pr-6">
                         <p class="font-extrabold text-white text-lg">New Feedback!</p>
                         <p id="feedback-text" class="text-white/90 text-sm truncate mt-0.5"></p>
                     </div>
@@ -183,10 +185,11 @@
             </div>
 
             <!-- Rejection Card -->
-            <div id="rejection-card" class="bg-gradient-to-r from-rose-500 to-red-600 border-2 border-white/30 p-6 rounded-[28px] hidden cursor-pointer shadow-lg hover:scale-[1.01] transition-transform">
+            <div id="rejection-card" class="bg-gradient-to-r from-rose-500 to-red-600 border-2 border-white/30 p-6 rounded-[28px] hidden cursor-pointer shadow-lg hover:scale-[1.01] transition-transform relative" onclick="handleRejectionClick()">
+                <button onclick="dismissRejectionCard(event)" title="Close" class="absolute top-4 right-4 text-white/80 hover:text-white text-lg font-bold z-10">✕</button>
                 <div class="flex items-center space-x-4">
                     <div class="text-3xl">❌</div>
-                    <div class="flex-1">
+                    <div class="flex-1 pr-6">
                         <p class="font-extrabold text-white text-lg">Mission Needs Retry</p>
                         <p id="rejection-reason" class="text-white/90 text-sm italic mt-0.5"></p>
                     </div>
@@ -624,8 +627,12 @@
                     if (rew) rew.classList.toggle('opacity-30', (userData.points||0) < thresholds[i-1]);
                 }
 
+                const isFeedbackDismissed = sessionStorage.getItem('dismissed_feedback_' + userData.id);
+                const isRejectionDismissed = sessionStorage.getItem('dismissed_rejection_' + userData.id);
+                const isWarningDismissed = sessionStorage.getItem('dismissed_warning_' + userData.id);
+
                 const wc = document.getElementById('warning-card');
-                if (userData.warning_note) {
+                if (userData.warning_note && !isWarningDismissed) {
                     wc.classList.remove('hidden');
                     document.getElementById('warning-text').innerText = userData.warning_note;
                 } else {
@@ -643,26 +650,63 @@
                 let latestFeedback = logs.find(l => l.doctor_feedback && !l.is_rejected);
 
                 const rc = document.getElementById('rejection-card');
-                if (latestRejected) {
+                if (latestRejected && !isRejectionDismissed) {
                     rc.classList.remove('hidden');
                     document.getElementById('rejection-reason').innerText = latestRejected.doctor_feedback;
                 } else rc.classList.add('hidden');
 
                 const fc = document.getElementById('feedback-card');
-                if (latestFeedback) {
+                if (latestFeedback && !isFeedbackDismissed) {
                     fc.classList.remove('hidden');
                     document.getElementById('feedback-text').innerText = latestFeedback.doctor_feedback;
                 } else fc.classList.add('hidden');
 
                 fetchChildAppts();
                 refreshDailyProgress(logs);
+
+                // Realtime subscription for instant appointment updates when doctor schedules a visit
+                try {
+                    supabaseClient.channel('patient_appts_' + userData.id)
+                        .on('postgres_changes', { event: '*', schema: 'public', table: 'appointments', filter: `child_id=eq.${userData.id}` }, payload => {
+                            fetchChildAppts();
+                        })
+                        .subscribe();
+                } catch (rtErr) { console.log("Realtime subscription note:", rtErr); }
             } catch (err) {
                 console.error("Dashboard Setup Error:", err);
             }
         }
 
+        function dismissFeedbackCard(e) {
+            if (e) e.stopPropagation();
+            const fc = document.getElementById('feedback-card');
+            if (fc) fc.classList.add('hidden');
+            if (userData?.id) sessionStorage.setItem('dismissed_feedback_' + userData.id, 'true');
+        }
+
         function showFeedbackPopup() {
-            alert("Doctor's Feedback:\n\n" + document.getElementById('feedback-text').innerText);
+            const txt = document.getElementById('feedback-text')?.innerText || "Keep up the great work!";
+            alert("Doctor's Feedback:\n\n" + txt);
+            dismissFeedbackCard();
+        }
+
+        function dismissRejectionCard(e) {
+            if (e) e.stopPropagation();
+            const rc = document.getElementById('rejection-card');
+            if (rc) rc.classList.add('hidden');
+            if (userData?.id) sessionStorage.setItem('dismissed_rejection_' + userData.id, 'true');
+        }
+
+        function handleRejectionClick() {
+            dismissRejectionCard();
+            openBrushingModal();
+        }
+
+        function dismissWarningCard(e) {
+            if (e) e.stopPropagation();
+            const wc = document.getElementById('warning-card');
+            if (wc) wc.classList.add('hidden');
+            if (userData?.id) sessionStorage.setItem('dismissed_warning_' + userData.id, 'true');
         }
 
         function showRewardStore() {
@@ -768,9 +812,26 @@
         }
 
         async function fetchChildAppts() {
-            const { data } = await supabaseClient.from('appointments').select('*').eq('child_id', userData.id).eq('status', 'upcoming').order('appt_date', { ascending: true }).limit(1);
-            if (data?.length) { document.getElementById('notif-appt').classList.remove('hidden'); document.getElementById('notif-appt-text').innerText = `${data[0].type}: ${new Date(data[0].appt_date).toLocaleString([], {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'})}`; }
-            else document.getElementById('notif-appt').classList.add('hidden');
+            try {
+                const { data } = await supabaseClient
+                    .from('appointments')
+                    .select('*')
+                    .eq('child_id', userData.id)
+                    .in('status', ['upcoming', 'confirmed'])
+                    .order('appt_date', { ascending: true })
+                    .limit(1);
+
+                const notifEl = document.getElementById('notif-appt');
+                if (data?.length) { 
+                    if (notifEl) notifEl.classList.remove('hidden'); 
+                    const dt = new Date(data[0].appt_date).toLocaleString([], {month:'short', day:'numeric', year:'numeric', hour:'2-digit', minute:'2-digit'});
+                    document.getElementById('notif-appt-text').innerText = `${data[0].type || 'Dental Visit'}: ${dt}`; 
+                } else {
+                    if (notifEl) notifEl.classList.add('hidden');
+                }
+            } catch (err) {
+                console.error("Error fetching patient appointments:", err);
+            }
         }
 
         function showAllPatientAppts() {
