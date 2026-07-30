@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Quicksand', sans-serif; }
-        .bg-app { background: linear-gradient(135deg, #1A237E 0%, #42A5F5 100%); }
+        .bg-app { background: linear-gradient(180deg, #1E78EC 0%, #1557C0 100%); }
         .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); }
         .hidden { display: none !important; }
         .loader { border: 3px solid #f3f3f3; border-top: 3px solid #3498db; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
@@ -90,21 +90,21 @@
     </div>
 
     <!-- 4. CHILD DASHBOARD -->
-    <div id="screen-dashboard-child" class="min-h-screen bg-app hidden pb-10 text-white">
-        <nav class="p-8 flex justify-between items-center sticky top-0 bg-app/80 backdrop-blur-md z-50">
+    <div id="screen-dashboard-child" class="min-h-screen bg-app hidden pb-12 text-white">
+        <nav class="p-6 md:p-8 flex justify-between items-center sticky top-0 bg-app/90 backdrop-blur-md z-50 max-w-2xl mx-auto w-full">
             <div>
-                <h2 id="child-welcome-msg" class="text-3xl font-black">Hi, Friend!</h2>
-                <p id="child-subtitle" class="opacity-80">Ready for your mission?</p>
+                <h2 id="child-welcome-msg" class="text-3xl font-extrabold text-white tracking-tight">Hi, Friend!</h2>
+                <p id="child-subtitle" class="text-white/80 text-base font-normal mt-0.5">Ready to brush today?</p>
             </div>
-            <div class="flex items-center space-x-4">
-                <button onclick="syncNow()" class="bg-white/20 px-4 py-2 rounded-xl text-[10px] font-black border border-white/20">SYNC</button>
-                <button onclick="logout()" class="w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center text-xl shadow-lg border-2 border-white text-white">⭐</button>
+            <div class="flex items-center space-x-3">
+                <button onclick="syncNow()" class="bg-white/20 hover:bg-white/30 text-white px-3 py-1.5 rounded-xl text-[10px] font-black border border-white/30 backdrop-blur-sm transition-all">SYNC</button>
+                <button onclick="logout()" title="Logout" class="w-14 h-14 bg-[#FFD54F] hover:bg-[#FFCA28] rounded-full flex items-center justify-center text-2xl shadow-lg border-2 border-white text-white transition-transform hover:scale-105">⭐</button>
             </div>
         </nav>
 
-        <div class="px-6 space-y-6 max-w-2xl mx-auto">
+        <div class="px-6 space-y-5 max-w-2xl mx-auto">
             <!-- Warning Note from Doctor -->
-            <div id="warning-card" class="bg-orange-500/90 border-2 border-white/30 p-6 rounded-[32px] hidden animate-pulse">
+            <div id="warning-card" class="bg-orange-500/90 border-2 border-white/30 p-6 rounded-[28px] hidden animate-pulse">
                 <div class="flex items-center space-x-4">
                     <div class="text-3xl">⚠️</div>
                     <div class="flex-1">
@@ -115,7 +115,7 @@
             </div>
 
             <!-- Doctor Feedback -->
-            <div id="feedback-card" class="bg-teal-500 border-2 border-white/30 p-6 rounded-[32px] hidden cursor-pointer shadow-lg" onclick="showFeedbackPopup()">
+            <div id="feedback-card" class="bg-teal-500 border-2 border-white/30 p-6 rounded-[28px] hidden cursor-pointer shadow-lg" onclick="showFeedbackPopup()">
                 <div class="flex items-center space-x-4">
                     <div class="text-3xl">💬</div>
                     <div class="flex-1">
@@ -126,7 +126,7 @@
             </div>
 
             <!-- Rejection Card -->
-            <div id="rejection-card" class="bg-red-500 border-2 border-white/30 p-6 rounded-[32px] hidden cursor-pointer shadow-lg">
+            <div id="rejection-card" class="bg-red-500 border-2 border-white/30 p-6 rounded-[28px] hidden cursor-pointer shadow-lg">
                 <div class="flex items-center space-x-4">
                     <div class="text-3xl">❌</div>
                     <div class="flex-1">
@@ -136,54 +136,94 @@
                 </div>
             </div>
 
-            <!-- Streak Card -->
-            <div class="bg-white p-6 rounded-[32px] shadow-xl flex justify-between items-center text-slate-800">
-                <div>
-                    <p class="text-slate-400 font-bold text-xs uppercase">Current Streak</p>
-                    <p id="child-streak" class="text-4xl font-black text-blue-900">0 Days</p>
+            <!-- Streak & Points Row -->
+            <div class="grid grid-cols-2 gap-4">
+                <!-- Streak Card -->
+                <div class="bg-white p-5 sm:p-6 rounded-[28px] shadow-lg flex justify-between items-center text-slate-800">
+                    <div>
+                        <p class="text-slate-400 font-medium text-xs sm:text-sm">Current Streak</p>
+                        <p id="child-streak" class="text-2xl sm:text-3xl font-extrabold text-[#1E293B] mt-1">0 Days</p>
+                    </div>
+                    <div class="text-3xl sm:text-4xl">🔥</div>
                 </div>
-                <div class="bg-orange-100 w-16 h-16 rounded-3xl flex items-center justify-center text-3xl">🔥</div>
+
+                <!-- Total Points Card -->
+                <div onclick="showRewardStore()" class="bg-white p-5 sm:p-6 rounded-[28px] shadow-lg flex justify-between items-center text-slate-800 cursor-pointer hover:scale-[1.02] transition-all group">
+                    <div>
+                        <p class="text-slate-400 font-medium text-xs sm:text-sm group-hover:text-amber-600 transition-colors">Total Points</p>
+                        <p id="child-points-card-val" class="text-2xl sm:text-3xl font-extrabold text-[#F59E0B] mt-1">0 Pts</p>
+                    </div>
+                    <div class="text-3xl sm:text-4xl">⭐</div>
+                </div>
             </div>
 
-            <!-- Brushing Task -->
-            <div onclick="openBrushingModal()" class="bg-white p-6 rounded-[32px] shadow-xl cursor-pointer hover:scale-[1.02] transition-all text-slate-800">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-xl font-black text-blue-900">Today's Mission</h3>
-                    <div class="flex items-center space-x-2">
-                        <span id="mission-icon" class="text-2xl opacity-20">⬜</span>
+            <!-- Today's Tasks Card -->
+            <div onclick="openBrushingModal()" class="bg-white p-6 rounded-[28px] shadow-lg cursor-pointer hover:scale-[1.01] transition-all text-slate-800">
+                <div class="flex justify-between items-center mb-1">
+                    <h3 class="text-xl font-bold text-[#1E293B]">Today's Tasks</h3>
+                    <div class="w-7 h-7 bg-slate-200 rounded-lg flex items-center justify-center">
+                        <span id="mission-icon" class="text-base opacity-40">⬜</span>
                         <div id="recording-dot" class="w-3 h-3 bg-red-500 rounded-full animate-pulse hidden"></div>
                     </div>
                 </div>
-                <div class="w-full bg-slate-100 h-2 rounded-full">
-                    <div id="mission-progress-bar" class="bg-blue-500 w-[0%] h-full rounded-full transition-all duration-500"></div>
+                <p class="text-slate-500 text-sm font-medium mb-4">Brush for 2 minutes</p>
+                <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden mb-2">
+                    <div id="mission-progress-bar" class="bg-amber-400 w-[0%] h-full rounded-full transition-all duration-500"></div>
                 </div>
-                <p id="mission-status-text" class="text-[10px] text-slate-400 mt-2 font-bold uppercase text-right">Not started yet</p>
+                <p id="mission-status-text" class="text-xs text-slate-400 font-normal">Not started yet</p>
                 <div class="mt-4 flex justify-center">
-                    <button id="btn-start-recording-main" onclick="openBrushingModal(); event.stopPropagation();" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-2xl font-black text-xs uppercase shadow-lg transition-all hover:scale-105">📹 START RECORDING MISSION</button>
+                    <button id="btn-start-recording-main" onclick="openBrushingModal(); event.stopPropagation();" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-2xl font-bold text-xs uppercase shadow-md transition-all hover:scale-105">📹 START RECORDING MISSION</button>
                 </div>
             </div>
 
-            <!-- Appointment -->
-            <div id="notif-appt" class="bg-blue-50 border-2 border-blue-200 p-6 rounded-[32px] hidden text-slate-800 cursor-pointer" onclick="showAllPatientAppts()">
-                <p class="font-black text-blue-800">Upcoming Appointment</p>
-                <p id="notif-appt-text" class="text-blue-600 text-sm"></p>
-                <p class="text-[10px] text-blue-300 mt-2 font-bold uppercase">Click to view all</p>
+            <!-- Quick Action Pills Row -->
+            <div class="grid grid-cols-2 gap-4">
+                <div onclick="openBrushingModal()" class="bg-white py-4 px-6 rounded-[24px] shadow-lg flex items-center justify-center space-x-3 text-[#1E293B] font-bold text-lg cursor-pointer hover:scale-105 transition-all">
+                    <span class="text-xl">🕒</span>
+                    <span>Brush</span>
+                </div>
+                <div onclick="showAllPatientAppts()" class="bg-white py-4 px-6 rounded-[24px] shadow-lg flex items-center justify-center space-x-3 text-[#1E293B] font-bold text-lg cursor-pointer hover:scale-105 transition-all">
+                    <span class="text-xl">📅</span>
+                    <span>Appts</span>
+                </div>
             </div>
 
-            <!-- Rewards -->
-            <div class="bg-white/10 border border-white/20 p-6 rounded-[32px]">
-                <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-xl font-black">🎁 My Rewards</h3>
+            <!-- Appointment Notification -->
+            <div id="notif-appt" class="bg-blue-50 border-2 border-blue-200 p-6 rounded-[28px] hidden text-slate-800 cursor-pointer" onclick="showAllPatientAppts()">
+                <p class="font-bold text-blue-900">Upcoming Appointment</p>
+                <p id="notif-appt-text" class="text-blue-600 text-sm mt-1"></p>
+                <p class="text-[10px] text-blue-400 mt-2 font-bold uppercase">Click to view all</p>
+            </div>
+
+            <!-- Rewards Card -->
+            <div class="bg-white p-6 rounded-[28px] shadow-lg text-slate-800">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold text-[#1E293B] flex items-center space-x-2">
+                        <span>🎁</span>
+                        <span>My Rewards</span>
+                    </h3>
                     <div class="flex items-center space-x-2">
-                        <span class="text-xs font-bold bg-white/20 px-3 py-1 rounded-full" id="points-display">0 PTS</span>
-                        <span class="text-[10px] text-blue-300 font-bold cursor-pointer hover:underline" onclick="showRewardStore()">VIEW ALL</span>
+                        <span class="text-xs font-bold bg-slate-100 text-slate-600 px-3 py-1 rounded-full hidden" id="points-display">0 PTS</span>
+                        <span class="text-blue-500 font-medium text-sm cursor-pointer hover:underline" onclick="showRewardStore()">View All</span>
                     </div>
                 </div>
-                <div class="grid grid-cols-4 gap-2 text-center text-[10px] font-bold">
-                    <div id="rew-1" class="opacity-30"><div class="bg-yellow-400 h-14 rounded-2xl mb-1 flex items-center justify-center text-xl">⭐</div>Star</div>
-                    <div id="rew-2" class="opacity-30"><div class="bg-pink-400 h-14 rounded-2xl mb-1 flex items-center justify-center text-xl">🖋️</div>Pens</div>
-                    <div id="rew-3" class="opacity-30"><div class="bg-purple-400 h-14 rounded-2xl mb-1 flex items-center justify-center text-xl">🧸</div>Teddy</div>
-                    <div id="rew-4" class="opacity-30"><div class="bg-blue-400 h-14 rounded-2xl mb-1 flex items-center justify-center text-xl">🏆</div>Trophy</div>
+                <div class="grid grid-cols-4 gap-3 text-center">
+                    <div id="rew-1" class="flex flex-col items-center opacity-30 transition-opacity">
+                        <div class="w-full aspect-square bg-slate-100 rounded-2xl flex items-center justify-center text-2xl sm:text-3xl mb-1.5 shadow-inner text-amber-400">⭐</div>
+                        <span class="text-[11px] font-medium text-slate-400">Star Badge</span>
+                    </div>
+                    <div id="rew-2" class="flex flex-col items-center opacity-30 transition-opacity">
+                        <div class="w-full aspect-square bg-slate-100 rounded-2xl flex items-center justify-center text-2xl sm:text-3xl mb-1.5 shadow-inner text-pink-400">🖋️</div>
+                        <span class="text-[11px] font-medium text-slate-400">Pens Set</span>
+                    </div>
+                    <div id="rew-3" class="flex flex-col items-center opacity-30 transition-opacity">
+                        <div class="w-full aspect-square bg-slate-100 rounded-2xl flex items-center justify-center text-2xl sm:text-3xl mb-1.5 shadow-inner text-purple-400">🧸</div>
+                        <span class="text-[11px] font-medium text-slate-400">Teddy Bear</span>
+                    </div>
+                    <div id="rew-4" class="flex flex-col items-center opacity-30 transition-opacity">
+                        <div class="w-full aspect-square bg-slate-100 rounded-2xl flex items-center justify-center text-2xl sm:text-3xl mb-1.5 shadow-inner text-yellow-500">🏆</div>
+                        <span class="text-[11px] font-medium text-slate-400">Trophy</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -518,6 +558,8 @@
                 document.getElementById('child-welcome-msg').innerText = `Hi, ${userData.name}!`;
                 document.getElementById('child-streak').innerText = `${userData.streak || 0} Days`;
                 document.getElementById('points-display').innerText = `${userData.points || 0} PTS`;
+                const ptsCardVal = document.getElementById('child-points-card-val');
+                if (ptsCardVal) ptsCardVal.innerText = `${userData.points || 0} PTS`;
 
                 const thresholds = [100, 200, 300, 500];
                 for (let i=1; i<=4; i++) {
@@ -566,40 +608,99 @@
             alert("Doctor's Feedback:\n\n" + document.getElementById('feedback-text').innerText);
         }
 
+        function showRewardStore() {
+            const storeModal = document.getElementById('modal-rewards-store');
+            if (storeModal) storeModal.classList.remove('hidden');
+            const ptsVal = document.getElementById('store-points-val');
+            if (ptsVal) ptsVal.innerText = `⭐ ${userData?.points || 0} Pts`;
+        }
+
+        async function handlePurchase(itemName, cost) {
+            const currentPoints = userData?.points || 0;
+            if (currentPoints < cost) {
+                alert(`Not enough points! You have ${currentPoints} PTS, but ${itemName} requires ${cost} PTS.`);
+                return;
+            }
+            try {
+                const newPts = currentPoints - cost;
+                const { error } = await supabaseClient.from('profiles').update({ points: newPts }).eq('id', userData.id);
+                if (error) throw error;
+                userData.points = newPts;
+                
+                const ptsDisplay = document.getElementById('points-display');
+                if (ptsDisplay) ptsDisplay.innerText = `${newPts} PTS`;
+                
+                const childPtsCard = document.getElementById('child-points-card-val');
+                if (childPtsCard) childPtsCard.innerText = `${newPts} PTS`;
+                
+                const storePtsVal = document.getElementById('store-points-val');
+                if (storePtsVal) storePtsVal.innerText = `⭐ ${newPts} Pts`;
+                
+                alert(`🎉 Congratulations! You collected the ${itemName} for ${cost} PTS!`);
+                setupChildDashboard();
+            } catch (err) {
+                console.error("Purchase failed:", err);
+                alert("Purchase failed: " + err.message);
+            }
+        }
+
         function refreshDailyProgress(logs) {
             const now = new Date();
             const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
             const endOfDay = startOfDay + 86400000;
 
             const logsToday = logs?.filter(l => l.created_at >= startOfDay && l.created_at < endOfDay) || [];
-            const count = logsToday.length;
+            const approvedCount = logsToday.filter(l => l.approved).length;
+            const pendingCount = logsToday.filter(l => !l.approved && !l.is_rejected).length;
 
             const bar = document.getElementById('mission-progress-bar');
             const status = document.getElementById('mission-status-text');
             const icon = document.getElementById('mission-icon');
             const startBtn = document.getElementById('btn-start-recording-main');
 
-            if (count === 0) {
-                bar.style.width = "0%";
-                status.innerText = "0/2 sessions completed today (0/10 pts)";
-                icon.innerText = "⬜";
-                if (startBtn) {
-                    startBtn.innerText = "📹 START RECORDING MISSION (1/2)";
-                    startBtn.disabled = false;
-                    startBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            if (approvedCount === 0) {
+                if (pendingCount > 0) {
+                    bar.style.width = "25%";
+                    status.innerText = "1 session submitted ⏳ Pending doctor review & approval";
+                    icon.innerText = "⏳";
+                    if (startBtn) {
+                        startBtn.innerText = "📹 START SECOND MISSION (2/2)";
+                        startBtn.disabled = false;
+                        startBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                    }
+                } else {
+                    bar.style.width = "0%";
+                    status.innerText = "0/2 sessions completed today (0/10 pts)";
+                    icon.innerText = "⬜";
+                    if (startBtn) {
+                        startBtn.innerText = "📹 START RECORDING MISSION (1/2)";
+                        startBtn.disabled = false;
+                        startBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                    }
                 }
-            } else if (count === 1) {
-                bar.style.width = "50%";
-                status.innerText = "1/2 sessions completed today (+5 pts earned!)";
-                icon.innerText = "🌗";
-                if (startBtn) {
-                    startBtn.innerText = "📹 START SECOND MISSION (2/2)";
-                    startBtn.disabled = false;
-                    startBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            } else if (approvedCount === 1) {
+                if (pendingCount > 0) {
+                    bar.style.width = "75%";
+                    status.innerText = "1 session approved, 1 session pending doctor review ⏳";
+                    icon.innerText = "⏳";
+                    if (startBtn) {
+                        startBtn.innerText = "⏳ MISSION SUBMITTED (PENDING DOCTOR REVIEW)";
+                        startBtn.disabled = true;
+                        startBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                    }
+                } else {
+                    bar.style.width = "50%";
+                    status.innerText = "1/2 sessions approved (+5 pts & streak updated! 🎉)";
+                    icon.innerText = "🌗";
+                    if (startBtn) {
+                        startBtn.innerText = "📹 START SECOND MISSION (2/2)";
+                        startBtn.disabled = false;
+                        startBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                    }
                 }
             } else {
                 bar.style.width = "100%";
-                status.innerText = "2/2 sessions completed today! (+10 pts max earned 🎉)";
+                status.innerText = "2/2 sessions approved today! (+10 pts max earned 🎉)";
                 icon.innerText = "✅";
                 if (startBtn) {
                     startBtn.innerText = "✅ DAILY LIMIT REACHED (2/2)";
