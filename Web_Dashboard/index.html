@@ -1018,11 +1018,11 @@
 
             if (approvedCount === 0) {
                 if (pendingCount > 0) {
-                    bar.style.width = "25%";
-                    status.innerText = "1 session submitted ⏳ Pending doctor review & approval";
-                    icon.innerText = "⏳";
+                    bar.style.width = "50%";
+                    status.innerText = "1/2 sessions submitted ⏳ Pending doctor review";
+                    icon.innerText = "🌗";
                     if (startBtn) {
-                        startBtn.innerText = "📹 START SECOND MISSION (2/2)";
+                        startBtn.innerText = "📹 START SECOND MISSION (1/2)";
                         startBtn.disabled = false;
                         startBtn.classList.remove('opacity-50', 'cursor-not-allowed');
                     }
@@ -1031,7 +1031,7 @@
                     status.innerText = "0/2 sessions completed today (0/10 pts)";
                     icon.innerText = "⬜";
                     if (startBtn) {
-                        startBtn.innerText = "📹 START RECORDING MISSION (1/2)";
+                        startBtn.innerText = "📹 START RECORDING MISSION (0/2)";
                         startBtn.disabled = false;
                         startBtn.classList.remove('opacity-50', 'cursor-not-allowed');
                     }
