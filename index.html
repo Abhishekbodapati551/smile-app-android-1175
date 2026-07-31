@@ -196,6 +196,27 @@
                 </div>
             </div>
 
+            <!-- Absent / Missed Appointment Alert Card -->
+            <div id="absent-notif-card" class="bg-gradient-to-r from-red-600 via-rose-600 to-pink-600 border-2 border-white/40 p-6 rounded-[28px] hidden text-white shadow-xl card-hover relative overflow-hidden">
+                <button onclick="dismissAbsentNotifCard(event)" title="Dismiss Alert" class="absolute top-4 right-4 text-white/80 hover:text-white text-lg font-bold z-10">✕</button>
+                <div class="flex items-start space-x-4">
+                    <div class="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center text-2xl backdrop-blur-md shrink-0 border border-white/30">⚠️</div>
+                    <div class="flex-1 pr-4">
+                        <div class="flex items-center space-x-2 mb-1">
+                            <span class="bg-white text-red-700 text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider shadow-sm">ABSENT / MISSED VISIT</span>
+                        </div>
+                        <h4 class="font-black text-lg text-white">Appointment Marked Absent</h4>
+                        <p id="absent-notif-text" class="text-white/95 text-xs font-semibold mt-1"></p>
+                        <div class="mt-4 flex flex-wrap items-center gap-3">
+                            <button onclick="showAllPatientAppts()" class="bg-white text-red-700 hover:bg-red-50 px-4 py-2 rounded-xl font-black text-xs uppercase tracking-wider shadow-md transition-all active:scale-95">
+                                📅 View & Reschedule
+                            </button>
+                            <span class="text-[11px] text-white/80 italic">Contact clinic for assistance</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Streak & Points Row -->
             <div class="grid grid-cols-2 gap-4">
                 <!-- Streak Card -->
@@ -237,14 +258,18 @@
             </div>
 
             <!-- Quick Action Pills Row -->
-            <div class="grid grid-cols-2 gap-4">
-                <div onclick="openBrushingModal()" class="bg-white py-4.5 px-6 rounded-[24px] shadow-xl flex items-center justify-center space-x-3 text-slate-900 font-extrabold text-lg cursor-pointer card-hover border border-slate-100/80">
-                    <span class="text-2xl">🕒</span>
+            <div class="grid grid-cols-3 gap-3">
+                <div onclick="openBrushingModal()" class="bg-white py-3.5 px-4 rounded-[24px] shadow-xl flex items-center justify-center space-x-2 text-slate-900 font-extrabold text-xs sm:text-base cursor-pointer card-hover border border-slate-100/80">
+                    <span class="text-xl">🕒</span>
                     <span>Brush</span>
                 </div>
-                <div onclick="showAllPatientAppts()" class="bg-white py-4.5 px-6 rounded-[24px] shadow-xl flex items-center justify-center space-x-3 text-slate-900 font-extrabold text-lg cursor-pointer card-hover border border-slate-100/80">
-                    <span class="text-2xl">📅</span>
+                <div onclick="showAllPatientAppts()" class="bg-white py-3.5 px-4 rounded-[24px] shadow-xl flex items-center justify-center space-x-2 text-slate-900 font-extrabold text-xs sm:text-base cursor-pointer card-hover border border-slate-100/80">
+                    <span class="text-xl">📅</span>
                     <span>Appts</span>
+                </div>
+                <div onclick="showPatientPrescriptions()" class="bg-white py-3.5 px-4 rounded-[24px] shadow-xl flex items-center justify-center space-x-2 text-slate-900 font-extrabold text-xs sm:text-base cursor-pointer card-hover border border-slate-100/80">
+                    <span class="text-xl">📋</span>
+                    <span>Prescription</span>
                 </div>
             </div>
 
@@ -301,37 +326,56 @@
 
     <!-- 5. DOCTOR DASHBOARD (MIRROR) -->
     <div id="screen-dashboard-doctor" class="min-h-screen bg-slate-50 hidden pb-10">
-        <header class="bg-app p-10 pt-16 text-white rounded-b-[50px] shadow-2xl">
-            <div class="max-w-6xl mx-auto flex justify-between items-center">
+        <header class="bg-app p-6 sm:p-8 pt-10 sm:pt-12 text-white rounded-b-[36px] shadow-xl">
+            <div class="max-w-6xl mx-auto flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div onclick="openDoctorProfile()" class="cursor-pointer group">
-                    <h2 id="doctor-welcome-msg" class="text-4xl font-black group-hover:underline">Welcome</h2>
-                    <p id="doctor-id-display" class="opacity-70 italic font-bold"></p>
+                    <div class="flex items-center space-x-3">
+                        <h2 id="doctor-welcome-msg" class="text-3xl sm:text-4xl font-black group-hover:underline">Welcome</h2>
+                        <span id="doctor-clinic-badge" class="bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-xs font-black text-white border border-white/30 hidden">🏥 Clinic</span>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1.5 text-xs sm:text-sm font-semibold opacity-90">
+                        <p id="doctor-id-display" class="italic opacity-80"></p>
+                        <span class="opacity-50 hidden sm:inline">•</span>
+                        <p id="doctor-clinic-display" class="font-extrabold text-blue-100 flex items-center space-x-1"></p>
+                    </div>
                 </div>
-                <div class="flex items-center space-x-4">
-                    <button onclick="syncNow()" class="bg-white/20 hover:bg-white/30 px-6 py-3 rounded-2xl text-sm font-black shadow-lg transition-all active:scale-95">SYNC ALL</button>
-                    <button onclick="logout()" class="bg-white/20 p-4 rounded-full text-xl shadow-lg transition-all hover:bg-red-500/30">🚪</button>
+                <div class="flex items-center space-x-3 self-end sm:self-auto">
+                    <button onclick="syncNow()" class="bg-white/20 hover:bg-white/30 px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-black shadow-lg transition-all active:scale-95 flex items-center space-x-1.5"><span>🔄</span><span>SYNC</span></button>
+                    <button onclick="logout()" title="Logout" class="bg-white/20 hover:bg-red-500/40 p-3 sm:p-3.5 rounded-2xl text-lg shadow-lg transition-all active:scale-95">🚪</button>
                 </div>
             </div>
         </header>
 
-        <main class="max-w-6xl mx-auto px-6 -mt-10 space-y-8">
-            <!-- Stats Grid -->
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                <div onclick="showSubPage('patients')" class="bg-white p-6 rounded-[32px] shadow-lg cursor-pointer hover:scale-105 transition-transform border-b-4 border-blue-100 group">
-                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-wider group-hover:text-blue-500 transition-colors">Patients</p>
-                    <p id="stat-patients" class="text-4xl font-black text-blue-900">0</p>
+        <main class="max-w-6xl mx-auto px-4 sm:px-6 mt-6 space-y-8">
+            <!-- Stats Grid (Fixed Collision & Dynamic Layout) -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-5">
+                <div onclick="showSubPage('patients')" class="bg-white p-4 sm:p-6 rounded-[28px] sm:rounded-[32px] shadow-lg cursor-pointer hover:-translate-y-1 transition-all border-b-4 border-blue-200 group flex flex-col justify-between min-h-[110px]">
+                    <div class="flex justify-between items-center">
+                        <p class="text-[11px] sm:text-xs font-black text-slate-400 uppercase tracking-wider group-hover:text-blue-600 transition-colors">Patients</p>
+                        <span class="text-base sm:text-xl">👦</span>
+                    </div>
+                    <p id="stat-patients" class="text-3xl sm:text-4xl font-black text-blue-950 mt-2 leading-none">0</p>
                 </div>
-                <div onclick="showSubPage('appointments')" class="bg-white p-6 rounded-[32px] shadow-lg cursor-pointer hover:scale-105 transition-transform border-b-4 border-teal-100 group">
-                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-wider group-hover:text-teal-500 transition-colors">Upcoming</p>
-                    <p id="stat-appts" class="text-4xl font-black text-teal-600">0</p>
+                <div onclick="showSubPage('appointments')" class="bg-white p-4 sm:p-6 rounded-[28px] sm:rounded-[32px] shadow-lg cursor-pointer hover:-translate-y-1 transition-all border-b-4 border-teal-200 group flex flex-col justify-between min-h-[110px]">
+                    <div class="flex justify-between items-center">
+                        <p class="text-[11px] sm:text-xs font-black text-slate-400 uppercase tracking-wider group-hover:text-teal-600 transition-colors">Upcoming</p>
+                        <span class="text-base sm:text-xl">📅</span>
+                    </div>
+                    <p id="stat-appts" class="text-3xl sm:text-4xl font-black text-teal-600 mt-2 leading-none">0</p>
                 </div>
-                <div onclick="showSubPage('approvals')" class="bg-white p-6 rounded-[32px] shadow-lg cursor-pointer hover:scale-105 transition-transform border-b-4 border-orange-100 group">
-                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-wider group-hover:text-orange-500 transition-colors">Approvals</p>
-                    <p id="stat-approvals" class="text-4xl font-black text-orange-500">0</p>
+                <div onclick="showSubPage('approvals')" class="bg-white p-4 sm:p-6 rounded-[28px] sm:rounded-[32px] shadow-lg cursor-pointer hover:-translate-y-1 transition-all border-b-4 border-orange-200 group flex flex-col justify-between min-h-[110px]">
+                    <div class="flex justify-between items-center">
+                        <p class="text-[11px] sm:text-xs font-black text-slate-400 uppercase tracking-wider group-hover:text-orange-600 transition-colors">Approvals</p>
+                        <span class="text-base sm:text-xl">⏳</span>
+                    </div>
+                    <p id="stat-approvals" class="text-3xl sm:text-4xl font-black text-orange-500 mt-2 leading-none">0</p>
                 </div>
-                <div onclick="showSubPage('reviews')" class="bg-white p-6 rounded-[32px] shadow-lg cursor-pointer hover:scale-105 transition-transform border-b-4 border-purple-100 group">
-                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-wider group-hover:text-purple-500 transition-colors">Reviews</p>
-                    <p id="stat-reviews" class="text-4xl font-black text-purple-600">0</p>
+                <div onclick="showSubPage('reviews')" class="bg-white p-4 sm:p-6 rounded-[28px] sm:rounded-[32px] shadow-lg cursor-pointer hover:-translate-y-1 transition-all border-b-4 border-purple-200 group flex flex-col justify-between min-h-[110px]">
+                    <div class="flex justify-between items-center">
+                        <p class="text-[11px] sm:text-xs font-black text-slate-400 uppercase tracking-wider group-hover:text-purple-600 transition-colors">Reviews</p>
+                        <span class="text-base sm:text-xl">📹</span>
+                    </div>
+                    <p id="stat-reviews" class="text-3xl sm:text-4xl font-black text-purple-600 mt-2 leading-none">0</p>
                 </div>
             </div>
 
@@ -412,23 +456,140 @@
                 <p class="text-6xl mb-4">👦</p>
                 <h2 id="det-name" class="text-3xl font-black">Name</h2>
                 <p id="det-email" class="opacity-70 text-sm"></p>
-                <div class="flex justify-center space-x-8 mt-6">
+                <div class="flex justify-center space-x-6 sm:space-x-8 mt-6">
                     <div><p id="det-points" class="text-2xl font-black">0</p><p class="text-[10px] font-black opacity-50 uppercase">Points</p></div>
                     <div><p id="det-streak" class="text-2xl font-black">0</p><p class="text-[10px] font-black opacity-50 uppercase">Streak</p></div>
+                    <div><p id="det-missed-count" class="text-2xl font-black text-rose-300">0</p><p class="text-[10px] font-black opacity-50 uppercase">Missed</p></div>
                 </div>
             </div>
             <div class="p-10 space-y-8">
                 <div id="det-attendance-section" class="hidden">
-                    <h3 class="text-xl font-black mb-4">Appointment Attendance</h3>
-                    <div class="bg-slate-50 p-6 rounded-3xl border border-slate-100">
-                        <p id="det-appt-date" class="font-black text-blue-900 text-lg mb-6"></p>
+                    <h3 class="text-xl font-black mb-4">Appointment Attendance & Report</h3>
+                    <div class="bg-slate-50 p-6 rounded-3xl border border-slate-100 space-y-4">
+                        <p id="det-appt-date" class="font-black text-blue-900 text-lg"></p>
                         <div class="grid grid-cols-2 gap-4">
-                            <button onclick="markWebAttendance('present')" class="bg-green-500 text-white p-4 rounded-2xl font-black shadow-lg">PRESENT</button>
-                            <button onclick="markWebAttendance('absent')" class="bg-red-500 text-white p-4 rounded-2xl font-black shadow-lg">ABSENT</button>
+                            <button onclick="markWebAttendance('present')" class="bg-green-500 hover:bg-green-600 text-white p-4 rounded-2xl font-black shadow-lg transition-all">PRESENT</button>
+                            <button onclick="markWebAttendance('absent')" class="bg-red-500 hover:bg-red-600 text-white p-4 rounded-2xl font-black shadow-lg transition-all">ABSENT</button>
+                        </div>
+                        <button onclick="togglePrescriptionForm()" class="w-full bg-teal-600 hover:bg-teal-700 text-white p-3.5 rounded-2xl font-black text-xs uppercase tracking-wider shadow-md flex items-center justify-center space-x-2 transition-all">
+                            <span>📝</span><span>Create Prescription / Clinical Report</span>
+                        </button>
+                    </div>
+
+                    <!-- Prescription Entry Form (Doctor Side) -->
+                    <div id="prescription-form-container" class="hidden bg-slate-100 p-6 rounded-3xl border-2 border-teal-200 space-y-4 mt-4">
+                        <div class="flex justify-between items-center">
+                            <h4 class="font-black text-teal-950 text-base flex items-center space-x-2">
+                                <span>🩺</span><span>Clinical Prescription Report</span>
+                            </h4>
+                            <span class="text-[10px] font-black bg-teal-100 text-teal-800 px-2.5 py-1 rounded-full uppercase">Visit RX</span>
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-black text-slate-500 uppercase ml-1">Diagnosis & Findings</label>
+                            <textarea id="rx-diagnosis" rows="2" placeholder="e.g. Tooth cavity checkup, regular brushing advised" class="w-full p-3.5 bg-white border border-slate-200 rounded-2xl text-xs font-semibold outline-none focus:border-teal-500 mt-1"></textarea>
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-black text-slate-500 uppercase ml-1">Prescribed Medicines & Dosage</label>
+                            <textarea id="rx-medicines" rows="3" placeholder="e.g. 1. Fluoride Gel - Apply once before bed&#10;2. Mouthwash 10ml - 2x daily after food" class="w-full p-3.5 bg-white border border-slate-200 rounded-2xl text-xs font-semibold outline-none focus:border-teal-500 mt-1"></textarea>
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-black text-slate-500 uppercase ml-1">Doctor Advice & Instructions</label>
+                            <input type="text" id="rx-instructions" placeholder="e.g. Brush 2 mins twice daily, avoid sugary snacks" class="w-full p-3.5 bg-white border border-slate-200 rounded-2xl text-xs font-semibold outline-none focus:border-teal-500 mt-1">
+                        </div>
+                        <div class="flex gap-3">
+                            <button onclick="savePrescriptionReport()" class="flex-1 bg-teal-600 hover:bg-teal-700 text-white p-3.5 rounded-2xl font-black text-xs uppercase tracking-wider shadow-lg transition-all">
+                                💾 Save & Issue Prescription
+                            </button>
+                            <button onclick="togglePrescriptionForm()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 rounded-2xl font-black text-xs uppercase">
+                                Cancel
+                            </button>
                         </div>
                     </div>
                 </div>
+
+                <!-- Prescriptions History Section -->
+                <div id="det-rx-section" class="bg-teal-50/80 p-6 rounded-3xl border border-teal-200/80 space-y-4">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-xs font-black text-teal-800 uppercase tracking-widest flex items-center space-x-2">
+                            <span>📋</span><span>Prescription Reports</span>
+                        </h3>
+                        <span id="det-rx-badge" class="bg-teal-200 text-teal-900 font-extrabold text-[10px] px-3 py-1 rounded-full uppercase">0 Reports</span>
+                    </div>
+                    <div id="det-rx-list" class="space-y-2.5"></div>
+                </div>
+
+                <!-- Missed Appointments History Section -->
+                <div id="det-missed-section" class="bg-rose-50/80 p-6 rounded-3xl border border-rose-200/80 space-y-4">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-xs font-black text-rose-800 uppercase tracking-widest flex items-center space-x-2">
+                            <span>⚠️</span><span>Missed Visits History</span>
+                        </h3>
+                        <span id="det-missed-badge" class="bg-rose-200 text-rose-900 font-extrabold text-[10px] px-3 py-1 rounded-full uppercase">0 Missed</span>
+                    </div>
+                    <div id="det-missed-list" class="space-y-2.5"></div>
+                </div>
+
                 <div><h3 class="text-xl font-black mb-4 text-slate-400 uppercase tracking-widest text-xs">Recent History</h3><div id="det-history" class="space-y-3"></div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Prescription View & Print Modal -->
+    <div id="modal-prescription-view" class="fixed inset-0 bg-slate-900/90 backdrop-blur-md z-[250] hidden flex items-center justify-center p-4 text-slate-800">
+        <div class="bg-white w-full max-w-xl rounded-[36px] shadow-2xl p-6 sm:p-8 relative overflow-hidden max-h-[90vh] overflow-y-auto">
+            <button onclick="document.getElementById('modal-prescription-view').classList.add('hidden')" class="absolute top-6 right-6 text-slate-400 text-2xl hover:text-slate-600">✕</button>
+            
+            <!-- Printable Prescription Banner Header -->
+            <div class="border-b-2 border-slate-100 pb-6 mb-6">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h3 class="text-xl font-black text-teal-700 flex items-center space-x-2">
+                            <span>🏥</span><span id="rx-clinic-title">Smile App Dental Clinic</span>
+                        </h3>
+                        <p id="rx-view-doc" class="text-xs font-bold text-slate-500 mt-1">Dr. Doctor Name</p>
+                    </div>
+                    <span class="bg-teal-100 text-teal-800 font-black text-[10px] px-3 py-1 rounded-full uppercase tracking-wider">OFFICIAL RX</span>
+                </div>
+            </div>
+
+            <!-- Details Grid -->
+            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 mb-6 grid grid-cols-2 gap-4 text-xs">
+                <div>
+                    <p class="text-[10px] font-black text-slate-400 uppercase">Patient Name</p>
+                    <p id="rx-view-patient" class="font-extrabold text-slate-800 text-sm mt-0.5">-</p>
+                </div>
+                <div>
+                    <p class="text-[10px] font-black text-slate-400 uppercase">Visit Date</p>
+                    <p id="rx-view-date" class="font-extrabold text-slate-800 text-sm mt-0.5">-</p>
+                </div>
+            </div>
+
+            <!-- Prescription Body -->
+            <div class="space-y-4">
+                <div class="bg-blue-50/60 p-4 rounded-2xl border border-blue-100">
+                    <p class="text-[10px] font-black text-blue-600 uppercase tracking-wider mb-1">🔍 Diagnosis & Clinical Findings</p>
+                    <p id="rx-view-diagnosis" class="text-slate-800 font-semibold text-xs leading-relaxed">-</p>
+                </div>
+
+                <div class="bg-emerald-50/60 p-4 rounded-2xl border border-emerald-100">
+                    <p class="text-[10px] font-black text-emerald-600 uppercase tracking-wider mb-1">💊 Prescribed Medicines & Dosage</p>
+                    <div id="rx-view-medicines" class="text-slate-800 font-semibold text-xs whitespace-pre-line leading-relaxed">-</div>
+                </div>
+
+                <div class="bg-purple-50/60 p-4 rounded-2xl border border-purple-100">
+                    <p class="text-[10px] font-black text-purple-600 uppercase tracking-wider mb-1">💡 Instructions & Care Advice</p>
+                    <p id="rx-view-instructions" class="text-slate-800 font-semibold text-xs leading-relaxed">-</p>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="mt-6 pt-4 border-t border-slate-100 flex gap-3">
+                <button onclick="window.print()" class="flex-1 bg-teal-600 hover:bg-teal-700 text-white p-3.5 rounded-2xl font-black text-xs uppercase tracking-wider shadow-lg flex items-center justify-center space-x-2 transition-all">
+                    <span>🖨️</span><span>PRINT / DOWNLOAD REPORT</span>
+                </button>
+                <button onclick="document.getElementById('modal-prescription-view').classList.add('hidden')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-5 rounded-2xl font-black text-xs uppercase">
+                    Close
+                </button>
             </div>
         </div>
     </div>
@@ -446,18 +607,18 @@
             </div>
 
             <!-- Stats Bar -->
-            <div class="grid grid-cols-3 gap-2 bg-slate-50 p-4 rounded-3xl mb-6 border border-slate-100 text-center">
-                <div onclick="document.getElementById('modal-doctor-profile').classList.add('hidden'); showSubPage('patients');" class="cursor-pointer hover:opacity-80">
-                    <p id="prof-stat-patients" class="text-xl font-black text-blue-900">0</p>
-                    <p class="text-[9px] font-black text-slate-400 uppercase">Patients</p>
+            <div class="grid grid-cols-3 gap-3 bg-slate-50 p-4 rounded-3xl mb-6 border border-slate-100 text-center">
+                <div onclick="document.getElementById('modal-doctor-profile').classList.add('hidden'); showSubPage('patients');" class="cursor-pointer hover:bg-white p-2.5 rounded-2xl transition-all border border-transparent hover:border-slate-200">
+                    <p id="prof-stat-patients" class="text-2xl font-black text-blue-900 leading-tight">0</p>
+                    <p class="text-[10px] font-black text-slate-400 uppercase mt-0.5">Patients</p>
                 </div>
-                <div onclick="document.getElementById('modal-doctor-profile').classList.add('hidden'); showSubPage('approvals');" class="cursor-pointer hover:opacity-80">
-                    <p id="prof-stat-approvals" class="text-xl font-black text-orange-500">0</p>
-                    <p class="text-[9px] font-black text-slate-400 uppercase">Pending</p>
+                <div onclick="document.getElementById('modal-doctor-profile').classList.add('hidden'); showSubPage('approvals');" class="cursor-pointer hover:bg-white p-2.5 rounded-2xl transition-all border border-transparent hover:border-slate-200">
+                    <p id="prof-stat-approvals" class="text-2xl font-black text-orange-500 leading-tight">0</p>
+                    <p class="text-[10px] font-black text-slate-400 uppercase mt-0.5">Pending</p>
                 </div>
-                <div onclick="document.getElementById('modal-doctor-profile').classList.add('hidden'); showSubPage('reviews');" class="cursor-pointer hover:opacity-80">
-                    <p id="prof-stat-reviews" class="text-xl font-black text-purple-600">0</p>
-                    <p class="text-[9px] font-black text-slate-400 uppercase">Reviews</p>
+                <div onclick="document.getElementById('modal-doctor-profile').classList.add('hidden'); showSubPage('reviews');" class="cursor-pointer hover:bg-white p-2.5 rounded-2xl transition-all border border-transparent hover:border-slate-200">
+                    <p id="prof-stat-reviews" class="text-2xl font-black text-purple-600 leading-tight">0</p>
+                    <p class="text-[10px] font-black text-slate-400 uppercase mt-0.5">Reviews</p>
                 </div>
             </div>
 
@@ -704,18 +865,6 @@
                     if (rew) rew.classList.toggle('opacity-30', (userData.points||0) < thresholds[i-1]);
                 }
 
-                const isFeedbackDismissed = sessionStorage.getItem('dismissed_feedback_' + userData.id);
-                const isRejectionDismissed = sessionStorage.getItem('dismissed_rejection_' + userData.id);
-                const isWarningDismissed = sessionStorage.getItem('dismissed_warning_' + userData.id);
-
-                const wc = document.getElementById('warning-card');
-                if (userData.warning_note && !isWarningDismissed) {
-                    wc.classList.remove('hidden');
-                    document.getElementById('warning-text').innerText = userData.warning_note;
-                } else {
-                    wc.classList.add('hidden');
-                }
-
                 // Fetch Logs for Feedback/Rejections/Progress
                 let logs = [];
                 try {
@@ -726,16 +875,38 @@
                 let latestRejected = logs.find(l => l.is_rejected);
                 let latestFeedback = logs.find(l => l.doctor_feedback && !l.is_rejected);
 
+                // Check warning card dismissal (per note text)
+                const warningDismissKey = 'dismissed_warning_' + userData.id + '_' + (userData.warning_note || '');
+                const isWarningDismissed = localStorage.getItem(warningDismissKey) || localStorage.getItem('dismissed_warning_' + userData.id);
+
+                const wc = document.getElementById('warning-card');
+                if (userData.warning_note && !isWarningDismissed) {
+                    wc.classList.remove('hidden');
+                    document.getElementById('warning-text').innerText = userData.warning_note;
+                } else {
+                    wc.classList.add('hidden');
+                }
+
+                // Check rejection card dismissal (per log ID)
+                const rejectionDismissKey = latestRejected ? ('dismissed_rejection_' + userData.id + '_' + latestRejected.id) : null;
+                const isRejectionDismissed = rejectionDismissKey ? (localStorage.getItem(rejectionDismissKey) || localStorage.getItem('dismissed_rejection_' + userData.id)) : false;
+
                 const rc = document.getElementById('rejection-card');
                 if (latestRejected && !isRejectionDismissed) {
                     rc.classList.remove('hidden');
                     document.getElementById('rejection-reason').innerText = latestRejected.doctor_feedback;
+                    window.currentRejectionLogId = latestRejected.id;
                 } else rc.classList.add('hidden');
+
+                // Check feedback card dismissal (per log ID)
+                const feedbackDismissKey = latestFeedback ? ('dismissed_feedback_' + userData.id + '_' + latestFeedback.id) : null;
+                const isFeedbackDismissed = feedbackDismissKey ? (localStorage.getItem(feedbackDismissKey) || localStorage.getItem('dismissed_feedback_' + userData.id)) : false;
 
                 const fc = document.getElementById('feedback-card');
                 if (latestFeedback && !isFeedbackDismissed) {
                     fc.classList.remove('hidden');
                     document.getElementById('feedback-text').innerText = latestFeedback.doctor_feedback;
+                    window.currentFeedbackLogId = latestFeedback.id;
                 } else fc.classList.add('hidden');
 
                 fetchChildAppts();
@@ -758,7 +929,10 @@
             if (e) e.stopPropagation();
             const fc = document.getElementById('feedback-card');
             if (fc) fc.classList.add('hidden');
-            if (userData?.id) sessionStorage.setItem('dismissed_feedback_' + userData.id, 'true');
+            if (userData?.id) {
+                localStorage.setItem('dismissed_feedback_' + userData.id, 'true');
+                if (window.currentFeedbackLogId) localStorage.setItem('dismissed_feedback_' + userData.id + '_' + window.currentFeedbackLogId, 'true');
+            }
         }
 
         function showFeedbackPopup() {
@@ -771,7 +945,10 @@
             if (e) e.stopPropagation();
             const rc = document.getElementById('rejection-card');
             if (rc) rc.classList.add('hidden');
-            if (userData?.id) sessionStorage.setItem('dismissed_rejection_' + userData.id, 'true');
+            if (userData?.id) {
+                localStorage.setItem('dismissed_rejection_' + userData.id, 'true');
+                if (window.currentRejectionLogId) localStorage.setItem('dismissed_rejection_' + userData.id + '_' + window.currentRejectionLogId, 'true');
+            }
         }
 
         function handleRejectionClick() {
@@ -783,7 +960,10 @@
             if (e) e.stopPropagation();
             const wc = document.getElementById('warning-card');
             if (wc) wc.classList.add('hidden');
-            if (userData?.id) sessionStorage.setItem('dismissed_warning_' + userData.id, 'true');
+            if (userData?.id) {
+                localStorage.setItem('dismissed_warning_' + userData.id, 'true');
+                if (userData.warning_note) localStorage.setItem('dismissed_warning_' + userData.id + '_' + userData.warning_note, 'true');
+            }
         }
 
         function showRewardStore() {
@@ -890,24 +1070,62 @@
 
         async function fetchChildAppts() {
             try {
-                const { data } = await supabaseClient
+                const { data: allAppts } = await supabaseClient
                     .from('appointments')
                     .select('*')
                     .eq('child_id', userData.id)
-                    .in('status', ['upcoming', 'confirmed'])
-                    .order('appt_date', { ascending: true })
-                    .limit(1);
+                    .order('appt_date', { ascending: false });
+
+                const nowMs = Date.now();
+                const absentCard = document.getElementById('absent-notif-card');
+
+                // Filter for missed/absent appointments (status absent/missed OR past upcoming visits)
+                const missedAppts = allAppts?.filter(v => {
+                    const st = (v.status || '').toLowerCase();
+                    const isPast = new Date(v.appt_date).getTime() < nowMs;
+                    return st === 'absent' || st === 'missed' || (isPast && (st === 'upcoming' || st === 'confirmed'));
+                }) || [];
+
+                const latestMissed = missedAppts[0];
+                const absentDismissKey = latestMissed ? ('dismissed_absent_' + userData.id + '_' + latestMissed.id) : null;
+                const isAbsentDismissed = absentDismissKey ? (localStorage.getItem(absentDismissKey) || localStorage.getItem('dismissed_absent_' + userData.id)) : false;
+
+                if (missedAppts.length > 0 && !isAbsentDismissed) {
+                    if (absentCard) absentCard.classList.remove('hidden');
+                    const dt = new Date(latestMissed.appt_date).toLocaleString([], {month:'short', day:'numeric', year:'numeric', hour:'2-digit', minute:'2-digit'});
+                    const txtEl = document.getElementById('absent-notif-text');
+                    if (txtEl) txtEl.innerText = `You were marked absent for your ${latestMissed.type || 'Dental Visit'} scheduled on ${dt}.`;
+                    window.currentAbsentApptId = latestMissed.id;
+                } else {
+                    if (absentCard) absentCard.classList.add('hidden');
+                }
+
+                // Filter for future upcoming appointments
+                const upcomingAppts = allAppts?.filter(v => {
+                    const st = (v.status || '').toLowerCase();
+                    return (st === 'upcoming' || st === 'confirmed') && new Date(v.appt_date).getTime() >= nowMs;
+                }) || [];
 
                 const notifEl = document.getElementById('notif-appt');
-                if (data?.length) { 
-                    if (notifEl) notifEl.classList.remove('hidden'); 
-                    const dt = new Date(data[0].appt_date).toLocaleString([], {month:'short', day:'numeric', year:'numeric', hour:'2-digit', minute:'2-digit'});
-                    document.getElementById('notif-appt-text').innerText = `${data[0].type || 'Dental Visit'}: ${dt}`; 
+                if (upcomingAppts.length > 0) {
+                    if (notifEl) notifEl.classList.remove('hidden');
+                    const dt = new Date(upcomingAppts[0].appt_date).toLocaleString([], {month:'short', day:'numeric', year:'numeric', hour:'2-digit', minute:'2-digit'});
+                    document.getElementById('notif-appt-text').innerText = `${upcomingAppts[0].type || 'Dental Visit'}: ${dt}`;
                 } else {
                     if (notifEl) notifEl.classList.add('hidden');
                 }
             } catch (err) {
                 console.error("Error fetching patient appointments:", err);
+            }
+        }
+
+        function dismissAbsentNotifCard(e) {
+            if (e) e.stopPropagation();
+            const card = document.getElementById('absent-notif-card');
+            if (card) card.classList.add('hidden');
+            if (userData?.id) {
+                localStorage.setItem('dismissed_absent_' + userData.id, 'true');
+                if (window.currentAbsentApptId) localStorage.setItem('dismissed_absent_' + userData.id + '_' + window.currentAbsentApptId, 'true');
             }
         }
 
@@ -923,6 +1141,20 @@
         async function setupDoctorDashboard() {
             document.getElementById('doctor-welcome-msg').innerText = `Dr. ${userData.name}`;
             document.getElementById('doctor-id-display').innerText = `Doctor ID: ${userData.doctor_id || 'Not Set'}`;
+            
+            const clinicName = userData.clinic_name ? userData.clinic_name : 'Not Set';
+            const cDisplay = document.getElementById('doctor-clinic-display');
+            if (cDisplay) cDisplay.innerText = `🏥 Clinic: ${clinicName}`;
+            
+            const cBadge = document.getElementById('doctor-clinic-badge');
+            if (cBadge) {
+                if (userData.clinic_name) {
+                    cBadge.innerText = `🏥 ${userData.clinic_name}`;
+                    cBadge.classList.remove('hidden');
+                } else {
+                    cBadge.classList.add('hidden');
+                }
+            }
             fetchDoctorStats(); fetchDoctorAppointmentsMini(); fetchRecentPatientsMini();
         }
 
@@ -999,7 +1231,42 @@
                     }
                 }
 
-                // 3. Fetch History
+                // 3. Fetch Missed Appointments History for Patient
+                const { data: pAppts } = await supabaseClient.from('appointments').select('*').eq('child_id', uid).order('appt_date', { ascending: false });
+                const nowMs = Date.now();
+                const missedVisits = pAppts?.filter(v => {
+                    const st = (v.status || '').toLowerCase();
+                    const isPast = new Date(v.appt_date).getTime() < nowMs;
+                    return st === 'absent' || st === 'missed' || (isPast && (st === 'upcoming' || st === 'confirmed'));
+                }) || [];
+
+                document.getElementById('det-missed-count').innerText = missedVisits.length;
+                document.getElementById('det-missed-badge').innerText = `${missedVisits.length} Missed`;
+
+                const ml = document.getElementById('det-missed-list');
+                if (ml) {
+                    ml.innerHTML = missedVisits.length ? '' : '<p class="text-slate-400 italic text-xs py-2">No missed visits recorded. ✅</p>';
+                    missedVisits.forEach(v => {
+                        const dStr = new Date(v.appt_date).toLocaleString([], {month:'short', day:'numeric', year:'numeric', hour:'2-digit', minute:'2-digit'});
+                        ml.innerHTML += `
+                            <div class="bg-white p-4 rounded-2xl border border-rose-200 flex flex-wrap justify-between items-center gap-2 shadow-sm">
+                                <div>
+                                    <p class="font-extrabold text-rose-950 text-sm">❌ ${v.type || 'Dental Visit'}</p>
+                                    <p class="text-xs text-slate-500 font-semibold mt-0.5">🗓️ ${dStr}</p>
+                                    <span class="inline-block mt-1 bg-rose-100 text-rose-700 font-black text-[9px] px-2 py-0.5 rounded-md uppercase">Absent / Missed</span>
+                                </div>
+                                <button onclick="openRescheduleModal('${v.id}', '${v.child_id}', '${p.name || 'Patient'}', '${v.type || 'Dental Visit'}', ${v.appt_date})" class="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-black uppercase shadow-sm transition-all active:scale-95">
+                                    Reschedule
+                                </button>
+                            </div>
+                        `;
+                    });
+                }
+
+                // 4. Fetch Prescription Reports History
+                loadPatientPrescriptionHistory(uid, pAppts);
+
+                // 5. Fetch Brushing History
                 const { data: logs, error: lError } = await supabaseClient.from('brushing_logs').select('*').eq('child_id', uid).order('created_at', { ascending: false }).limit(5);
                 const hl = document.getElementById('det-history');
                 hl.innerHTML = logs?.length ? '' : '<p class="text-slate-400 italic text-sm">No history found.</p>';
@@ -1014,6 +1281,156 @@
                 alert("Could not load patient profile. Please try again.");
                 document.getElementById('modal-patient-detail').classList.add('hidden');
             }
+        }
+
+        function togglePrescriptionForm() {
+            const container = document.getElementById('prescription-form-container');
+            if (container) container.classList.toggle('hidden');
+        }
+
+        async function savePrescriptionReport() {
+            if (!selectedPatientId && !selectedAppt) return alert("Please select a patient visit.");
+            const diag = document.getElementById('rx-diagnosis').value;
+            const meds = document.getElementById('rx-medicines').value;
+            const inst = document.getElementById('rx-instructions').value;
+            if (!diag && !meds) return alert("Please fill in diagnosis or prescribed medicines.");
+
+            const rxData = {
+                diagnosis: diag,
+                medicines: meds,
+                instructions: inst,
+                issued_at: new Date().toISOString(),
+                doctor_name: userData?.name || 'Doctor',
+                clinic_name: userData?.clinic_name || 'Smile App Dental Clinic'
+            };
+
+            try {
+                if (selectedAppt) {
+                    await supabaseClient.from('appointments').update({ 
+                        prescription_notes: JSON.stringify(rxData),
+                        status: 'completed'
+                    }).eq('id', selectedAppt.id);
+                }
+                
+                const rxKey = 'rx_history_' + selectedPatientId;
+                const existing = JSON.parse(localStorage.getItem(rxKey) || '[]');
+                existing.unshift({ ...rxData, id: 'rx_' + Date.now(), child_id: selectedPatientId, patient_name: document.getElementById('det-name')?.innerText || 'Patient' });
+                localStorage.setItem(rxKey, JSON.stringify(existing));
+
+                alert("Prescription Report Saved & Issued to Patient! 📋");
+                togglePrescriptionForm();
+                document.getElementById('rx-diagnosis').value = '';
+                document.getElementById('rx-medicines').value = '';
+                document.getElementById('rx-instructions').value = '';
+
+                if (selectedPatientId) viewPatientDetail(selectedPatientId, selectedAppt?.id);
+            } catch (err) {
+                console.error("Rx Save error:", err);
+                alert("Error saving prescription: " + err.message);
+            }
+        }
+
+        function loadPatientPrescriptionHistory(uid, appts) {
+            const rxKey = 'rx_history_' + uid;
+            const localRxs = JSON.parse(localStorage.getItem(rxKey) || '[]');
+            
+            const dbRxs = appts?.filter(v => v.prescription_notes).map(v => {
+                try {
+                    const parsed = typeof v.prescription_notes === 'string' ? JSON.parse(v.prescription_notes) : v.prescription_notes;
+                    return { ...parsed, appt_date: v.appt_date, type: v.type, id: v.id };
+                } catch (e) { return null; }
+            }).filter(Boolean) || [];
+
+            const combined = [...dbRxs, ...localRxs];
+            const rxBadge = document.getElementById('det-rx-badge');
+            if (rxBadge) rxBadge.innerText = `${combined.length} Reports`;
+
+            const rxList = document.getElementById('det-rx-list');
+            if (rxList) {
+                rxList.innerHTML = combined.length ? '' : '<p class="text-slate-400 italic text-xs py-2">No prescriptions issued yet. 📝</p>';
+                combined.forEach((rx) => {
+                    const dStr = new Date(rx.issued_at || rx.appt_date || Date.now()).toLocaleDateString([], {month:'short', day:'numeric', year:'numeric'});
+                    rxList.innerHTML += `
+                        <div class="bg-white p-4 rounded-2xl border border-teal-200 flex justify-between items-center shadow-sm">
+                            <div>
+                                <p class="font-extrabold text-teal-950 text-sm">📋 Prescription (${dStr})</p>
+                                <p class="text-xs text-slate-500 font-semibold truncate max-w-xs mt-0.5">${rx.diagnosis || 'Clinical Rx Report'}</p>
+                            </div>
+                            <button onclick='viewPrescriptionDetails(${JSON.stringify(rx).replace(/'/g, "&apos;")})' class="px-3.5 py-1.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-black uppercase shadow-sm">
+                                View Report
+                            </button>
+                        </div>
+                    `;
+                });
+            }
+        }
+
+        function viewPrescriptionDetails(rx) {
+            if (!rx) return;
+            document.getElementById('rx-clinic-title').innerText = rx.clinic_name || userData?.clinic_name || 'Smile App Dental Clinic';
+            document.getElementById('rx-view-doc').innerText = `Dr. ${rx.doctor_name || userData?.name || 'Doctor'}`;
+            document.getElementById('rx-view-patient').innerText = rx.patient_name || document.getElementById('det-name')?.innerText || userData?.name || 'Patient';
+            document.getElementById('rx-view-date').innerText = new Date(rx.issued_at || rx.appt_date || Date.now()).toLocaleString([], {month:'short', day:'numeric', year:'numeric', hour:'2-digit', minute:'2-digit'});
+            
+            document.getElementById('rx-view-diagnosis').innerText = rx.diagnosis || 'Standard Checkup & Routine Hygiene';
+            document.getElementById('rx-view-medicines').innerText = rx.medicines || 'No oral medicines prescribed.';
+            document.getElementById('rx-view-instructions').innerText = rx.instructions || 'Maintain regular brushing 2x daily.';
+            
+            document.getElementById('modal-prescription-view').classList.remove('hidden');
+        }
+
+        async function showPatientPrescriptions() {
+            navigateToSubPage("My Prescription Reports", true);
+            const c = document.getElementById('subpage-content');
+            if (!c) return;
+
+            c.innerHTML = '<div class="loader mx-auto"></div>';
+            
+            const rxKey = 'rx_history_' + userData.id;
+            const localRxs = JSON.parse(localStorage.getItem(rxKey) || '[]');
+
+            const { data } = await supabaseClient.from('appointments').select('*').eq('child_id', userData.id).order('appt_date', { ascending: false });
+            
+            const dbRxs = data?.filter(v => v.prescription_notes).map(v => {
+                try {
+                    const parsed = typeof v.prescription_notes === 'string' ? JSON.parse(v.prescription_notes) : v.prescription_notes;
+                    return { ...parsed, appt_date: v.appt_date, patient_name: userData.name };
+                } catch (e) { return null; }
+            }).filter(Boolean) || [];
+
+            const allRxs = [...dbRxs, ...localRxs];
+
+            if (!allRxs.length) {
+                c.innerHTML = `
+                    <div class="text-center py-12 bg-slate-50 rounded-3xl border border-slate-200">
+                        <p class="text-5xl mb-3">📋</p>
+                        <p class="text-slate-800 font-extrabold text-lg">No Prescription Reports Yet</p>
+                        <p class="text-slate-400 font-medium text-xs mt-1">Your doctor will issue medical reports after your clinic visits.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            c.innerHTML = '';
+            allRxs.forEach(rx => {
+                const dStr = new Date(rx.issued_at || rx.appt_date || Date.now()).toLocaleDateString([], {month:'short', day:'numeric', year:'numeric'});
+                c.innerHTML += `
+                    <div class="bg-gradient-to-r from-teal-50 to-emerald-50 p-6 rounded-3xl border border-teal-200 mb-4 shadow-sm flex flex-wrap justify-between items-center gap-4">
+                        <div>
+                            <div class="flex items-center space-x-2">
+                                <span class="bg-teal-600 text-white text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase">Official Rx</span>
+                                <span class="text-xs text-slate-400 font-bold">${dStr}</span>
+                            </div>
+                            <h4 class="font-black text-slate-800 text-lg mt-1">${rx.clinic_name || 'Smile App Dental Clinic'}</h4>
+                            <p class="text-xs font-bold text-teal-700">Dr. ${rx.doctor_name || 'Doctor'}</p>
+                            <p class="text-xs text-slate-600 font-semibold mt-2 line-clamp-1">Diagnosis: ${rx.diagnosis || 'Routine Checkup'}</p>
+                        </div>
+                        <button onclick='viewPrescriptionDetails(${JSON.stringify(rx).replace(/'/g, "&apos;")})' class="bg-teal-600 hover:bg-teal-700 text-white px-5 py-2.5 rounded-2xl text-xs font-black uppercase tracking-wider shadow-md transition-all active:scale-95">
+                            📄 Open Full Report
+                        </button>
+                    </div>
+                `;
+            });
         }
 
         async function markWebAttendance(s) {

@@ -57,30 +57,40 @@ public class PendingReviewsActivity extends AppCompatActivity {
     private void loadLogs() {
         SupabaseManager.execute(() -> {
             try {
-                // 1. Fetch fresh logs from Supabase
-                List<BrushingLog> latestLogs = SupabaseAuthHelper.fetchPendingBrushingLogsBlocking(doctorId);
+                // 1. Initial load from local Room DB for instant display
+                List<BrushingLog> localLogs = db.appDao().getPendingBrushingLogsForDoctor(doctorId);
+                List<BrushingLog> initialUnique = deDuplicateLogs(localLogs);
+                for (BrushingLog log : initialUnique) {
+                    if (log.childName == null || log.childName.isEmpty()) {
+                        User child = db.appDao().getUserById(log.childId);
+                        if (child != null) log.childName = child.name;
+                    }
+                }
                 
-                // 2. Process data on background thread
-                List<BrushingLog> uniqueLogs = new ArrayList<>();
+                runOnUiThread(() -> {
+                    logList.clear();
+                    logList.addAll(initialUnique);
+                    adapter.notifyDataSetChanged();
+                });
+
+                // 2. Fetch fresh logs from Supabase
+                List<BrushingLog> latestLogs = SupabaseAuthHelper.fetchPendingBrushingLogsBlocking(doctorId);
                 for (BrushingLog log : latestLogs) {
-                    // Update metadata
+                    log.doctorId = doctorId;
                     if (log.childName == null || log.childName.isEmpty()) {
                         User child = db.appDao().getUserById(log.childId);
                         if (child != null) log.childName = child.name;
                     }
                     db.appDao().insertBrushingLog(log);
-
-                    // De-duplicate
-                    boolean duplicate = false;
-                    for (BrushingLog existing : uniqueLogs) {
-                        if (existing.id == log.id) { duplicate = true; break; }
-                    }
-                    if (!duplicate) uniqueLogs.add(log);
                 }
+
+                // 3. Re-query local Room DB after network sync to get complete list
+                List<BrushingLog> updatedLocalLogs = db.appDao().getPendingBrushingLogsForDoctor(doctorId);
+                List<BrushingLog> finalUnique = deDuplicateLogs(updatedLocalLogs);
 
                 runOnUiThread(() -> {
                     logList.clear();
-                    logList.addAll(uniqueLogs);
+                    logList.addAll(finalUnique);
                     adapter.notifyDataSetChanged();
                     
                     if (logList.isEmpty()) {
@@ -91,6 +101,18 @@ public class PendingReviewsActivity extends AppCompatActivity {
                 Log.e("PendingReviews", "Failed to load logs", e);
             }
         });
+    }
+
+    private List<BrushingLog> deDuplicateLogs(List<BrushingLog> logs) {
+        List<BrushingLog> uniqueLogs = new ArrayList<>();
+        for (BrushingLog log : logs) {
+            boolean duplicate = false;
+            for (BrushingLog existing : uniqueLogs) {
+                if (existing.id == log.id) { duplicate = true; break; }
+            }
+            if (!duplicate) uniqueLogs.add(log);
+        }
+        return uniqueLogs;
     }
 
     private class ReviewsAdapter extends RecyclerView.Adapter<ReviewsAdapter.ViewHolder> {

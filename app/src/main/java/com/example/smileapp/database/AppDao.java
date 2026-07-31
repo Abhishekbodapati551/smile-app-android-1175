@@ -51,11 +51,11 @@ public interface AppDao {
     @Query("SELECT * FROM brushing_logs WHERE childId = :childId")
     List<BrushingLog> getBrushingLogsForChild(String childId);
 
-    @Query("SELECT * FROM brushing_logs WHERE approved = 0")
+    @Query("SELECT * FROM brushing_logs WHERE approved = 0 AND isRejected = 0")
     List<BrushingLog> getPendingBrushingLogs();
 
     // Get pending brushing logs for children of a specific doctor - SIMPLIFIED
-    @Query("SELECT * FROM brushing_logs WHERE approved = 0 AND doctorId = :doctorId")
+    @Query("SELECT * FROM brushing_logs WHERE approved = 0 AND isRejected = 0 AND doctorId = :doctorId")
     List<BrushingLog> getPendingBrushingLogsForDoctor(String doctorId);
 
     @Query("UPDATE brushing_logs SET approved = 1, isRejected = 0 WHERE id = :logId")

@@ -167,6 +167,7 @@ object SupabaseAuthHelper {
                     filter {
                         eq("approved", false)
                         eq("is_rejected", false)
+                        eq("doctor_id", doctorId)
                     }
                 }.decodeList<BrushingLog>()
                 Log.d("SupabaseAuth", "Successfully fetched ${logs.size} pending logs")
