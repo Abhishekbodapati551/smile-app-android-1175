@@ -850,9 +850,37 @@
         function logout() { supabaseClient.auth.signOut(); }
         async function syncNow() { await loadUserProfile(userData.id); alert("Data Synced! ⭐"); }
 
+        async function autoMarkPastAppointmentsAbsent() {
+            try {
+                const nowIso = new Date().toISOString();
+                const { data: pastAppts, error } = await supabaseClient
+                    .from('appointments')
+                    .select('*')
+                    .lt('appt_date', nowIso)
+                    .in('status', ['upcoming', 'confirmed']);
+
+                if (error || !pastAppts || !pastAppts.length) return;
+
+                console.log(`Auto-marking ${pastAppts.length} past appointment(s) as ABSENT...`);
+
+                const pastIds = pastAppts.map(a => a.id);
+                await supabaseClient.from('appointments').update({ status: 'absent' }).in('id', pastIds);
+
+                for (const appt of pastAppts) {
+                    if (appt.child_id) {
+                        const dtStr = new Date(appt.appt_date).toLocaleDateString([], {month:'short', day:'numeric', year:'numeric'});
+                        await supabaseClient.from('profiles').update({ warning_note: `Missed appointment on ${dtStr}` }).eq('id', appt.child_id);
+                    }
+                }
+            } catch (err) {
+                console.error("Auto absent check error:", err);
+            }
+        }
+
         // CHILD DASHBOARD
         async function setupChildDashboard() {
             try {
+                await autoMarkPastAppointmentsAbsent();
                 document.getElementById('child-welcome-msg').innerText = `Hi, ${userData.name}!`;
                 document.getElementById('child-streak').innerText = `${userData.streak || 0} Days`;
                 document.getElementById('points-display').innerText = `${userData.points || 0} PTS`;
@@ -1139,6 +1167,7 @@
 
         // DOCTOR DASHBOARD
         async function setupDoctorDashboard() {
+            await autoMarkPastAppointmentsAbsent();
             document.getElementById('doctor-welcome-msg').innerText = `Dr. ${userData.name}`;
             document.getElementById('doctor-id-display').innerText = `Doctor ID: ${userData.doctor_id || 'Not Set'}`;
             
