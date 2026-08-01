@@ -140,6 +140,15 @@ public class ChildDashboardActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
+        View btnPrescriptions = findViewById(R.id.btn_prescriptions);
+        if (btnPrescriptions != null) {
+            btnPrescriptions.setOnClickListener(v -> {
+                Intent intent = new Intent(this, ChildPrescriptionsActivity.class);
+                intent.putExtra("USER_ID", userId);
+                startActivity(intent);
+            });
+        }
+
         findViewById(R.id.logout_btn).setOnClickListener(v -> {
             new SessionManager(this).logoutUser();
             startActivity(new Intent(this, MainActivity.class));
@@ -355,7 +364,7 @@ public class ChildDashboardActivity extends AppCompatActivity {
         cal.set(Calendar.MILLISECOND, 999);
         long endOfDay = cal.getTimeInMillis();
 
-        List<BrushingLog> logsToday = db.appDao().getBrushingLogsForChildToday(userId, startOfDay, endOfDay);
+        List<BrushingLog> logsToday = db.appDao().getApprovedBrushingLogsForChildToday(userId, startOfDay, endOfDay);
         int sessionsDone = logsToday != null ? logsToday.size() : 0;
 
         runOnUiThread(() -> {

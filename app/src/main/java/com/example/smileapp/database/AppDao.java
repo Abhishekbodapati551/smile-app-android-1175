@@ -39,6 +39,9 @@ public interface AppDao {
     @Query("SELECT * FROM appointments WHERE childId = :childId AND status != 'upcoming' ORDER BY date DESC")
     List<Appointment> getAppointmentHistoryForChild(String childId);
 
+    @Query("SELECT * FROM appointments WHERE childId = :childId ORDER BY date DESC")
+    List<Appointment> getAllAppointmentsForChild(String childId);
+
     @Query("SELECT * FROM appointments WHERE doctorId = :doctorId AND status = 'upcoming' ORDER BY date ASC")
     List<Appointment> getAppointmentsForDoctor(String doctorId);
 

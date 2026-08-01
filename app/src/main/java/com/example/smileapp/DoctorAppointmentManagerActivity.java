@@ -2,6 +2,7 @@ package com.example.smileapp;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -37,10 +38,15 @@ public class DoctorAppointmentManagerActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private AppointmentAdapter adapter;
     private ProgressBar mainProgress;
-    private List<Appointment> appointmentList = new ArrayList<>();
+    private View emptyContainer;
+    
+    private List<Appointment> allAppointmentList = new ArrayList<>();
+    private List<Appointment> displayedList = new ArrayList<>();
     private List<User> myPatients = new ArrayList<>();
 
     private TextView totalMgmtText, confirmedMgmtText, pendingMgmtText;
+    private TextView filterAll, filterToday, filterUpcoming, filterMissed;
+    private String activeFilter = "all";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,16 +59,101 @@ public class DoctorAppointmentManagerActivity extends AppCompatActivity {
         totalMgmtText = findViewById(R.id.total_mgmt_text);
         confirmedMgmtText = findViewById(R.id.confirmed_mgmt_text);
         pendingMgmtText = findViewById(R.id.pending_mgmt_text);
+        emptyContainer = findViewById(R.id.empty_doctor_appts_container);
+
+        filterAll = findViewById(R.id.filter_all);
+        filterToday = findViewById(R.id.filter_today);
+        filterUpcoming = findViewById(R.id.filter_upcoming);
+        filterMissed = findViewById(R.id.filter_missed);
+
+        setupFilterListeners();
+
+        View backBtn = findViewById(R.id.back_button);
+        if (backBtn != null) backBtn.setOnClickListener(v -> finish());
 
         recyclerView = findViewById(R.id.appointments_recycler);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new AppointmentAdapter(appointmentList);
+        adapter = new AppointmentAdapter(displayedList);
         recyclerView.setAdapter(adapter);
         mainProgress = findViewById(R.id.main_progress);
 
         findViewById(R.id.add_appointment_btn).setOnClickListener(v -> showAddAppointmentDialog());
 
         loadDoctorData();
+    }
+
+    private void setupFilterListeners() {
+        if (filterAll != null) filterAll.setOnClickListener(v -> applyFilter("all"));
+        if (filterToday != null) filterToday.setOnClickListener(v -> applyFilter("today"));
+        if (filterUpcoming != null) filterUpcoming.setOnClickListener(v -> applyFilter("upcoming"));
+        if (filterMissed != null) filterMissed.setOnClickListener(v -> applyFilter("missed"));
+    }
+
+    private void applyFilter(String filter) {
+        activeFilter = filter;
+        updateFilterTabsUI();
+        filterAndDisplayAppointments();
+    }
+
+    private void updateFilterTabsUI() {
+        resetFilterStyle(filterAll);
+        resetFilterStyle(filterToday);
+        resetFilterStyle(filterUpcoming);
+        resetFilterStyle(filterMissed);
+
+        TextView selected = filterAll;
+        if ("today".equals(activeFilter)) selected = filterToday;
+        else if ("upcoming".equals(activeFilter)) selected = filterUpcoming;
+        else if ("missed".equals(activeFilter)) selected = filterMissed;
+
+        if (selected != null) {
+            selected.setBackgroundResource(R.drawable.bg_chip_filter_selected);
+            selected.setTextColor(Color.WHITE);
+        }
+    }
+
+    private void resetFilterStyle(TextView tv) {
+        if (tv == null) return;
+        tv.setBackgroundResource(R.drawable.bg_chip_filter_unselected);
+        tv.setTextColor(Color.parseColor("#475569"));
+    }
+
+    private void filterAndDisplayAppointments() {
+        displayedList.clear();
+        long now = System.currentTimeMillis();
+
+        Calendar todayCal = Calendar.getInstance();
+        int todayYear = todayCal.get(Calendar.YEAR);
+        int todayDay = todayCal.get(Calendar.DAY_OF_YEAR);
+
+        for (Appointment a : allAppointmentList) {
+            String st = a.status != null ? a.status.toLowerCase() : "upcoming";
+
+            if ("today".equals(activeFilter)) {
+                Calendar appCal = Calendar.getInstance();
+                appCal.setTimeInMillis(a.date);
+                if (appCal.get(Calendar.YEAR) == todayYear && appCal.get(Calendar.DAY_OF_YEAR) == todayDay) {
+                    displayedList.add(a);
+                }
+            } else if ("upcoming".equals(activeFilter)) {
+                if (a.date >= now && !"absent".equals(st) && !"missed".equals(st)) {
+                    displayedList.add(a);
+                }
+            } else if ("missed".equals(activeFilter)) {
+                if ("absent".equals(st) || "missed".equals(st) || (a.date < now && "upcoming".equals(st))) {
+                    displayedList.add(a);
+                }
+            } else {
+                // "all"
+                displayedList.add(a);
+            }
+        }
+
+        adapter.notifyDataSetChanged();
+
+        if (emptyContainer != null) {
+            emptyContainer.setVisibility(displayedList.isEmpty() ? View.VISIBLE : View.GONE);
+        }
     }
 
     private void loadDoctorData() {
@@ -95,10 +186,10 @@ public class DoctorAppointmentManagerActivity extends AppCompatActivity {
 
                 runOnUiThread(() -> {
                     mainProgress.setVisibility(View.GONE);
-                    appointmentList.clear();
-                    appointmentList.addAll(latestApps);
-                    adapter.notifyDataSetChanged();
+                    allAppointmentList.clear();
+                    allAppointmentList.addAll(latestApps);
                     updateAppointmentStatsUI(latestApps);
+                    filterAndDisplayAppointments();
                 });
             } catch (Exception e) {
                 Log.e("AppointmentManager", "Fetch failed", e);
@@ -106,10 +197,10 @@ public class DoctorAppointmentManagerActivity extends AppCompatActivity {
                 List<Appointment> apps = db.appDao().getAppointmentsForDoctor(sequentialDoctorId);
                 runOnUiThread(() -> {
                     mainProgress.setVisibility(View.GONE);
-                    appointmentList.clear();
-                    appointmentList.addAll(apps);
-                    adapter.notifyDataSetChanged();
+                    allAppointmentList.clear();
+                    allAppointmentList.addAll(apps);
                     updateAppointmentStatsUI(apps);
+                    filterAndDisplayAppointments();
                 });
             }
         });
@@ -184,10 +275,8 @@ public class DoctorAppointmentManagerActivity extends AppCompatActivity {
         new Thread(() -> {
             boolean success;
             if (app.id > 0) {
-                // Update existing appointment
                 success = SupabaseAuthHelper.updateAppointmentBlocking(app);
             } else {
-                // Insert new appointment
                 success = SupabaseAuthHelper.saveAppointmentBlocking(app);
             }
 
@@ -221,7 +310,7 @@ public class DoctorAppointmentManagerActivity extends AppCompatActivity {
 
         // Pre-fill
         patientSpinner.setText(app.childName);
-        patientSpinner.setEnabled(false); // Can't change patient while rescheduling
+        patientSpinner.setEnabled(false);
         typeEdit.setText(app.type);
         
         final Calendar calendar = Calendar.getInstance();
@@ -253,29 +342,55 @@ public class DoctorAppointmentManagerActivity extends AppCompatActivity {
     private class AppointmentAdapter extends RecyclerView.Adapter<AppointmentAdapter.ViewHolder> {
         private List<Appointment> apps;
         public AppointmentAdapter(List<Appointment> apps) { this.apps = apps; }
+        
         @NonNull
         @Override
         public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_appointment, parent, false));
         }
+
         @Override
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
             Appointment a = apps.get(position);
-            holder.pName.setText(a.childName);
-            holder.type.setText(a.type);
-            holder.date.setText(new SimpleDateFormat("MMM dd, yyyy - hh:mm a", Locale.getDefault()).format(new Date(a.date)));
+            holder.pName.setText(a.childName != null ? a.childName : "Patient");
+            holder.type.setText(a.type != null ? a.type : "Dental Checkup");
+            holder.date.setText(new SimpleDateFormat("EEE, MMM dd, yyyy - hh:mm a", Locale.getDefault()).format(new Date(a.date)));
+            
+            String st = a.status != null ? a.status.toLowerCase() : "upcoming";
+            if (holder.statusPill != null && holder.statusText != null) {
+                if ("confirmed".equals(st) || "present".equals(st) || "completed".equals(st)) {
+                    holder.statusPill.setBackgroundResource(R.drawable.bg_status_pill_confirmed);
+                    holder.statusText.setText("CONFIRMED");
+                    holder.statusText.setTextColor(Color.parseColor("#2E7D32"));
+                } else if ("absent".equals(st) || "missed".equals(st)) {
+                    holder.statusPill.setBackgroundResource(R.drawable.bg_status_pill_missed);
+                    holder.statusText.setText("MISSED");
+                    holder.statusText.setTextColor(Color.parseColor("#C62828"));
+                } else {
+                    holder.statusPill.setBackgroundResource(R.drawable.bg_status_pill_pending);
+                    holder.statusText.setText("UPCOMING");
+                    holder.statusText.setTextColor(Color.parseColor("#E65100"));
+                }
+            }
+
             holder.rescheduleBtn.setOnClickListener(v -> showRescheduleDialog(a));
         }
+
         @Override
         public int getItemCount() { return apps.size(); }
+
         class ViewHolder extends RecyclerView.ViewHolder {
-            TextView pName, type, date;
+            TextView pName, type, date, statusText;
+            View statusPill;
             MaterialButton rescheduleBtn;
+
             public ViewHolder(@NonNull View v) {
                 super(v);
                 pName = v.findViewById(R.id.patient_name);
                 type = v.findViewById(R.id.appointment_type);
                 date = v.findViewById(R.id.appointment_date);
+                statusText = v.findViewById(R.id.status_text);
+                statusPill = v.findViewById(R.id.status_pill);
                 rescheduleBtn = v.findViewById(R.id.reschedule_btn);
             }
         }

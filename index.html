@@ -1045,19 +1045,17 @@
             const startBtn = document.getElementById('btn-start-recording-main');
 
             if (approvedCount === 0) {
+                bar.style.width = "0%";
+                icon.innerText = "⬜";
                 if (pendingCount > 0) {
-                    bar.style.width = "50%";
-                    status.innerText = "1/2 sessions submitted ⏳ Pending doctor review";
-                    icon.innerText = "🌗";
+                    status.innerText = "0/2 sessions completed (1 video pending doctor review ⏳)";
                     if (startBtn) {
                         startBtn.innerText = "📹 START SECOND MISSION (1/2)";
                         startBtn.disabled = false;
                         startBtn.classList.remove('opacity-50', 'cursor-not-allowed');
                     }
                 } else {
-                    bar.style.width = "0%";
                     status.innerText = "0/2 sessions completed today (0/10 pts)";
-                    icon.innerText = "⬜";
                     if (startBtn) {
                         startBtn.innerText = "📹 START RECORDING MISSION (0/2)";
                         startBtn.disabled = false;
@@ -1065,21 +1063,19 @@
                     }
                 }
             } else if (approvedCount === 1) {
+                bar.style.width = "50%";
+                icon.innerText = "🌗";
                 if (pendingCount > 0) {
-                    bar.style.width = "75%";
-                    status.innerText = "1 session approved, 1 session pending doctor review ⏳";
-                    icon.innerText = "⏳";
+                    status.innerText = "1/2 sessions approved (2nd video pending doctor review ⏳)";
                     if (startBtn) {
                         startBtn.innerText = "⏳ MISSION SUBMITTED (PENDING DOCTOR REVIEW)";
                         startBtn.disabled = true;
                         startBtn.classList.add('opacity-50', 'cursor-not-allowed');
                     }
                 } else {
-                    bar.style.width = "50%";
                     status.innerText = "1/2 sessions approved (+5 pts & streak updated! 🎉)";
-                    icon.innerText = "🌗";
                     if (startBtn) {
-                        startBtn.innerText = "📹 START SECOND MISSION (2/2)";
+                        startBtn.innerText = "📹 START SECOND MISSION (1/2)";
                         startBtn.disabled = false;
                         startBtn.classList.remove('opacity-50', 'cursor-not-allowed');
                     }
@@ -1463,11 +1459,39 @@
         }
 
         async function markWebAttendance(s) {
-            const { error } = await supabaseClient.from('appointments').update({ status: s }).eq('id', selectedAppt.id);
+            let rxJsonStr = null;
+
+            if (s === 'present') {
+                const addRx = confirm("Patient marked PRESENT! Would you like to issue an official Rx Prescription for this appointment?");
+                if (addRx) {
+                    const diagnosis = prompt("Enter Diagnosis:", "Standard Checkup & Routine Hygiene") || "Standard Checkup & Routine Hygiene";
+                    const medicines = prompt("Enter Prescribed Medicines:", "No oral medicines prescribed.") || "No oral medicines prescribed.";
+                    const instructions = prompt("Enter Doctor Instructions:", "Maintain regular brushing 2x daily.") || "Maintain regular brushing 2x daily.";
+
+                    const rxObj = {
+                        diagnosis: diagnosis,
+                        medicines: medicines,
+                        instructions: instructions,
+                        clinic_name: userData?.clinic_name || "Smile App Dental Clinic",
+                        doctor_name: userData?.name || "Doctor",
+                        issued_at: Date.now()
+                    };
+                    rxJsonStr = JSON.stringify(rxObj);
+                }
+            }
+
+            const updateData = { status: s };
+            if (rxJsonStr) updateData.prescription_notes = rxJsonStr;
+
+            const { error } = await supabaseClient.from('appointments').update(updateData).eq('id', selectedAppt.id);
             if (!error) {
                 if (s === 'absent') await supabaseClient.from('profiles').update({ warning_note: `Missed appointment on ${new Date(selectedAppt.appt_date).toLocaleDateString()}` }).eq('id', selectedPatientId);
                 else await supabaseClient.from('profiles').update({ warning_note: null }).eq('id', selectedPatientId);
-                alert(`Marked ${s}!`); document.getElementById('modal-patient-detail').classList.add('hidden'); setupDoctorDashboard();
+                alert(`Marked ${s}${rxJsonStr ? ' with Prescription 📋' : ''}!`); 
+                document.getElementById('modal-patient-detail')?.classList.add('hidden'); 
+                setupDoctorDashboard();
+            } else {
+                alert("Attendance update failed: " + error.message);
             }
         }
 
@@ -1721,7 +1745,16 @@
             `;
 
             if (!filtered.length) {
-                html += `<div class="text-center py-12 bg-slate-50 rounded-3xl border border-slate-200"><p class="text-4xl mb-2">📅</p><p class="text-slate-400 font-bold">No visits found matching this filter.</p></div>`;
+                html += `
+                    <div class="text-center py-16 px-6 bg-gradient-to-br from-slate-50 to-blue-50/50 rounded-3xl border-2 border-dashed border-slate-200 my-4 shadow-inner">
+                        <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl shadow-sm">📅</div>
+                        <h4 class="text-xl font-extrabold text-slate-800 mb-1">No Schedule Found</h4>
+                        <p class="text-slate-500 font-medium text-xs max-w-sm mx-auto mb-6">There are no visits or appointments currently scheduled under this filter category.</p>
+                        <button onclick="openAppointmentModal()" class="bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-600 hover:to-blue-700 text-white px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-wider shadow-lg transition-all hover:scale-105">
+                            + Schedule New Visit
+                        </button>
+                    </div>
+                `;
             } else {
                 filtered.forEach(v => {
                     const dateObj = new Date(v.appt_date);

@@ -234,6 +234,7 @@ object SupabaseAuthHelper {
                     put("appt_date", app.date)
                     put("type", app.type)
                     put("status", app.status)
+                    if (app.prescriptionNotes != null) put("prescription_notes", app.prescriptionNotes)
                 }
                 Log.d("SupabaseAuth", "Inserting appointment: $data")
                 client.postgrest["appointments"].insert(data)
@@ -256,9 +257,9 @@ object SupabaseAuthHelper {
                     put("appt_date", app.date)
                     put("type", app.type)
                     put("status", app.status)
-                    // Explicitly include child_id and doctor_id just in case, though they shouldn't change
                     put("child_id", app.childId)
                     put("doctor_id", app.doctorId)
+                    if (app.prescriptionNotes != null) put("prescription_notes", app.prescriptionNotes)
                 }
                 
                 Log.d("SupabaseAuth", "Updating appointment with ID: ${app.id}")

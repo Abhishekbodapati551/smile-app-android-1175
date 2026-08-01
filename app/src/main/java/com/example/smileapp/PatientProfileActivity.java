@@ -75,28 +75,85 @@ public class PatientProfileActivity extends AppCompatActivity {
 
     private void markAttendance(String status) {
         if (activeAppt == null) return;
-        activeAppt.status = status;
         
+        if ("present".equals(status)) {
+            showPrescriptionDialogAndMarkPresent();
+        } else {
+            executeAttendanceUpdate("absent", null);
+        }
+    }
+
+    private void showPrescriptionDialogAndMarkPresent() {
+        android.widget.LinearLayout layout = new android.widget.LinearLayout(this);
+        layout.setOrientation(android.widget.LinearLayout.VERTICAL);
+        layout.setPadding(40, 20, 40, 10);
+
+        final android.widget.EditText diagInput = new android.widget.EditText(this);
+        diagInput.setHint("Diagnosis (e.g. Routine Checkup)");
+        layout.addView(diagInput);
+
+        final android.widget.EditText medsInput = new android.widget.EditText(this);
+        medsInput.setHint("Medicines (e.g. Fluoride Gel)");
+        layout.addView(medsInput);
+
+        final android.widget.EditText instInput = new android.widget.EditText(this);
+        instInput.setHint("Instructions (e.g. Brush 2x daily)");
+        layout.addView(instInput);
+
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Issue Rx Prescription")
+                .setMessage("Enter prescription details for this appointment:")
+                .setView(layout)
+                .setPositiveButton("Issue Rx & Save", (dialog, which) -> {
+                    String diagnosis = diagInput.getText().toString().trim();
+                    String medicines = medsInput.getText().toString().trim();
+                    String instructions = instInput.getText().toString().trim();
+
+                    if (diagnosis.isEmpty()) diagnosis = "Standard Checkup & Routine Hygiene";
+                    if (medicines.isEmpty()) medicines = "No oral medicines prescribed.";
+                    if (instructions.isEmpty()) instructions = "Maintain regular brushing 2x daily.";
+
+                    try {
+                        org.json.JSONObject rxJson = new org.json.JSONObject();
+                        rxJson.put("diagnosis", diagnosis);
+                        rxJson.put("medicines", medicines);
+                        rxJson.put("instructions", instructions);
+                        rxJson.put("issued_at", System.currentTimeMillis());
+                        
+                        executeAttendanceUpdate("present", rxJson.toString());
+                    } catch (Exception e) {
+                        executeAttendanceUpdate("present", null);
+                    }
+                })
+                .setNegativeButton("Mark Present Only", (dialog, which) -> executeAttendanceUpdate("present", null))
+                .setNeutralButton("Cancel", null)
+                .show();
+    }
+
+    private void executeAttendanceUpdate(String status, String rxNotes) {
+        if (activeAppt == null) return;
+        activeAppt.status = status;
+        activeAppt.prescriptionNotes = rxNotes;
+
         new Thread(() -> {
             boolean success = SupabaseAuthHelper.updateAppointmentBlocking(activeAppt);
             if (success) {
                 db.appDao().updateAppointment(activeAppt);
-                
+
                 if ("absent".equals(status)) {
-                    String warning = "Note: You were missed at your appointment on " + 
-                            new SimpleDateFormat("MMM dd", Locale.getDefault()).format(new Date(activeAppt.date)) + 
+                    String warning = "Note: You were missed at your appointment on " +
+                            new SimpleDateFormat("MMM dd", Locale.getDefault()).format(new Date(activeAppt.date)) +
                             ". Please contact the clinic.";
                     SupabaseAuthHelper.updateWarningNoteBlocking(patientUid, warning);
                 } else {
-                    // Clear warning if present
                     SupabaseAuthHelper.updateWarningNoteBlocking(patientUid, null);
                 }
 
                 runOnUiThread(() -> {
-                    Toast.makeText(this, "Marked as " + status, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Marked " + status + (rxNotes != null ? " with Prescription 📋" : ""), Toast.LENGTH_SHORT).show();
                     attendanceTitle.setVisibility(View.GONE);
                     attendanceCard.setVisibility(View.GONE);
-                    loadPatientData(); // Refresh history
+                    loadPatientData();
                 });
             }
         }).start();

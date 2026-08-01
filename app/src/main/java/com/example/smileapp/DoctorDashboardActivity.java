@@ -31,6 +31,8 @@ public class DoctorDashboardActivity extends AppCompatActivity {
     private TextView totalPatientsText, todaysApptsText, pendingApprovalsText, pendingReviewsText;
     private RecyclerView appointmentsRecycler, patientsRecycler;
     private DashboardListAdapter appointmentsAdapter, patientsAdapter;
+    private View emptyScheduleContainer, emptyPatientsContainer;
+    
     private List<Appointment> dashboardApps = new ArrayList<>();
     private List<User> dashboardPatients = new ArrayList<>();
 
@@ -49,6 +51,9 @@ public class DoctorDashboardActivity extends AppCompatActivity {
         todaysApptsText = findViewById(R.id.todays_appts_text);
         pendingApprovalsText = findViewById(R.id.pending_approvals_text);
         pendingReviewsText = findViewById(R.id.pending_reviews_text);
+
+        emptyScheduleContainer = findViewById(R.id.empty_schedule_container);
+        emptyPatientsContainer = findViewById(R.id.empty_patients_container);
 
         appointmentsRecycler = findViewById(R.id.appointments_mini_recycler);
         patientsRecycler = findViewById(R.id.recent_patients_recycler);
@@ -73,45 +78,14 @@ public class DoctorDashboardActivity extends AppCompatActivity {
             finish();
         });
 
-        findViewById(R.id.total_patients_card).setOnClickListener(v -> {
-            SupabaseManager.execute(() -> {
-                User doctorUser = db.appDao().getUserById(doctorId);
-                if (doctorUser != null && doctorUser.doctorId != null) {
-                    runOnUiThread(() -> {
-                        Intent intent = new Intent(this, PatientManagementActivity.class);
-                        intent.putExtra("DOCTOR_ID", doctorUser.doctorId);
-                        startActivity(intent);
-                    });
-                } else {
-                    runOnUiThread(() -> Toast.makeText(this, "Doctor ID not set.", Toast.LENGTH_SHORT).show());
-                }
-            });
-        });
+        findViewById(R.id.total_patients_card).setOnClickListener(v -> openPatientManagement());
+        findViewById(R.id.btn_view_all_patients).setOnClickListener(v -> openPatientManagement());
 
-        findViewById(R.id.btn_view_all_patients).setOnClickListener(v -> {
-            SupabaseManager.execute(() -> {
-                User doctorUser = db.appDao().getUserById(doctorId);
-                if (doctorUser != null && doctorUser.doctorId != null) {
-                    runOnUiThread(() -> {
-                        Intent intent = new Intent(this, PatientManagementActivity.class);
-                        intent.putExtra("DOCTOR_ID", doctorUser.doctorId);
-                        startActivity(intent);
-                    });
-                }
-            });
-        });
+        View viewAllText = findViewById(R.id.btn_view_all_patients_text);
+        if (viewAllText != null) viewAllText.setOnClickListener(v -> openPatientManagement());
 
-        findViewById(R.id.appointments_card).setOnClickListener(v -> {
-            Intent intent = new Intent(this, DoctorAppointmentManagerActivity.class);
-            intent.putExtra("USER_ID", doctorId);
-            startActivity(intent);
-        });
-
-        findViewById(R.id.btn_manage_appointments_feature).setOnClickListener(v -> {
-            Intent intent = new Intent(this, DoctorAppointmentManagerActivity.class);
-            intent.putExtra("USER_ID", doctorId);
-            startActivity(intent);
-        });
+        findViewById(R.id.appointments_card).setOnClickListener(v -> openAppointmentManager());
+        findViewById(R.id.btn_manage_appointments_feature).setOnClickListener(v -> openAppointmentManager());
 
         findViewById(R.id.pending_approvals_card).setOnClickListener(v -> {
             SupabaseManager.execute(() -> {
@@ -150,6 +124,27 @@ public class DoctorDashboardActivity extends AppCompatActivity {
         });
     }
 
+    private void openPatientManagement() {
+        SupabaseManager.execute(() -> {
+            User doctorUser = db.appDao().getUserById(doctorId);
+            if (doctorUser != null && doctorUser.doctorId != null) {
+                runOnUiThread(() -> {
+                    Intent intent = new Intent(this, PatientManagementActivity.class);
+                    intent.putExtra("DOCTOR_ID", doctorUser.doctorId);
+                    startActivity(intent);
+                });
+            } else {
+                runOnUiThread(() -> Toast.makeText(this, "Doctor ID not set.", Toast.LENGTH_SHORT).show());
+            }
+        });
+    }
+
+    private void openAppointmentManager() {
+        Intent intent = new Intent(this, DoctorAppointmentManagerActivity.class);
+        intent.putExtra("USER_ID", doctorId);
+        startActivity(intent);
+    }
+
     private void loadDoctorData() {
         SupabaseManager.execute(() -> {
             // 1. Show local data INSTANTLY
@@ -185,7 +180,7 @@ public class DoctorDashboardActivity extends AppCompatActivity {
         if (doctor.clinicName != null && !doctor.clinicName.isEmpty()) {
             doctorSubtitleText.setText(doctor.clinicName);
         } else {
-            doctorSubtitleText.setText("Hospital Name Not Set");
+            doctorSubtitleText.setText("Smile Bright Dental Clinic");
         }
     }
 
@@ -198,7 +193,6 @@ public class DoctorDashboardActivity extends AppCompatActivity {
             
             String seqId = doctor.doctorId;
 
-            // Fetch in separate parallel threads to save time
             new Thread(() -> {
                 try {
                     List<User> latestPatients = SupabaseAuthHelper.fetchPatientsBlocking(seqId);
@@ -226,7 +220,6 @@ public class DoctorDashboardActivity extends AppCompatActivity {
                 } catch (Exception e) { Log.e("DoctorDashboard", "Appts sync failed", e); }
             }).start();
 
-            // Initial load from local
             refreshUIFromLocal(seqId);
         });
     }
@@ -241,7 +234,6 @@ public class DoctorDashboardActivity extends AppCompatActivity {
             totalPatientsText.setText(String.valueOf(patients.size()));
             todaysApptsText.setText(String.valueOf(apps.size()));
             
-            // Unique reviews only
             List<BrushingLog> uniquePending = new ArrayList<>();
             for (BrushingLog log : pendingRev) {
                 boolean found = false;
@@ -260,29 +252,39 @@ public class DoctorDashboardActivity extends AppCompatActivity {
             dashboardApps.addAll(apps);
             appointmentsAdapter.notifyDataSetChanged();
 
+            if (emptyScheduleContainer != null) {
+                emptyScheduleContainer.setVisibility(apps.isEmpty() ? View.VISIBLE : View.GONE);
+            }
+
             dashboardPatients.clear();
             dashboardPatients.addAll(patients);
             patientsAdapter.notifyDataSetChanged();
+
+            if (emptyPatientsContainer != null) {
+                emptyPatientsContainer.setVisibility(patients.isEmpty() ? View.VISIBLE : View.GONE);
+            }
         });
     }
 
     private class DashboardListAdapter extends RecyclerView.Adapter<DashboardListAdapter.ViewHolder> {
         private boolean isAppointment;
         public DashboardListAdapter(boolean isAppointment) { this.isAppointment = isAppointment; }
+        
         @NonNull
         @Override
         public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_dashboard_list, parent, false);
             return new ViewHolder(view);
         }
+
         @Override
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
             if (isAppointment) {
                 if (position < dashboardApps.size()) {
                     Appointment app = dashboardApps.get(position);
-                    holder.title.setText(app.childName);
+                    holder.title.setText(app.childName != null ? app.childName : "Patient");
                     SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, hh:mm a", Locale.getDefault());
-                    holder.subtitle.setText(app.type + " - " + sdf.format(new Date(app.date)));
+                    holder.subtitle.setText((app.type != null ? app.type : "Visit") + " • " + sdf.format(new Date(app.date)));
 
                     holder.itemView.setOnClickListener(v -> {
                         Intent intent = new Intent(DoctorDashboardActivity.this, PatientProfileActivity.class);
@@ -294,8 +296,8 @@ public class DoctorDashboardActivity extends AppCompatActivity {
             } else {
                 if (position < dashboardPatients.size()) {
                     User p = dashboardPatients.get(position);
-                    holder.title.setText(p.name);
-                    holder.subtitle.setText("Points: " + p.points);
+                    holder.title.setText(p.name != null ? p.name : "Patient");
+                    holder.subtitle.setText("Points: " + p.points + " ⭐");
                     
                     holder.itemView.setOnClickListener(v -> {
                         Intent intent = new Intent(DoctorDashboardActivity.this, PatientProfileActivity.class);
@@ -305,8 +307,12 @@ public class DoctorDashboardActivity extends AppCompatActivity {
                 }
             }
         }
+
         @Override
-        public int getItemCount() { return isAppointment ? dashboardApps.size() : dashboardPatients.size(); }
+        public int getItemCount() {
+            return isAppointment ? dashboardApps.size() : dashboardPatients.size();
+        }
+
         class ViewHolder extends RecyclerView.ViewHolder {
             TextView title, subtitle;
             public ViewHolder(@NonNull View v) {
@@ -315,11 +321,5 @@ public class DoctorDashboardActivity extends AppCompatActivity {
                 subtitle = v.findViewById(R.id.item_subtitle);
             }
         }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        loadDoctorData();
     }
 }

@@ -28,7 +28,10 @@ data class Appointment(
     @JvmField var type: String = "",
 
     @SerialName("status")
-    @JvmField var status: String = "upcoming"
+    @JvmField var status: String = "upcoming",
+
+    @SerialName("prescription_notes")
+    @JvmField var prescriptionNotes: String? = null
 ) {
     // Constructor for Java compatibility
     constructor(childId: String, childName: String, doctorId: String, date: Long, type: String) : this(

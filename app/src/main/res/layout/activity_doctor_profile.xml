@@ -3,64 +3,94 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_gradient_doctor">
+    android:background="@drawable/bg_app_standard"
+    android:fillViewport="true"
+    android:fitsSystemWindows="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingTop="60dp"
-        android:paddingLeft="24dp"
-        android:paddingRight="24dp"
-        android:paddingBottom="24dp">
+        android:padding="16dp">
 
-        <!-- Back Button -->
-        <ImageButton
-            android:id="@+id/back_button"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@android:drawable/ic_menu_revert"
-            app:tint="@color/white" />
-
-        <TextView
-            android:layout_width="wrap_content"
+        <!-- Top Header Navigation Bar -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="Doctor Profile"
-            android:textColor="@color/white"
-            android:textSize="28sp"
-            android:textStyle="bold" />
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
+            <ImageButton
+                android:id="@+id/back_button"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Back"
+                android:src="@android:drawable/ic_menu_revert"
+                app:tint="@color/text_primary" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Doctor Profile"
+                    android:textColor="@color/text_primary"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Manage your account &amp; clinic info"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="12sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Hero Doctor Badge Card -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            app:cardBackgroundColor="#4D1A237E"
-            app:strokeColor="@color/white"
-            app:strokeWidth="1dp"
+            android:layout_marginTop="16dp"
             app:cardCornerRadius="24dp"
-            app:cardElevation="8dp">
+            app:cardElevation="6dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@drawable/bg_doctor_hero_card"
                 android:gravity="center"
                 android:orientation="vertical"
                 android:padding="24dp">
 
-                <ImageView
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
-                    android:src="@android:drawable/ic_menu_myplaces"
-                    app:tint="@color/white" />
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
+                    app:cardBackgroundColor="#33FFFFFF"
+                    app:cardCornerRadius="36dp"
+                    app:cardElevation="0dp"
+                    app:strokeColor="#55FFFFFF"
+                    app:strokeWidth="1.5dp">
+
+                    <ImageView
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_doctor_avatar" />
+                </com.google.android.material.card.MaterialCardView>
 
                 <TextView
                     android:id="@+id/profile_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="Dr. Abhishek"
+                    android:layout_marginTop="12dp"
+                    android:text="Dr. Balu"
                     android:textColor="@color/white"
                     android:textSize="22sp"
                     android:textStyle="bold" />
@@ -69,132 +99,162 @@
                     android:id="@+id/profile_specialization"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Pediatric Dentist"
-                    android:textColor="#DDDDDD"
-                    android:textSize="16sp" />
+                    android:layout_marginTop="2dp"
+                    android:text="Pediatric Dental Specialist"
+                    android:textColor="#E0F2FE"
+                    android:textSize="13sp" />
 
                 <TextView
                     android:id="@+id/doctor_id_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="ID: Loading..."
+                    android:background="#22FFFFFF"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="3dp"
+                    android:text="Doctor ID: 1175"
                     android:textColor="@color/white"
                     android:textSize="12sp"
-                    android:textStyle="italic" />
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
+        <!-- Doctor ID & Clinic Form Card -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:cardBackgroundColor="@color/white"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="4dp"
+            app:strokeColor="#E2E8F0"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="DOCTOR &amp; CLINIC DETAILS"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+
+                <!-- Doctor ID Field -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/doctor_id_layout"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
-                    app:boxBackgroundMode="outline"
-                    app:boxCornerRadiusBottomEnd="12dp"
-                    app:boxCornerRadiusBottomStart="12dp"
-                    app:boxCornerRadiusTopEnd="12dp"
-                    app:boxCornerRadiusTopStart="12dp"
-                    android:textColorHint="#DDDDDD"
-                    android:hint="Set 4-Digit Doctor ID">
+                    android:hint="4-Digit Doctor ID"
+                    app:boxCornerRadiusBottomEnd="14dp"
+                    app:boxCornerRadiusBottomStart="14dp"
+                    app:boxCornerRadiusTopEnd="14dp"
+                    app:boxCornerRadiusTopStart="14dp">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/doctor_id_edit"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textColor="@color/white"
                         android:inputType="number"
-                        android:maxLength="4" />
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginTop="24dp"
-                    android:background="#55FFFFFF" />
-
-                <!-- Clinic Info Section -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="24dp"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Clinic Information"
-                        android:textColor="@color/white"
+                        android:maxLength="4"
+                        android:textColor="@color/text_primary"
                         android:textSize="14sp"
                         android:textStyle="bold" />
+                </com.google.android.material.textfield.TextInputLayout>
 
-                    <com.google.android.material.textfield.TextInputLayout
+                <!-- Clinic Name Field -->
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:hint="Hospital / Clinic Name"
+                    app:boxCornerRadiusBottomEnd="14dp"
+                    app:boxCornerRadiusBottomStart="14dp"
+                    app:boxCornerRadiusTopEnd="14dp"
+                    app:boxCornerRadiusTopStart="14dp">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/clinic_name_edit"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        app:boxBackgroundMode="outline"
-                        app:boxCornerRadiusBottomEnd="12dp"
-                        app:boxCornerRadiusBottomStart="12dp"
-                        app:boxCornerRadiusTopEnd="12dp"
-                        app:boxCornerRadiusTopStart="12dp"
-                        android:textColorHint="#DDDDDD"
-                        android:hint="Clinic Name">
+                        android:textColor="@color/text_primary"
+                        android:textSize="14sp" />
+                </com.google.android.material.textfield.TextInputLayout>
 
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/clinic_name_edit"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:textColor="@color/white"
-                            android:text="Smile Bright Dental Clinic" />
-                    </com.google.android.material.textfield.TextInputLayout>
+                <!-- Email Field (Read Only) -->
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:hint="Registered Email"
+                    app:boxCornerRadiusBottomEnd="14dp"
+                    app:boxCornerRadiusBottomStart="14dp"
+                    app:boxCornerRadiusTopEnd="14dp"
+                    app:boxCornerRadiusTopStart="14dp">
 
-                    <com.google.android.material.textfield.TextInputLayout
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/email_edit"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        app:boxBackgroundMode="outline"
-                        app:boxCornerRadiusBottomEnd="12dp"
-                        app:boxCornerRadiusBottomStart="12dp"
-                        app:boxCornerRadiusTopEnd="12dp"
-                        app:boxCornerRadiusTopStart="12dp"
-                        android:textColorHint="#DDDDDD"
-                        android:hint="Email Address">
+                        android:enabled="false"
+                        android:textColor="#64748B"
+                        android:textSize="14sp" />
+                </com.google.android.material.textfield.TextInputLayout>
 
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/email_edit"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:enabled="false"
-                            android:textColor="@color/white"
-                            android:text="doctor@smile.com" />
-                    </com.google.android.material.textfield.TextInputLayout>
+                <!-- Save Profile Button -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/save_profile_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="54dp"
+                    android:layout_marginTop="20dp"
+                    android:backgroundTint="#0284C7"
+                    android:text="Save Profile Changes"
+                    android:textAllCaps="false"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    app:cornerRadius="27dp" />
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/save_profile_button"
-                        android:layout_width="match_parent"
-                        android:layout_height="60dp"
-                        android:layout_marginTop="24dp"
-                        android:backgroundTint="@color/white"
-                        android:textColor="#1A237E"
-                        android:text="Save Profile"
-                        android:textAllCaps="false"
-                        app:cornerRadius="30dp" />
+                <ProgressBar
+                    android:id="@+id/save_progress"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="12dp"
+                    android:visibility="gone" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
-                    <ProgressBar
-                        android:id="@+id/save_progress"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginTop="16dp"
-                        android:visibility="gone"
-                        android:indeterminateTint="@color/white" />
+        <!-- Stats Overview Card -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:cardBackgroundColor="@color/white"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="4dp"
+            app:strokeColor="#E2E8F0"
+            app:strokeWidth="1dp">
 
-                <!-- Appointment Management Stats -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="24dp"
-                    android:text="Appointment Management"
-                    android:textColor="@color/white"
-                    android:textSize="14sp"
+                    android:text="PRACTICE SUMMARY"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="11sp"
                     android:textStyle="bold" />
 
                 <LinearLayout
@@ -203,84 +263,101 @@
                     android:layout_marginTop="12dp"
                     android:orientation="horizontal">
 
+                    <!-- Total Card -->
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_marginEnd="4dp"
                         android:layout_weight="1"
+                        android:background="@drawable/bg_stat_patients"
                         android:gravity="center"
                         android:orientation="vertical"
-                        android:background="#22FFFFFF"
-                        android:padding="12dp"
-                        android:layout_marginEnd="4dp">
+                        android:padding="12dp">
+
                         <TextView
                             android:id="@+id/total_appointments_text"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="0"
-                            android:textColor="@color/white"
-                            android:textSize="18sp"
+                            android:textColor="#0284C7"
+                            android:textSize="20sp"
                             android:textStyle="bold" />
+
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Total"
-                            android:textColor="#DDDDDD"
-                            android:textSize="10sp" />
+                            android:text="Total Visits"
+                            android:textColor="#0369A1"
+                            android:textSize="10sp"
+                            android:textStyle="bold" />
                     </LinearLayout>
 
+                    <!-- Confirmed Card -->
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="4dp"
                         android:layout_weight="1"
+                        android:background="@drawable/bg_stat_visits"
                         android:gravity="center"
                         android:orientation="vertical"
-                        android:background="#22FFFFFF"
-                        android:padding="12dp"
-                        android:layout_marginHorizontal="4dp">
+                        android:padding="12dp">
+
                         <TextView
                             android:id="@+id/confirmed_appointments_text"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="0"
-                            android:textColor="#4CAF50"
-                            android:textSize="18sp"
+                            android:textColor="#16A34A"
+                            android:textSize="20sp"
                             android:textStyle="bold" />
+
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Confirmed"
-                            android:textColor="#DDDDDD"
-                            android:textSize="10sp" />
+                            android:textColor="#15803D"
+                            android:textSize="10sp"
+                            android:textStyle="bold" />
                     </LinearLayout>
 
+                    <!-- Pending Card -->
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
                         android:layout_weight="1"
+                        android:background="@drawable/bg_stat_pending"
                         android:gravity="center"
                         android:orientation="vertical"
-                        android:background="#22FFFFFF"
-                        android:padding="12dp"
-                        android:layout_marginStart="4dp">
+                        android:padding="12dp">
+
                         <TextView
                             android:id="@+id/pending_appointments_text"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="0"
-                            android:textColor="#FFC107"
-                            android:textSize="18sp"
+                            android:textColor="#D97706"
+                            android:textSize="20sp"
                             android:textStyle="bold" />
+
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Pending"
-                            android:textColor="#DDDDDD"
-                            android:textSize="10sp" />
+                            android:textColor="#B45309"
+                            android:textSize="10sp"
+                            android:textStyle="bold" />
                     </LinearLayout>
                 </LinearLayout>
 
-                </LinearLayout>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
+
+        <!-- Bottom Space -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="32dp" />
+
     </LinearLayout>
 </ScrollView>
