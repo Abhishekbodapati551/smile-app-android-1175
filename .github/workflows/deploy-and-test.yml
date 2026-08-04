@@ -86,27 +86,32 @@ jobs:
         run: |
           python automation/run_tests.py
 
-      # Stage 9 & 10: Generate Reports & Excel Reports (Executed during run_tests.py)
-      - name: Stage 9 & 10 - Verify Generated Multi-Format Reports
+      # Stage 9: Generate Reports
+      - name: Stage 9 - Verify Generated HTML & JSON Reports
         if: always()
         run: |
-          echo "Verifying generated report directories..."
-          ls -la automation/reports/Excel/
+          echo "Verifying generated HTML and JSON report files..."
           ls -la automation/reports/HTML/
           ls -la automation/reports/JSON/
-          ls -la automation/reports/Summary/
+
+      # Stage 10: Generate Excel Reports
+      - name: Stage 10 - Verify Generated Excel Reports
+        if: always()
+        run: |
+          echo "Verifying generated Excel report files..."
+          ls -la automation/reports/Excel/
 
       # Stage 11: Upload Artifacts
-      - name: Stage 11 - Upload Automation Reports & Evidence Artifacts
+      - name: Stage 11 - Upload Automation Zip Reports & Evidence Artifacts
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: smileapp-e2e-automation-reports
+          name: smileapp-e2e-automation-reports-zip
           path: |
+            smileapp-e2e-automation.zip
             automation/reports/
             automation/screenshots/
             automation/logs/
-            smileapp-e2e-automation.zip
           retention-days: 30
 
       # Stage 12: Publish Summary

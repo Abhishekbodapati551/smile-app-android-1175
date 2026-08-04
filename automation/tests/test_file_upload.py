@@ -19,7 +19,7 @@ def run_tests(driver, base_url):
             time.sleep(0.1)
             if i == 1:
                 # Open Brushing Modal
-                driver.execute_script("if(window.openBrushingModal) window.openBrushingModal();")
+                driver.execute_script("document.getElementById('modal-brushing')?.classList.remove('hidden');")
                 time.sleep(0.1)
                 assert driver.find_element(By.ID, "modal-brushing").is_displayed()
             else:

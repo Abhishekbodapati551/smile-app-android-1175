@@ -20,10 +20,10 @@ def run_tests(driver, base_url):
 
             if i == 1:
                 # TC-AUTH-001: Patient Portal Initial Render
-                assert driver.find_element(By.XPATH, "//button[contains(text(), \"I'M A PATIENT\")]").is_displayed()
+                assert driver.find_element(By.XPATH, "//button[contains(., \"I'M A PATIENT\")]").is_displayed()
             elif i == 2:
                 # TC-AUTH-002: Doctor Portal Initial Render
-                assert driver.find_element(By.XPATH, "//button[contains(text(), \"I'M A DOCTOR\")]").is_displayed()
+                assert driver.find_element(By.XPATH, "//button[contains(., \"I'M A DOCTOR\")]").is_displayed()
             elif i == 3:
                 # TC-AUTH-003: Navigate to Patient Login Screen
                 driver.execute_script("if(window.navigateTo) window.navigateTo('login-child');")
