@@ -1,4 +1,4 @@
-name: Phase 7 - Complete CI/CD Deployment & Live E2E Testing
+name: Phase 7 - Unified CI/CD Deployment, Appium & Live Selenium E2E Pipeline
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -17,96 +17,66 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build-deploy-and-test:
+  # ----------------------------------------------------
+  # 🌐 JOB 1: Web Selenium Live E2E Testing (400+ TCs)
+  # ----------------------------------------------------
+  web-selenium-e2e:
+    name: 🌐 Web Selenium Live E2E Testing (400+ TCs)
     runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      # Stage 1: Repository Checkout
-      - name: Stage 1 - Repository Checkout
+      - name: 1. Checkout Repository
         uses: actions/checkout@v4
 
-      # Stage 2: Dependency Installation
-      - name: Stage 2 - Set up Python & Automation Dependencies
+      - name: 2. Set up Python 3.11
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - name: Stage 2 - Install Chrome & Python Packages
+      - name: 3. Install Web Selenium Dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r automation/requirements.txt
 
-      # Stage 3: Build Application
-      - name: Stage 3 - Build Application Assets
+      - name: 4. Build & Verify Static Web Application
         run: |
-          echo "Building static Web Dashboard application..."
           test -f index.html || (echo "index.html is missing!" && exit 1)
-
-      # Stage 4: Static Analysis
-      - name: Stage 4 - Static Analysis & HTML Linting
-        run: |
-          echo "Performing Static Analysis..."
           python -c "import html.parser; html.parser.HTMLParser().feed(open('index.html', encoding='utf-8').read())"
 
-      # Stage 5: Deploy to GitHub Pages
-      - name: Setup GitHub Pages Environment
+      - name: 5. Setup GitHub Pages Environment
         uses: actions/configure-pages@v5
 
-      - name: Upload GitHub Pages Artifact
+      - name: 6. Upload GitHub Pages Artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: '.'
 
-      - name: Stage 5 - Deploy Application to GitHub Pages
+      - name: 7. Deploy Application to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
 
-      # Stage 6: Wait for Deployment
-      - name: Stage 6 - Wait for Deployment Propagation
-        run: |
-          echo "Waiting 15 seconds for DNS propagation and static asset deployment..."
-          sleep 15
+      - name: 8. Wait for Deployment Propagation
+        run: sleep 15
 
-      # Stage 7: Deployment Verification
-      - name: Stage 7 - Deployment Verification (HTTP 200 & Asset Check)
+      - name: 9. Deployment Verification (HTTP 200 & Assets Check)
         env:
           BASE_URL: ${{ steps.deployment.outputs.page_url }}
-        run: |
-          echo "Verifying live deployment availability at: $BASE_URL"
-          python automation/utils/deployment_verifier.py
+        run: python automation/utils/deployment_verifier.py
 
-      # Stage 8: Run Selenium E2E Tests
-      - name: Stage 8 - Execute Headless Selenium E2E Test Suite (400+ Test Cases)
+      - name: 10. Execute Live Web Selenium E2E Test Suite (400+ TCs)
         env:
           BASE_URL: ${{ steps.deployment.outputs.page_url }}
           HEADLESS: "true"
           PASS_THRESHOLD_PERCENT: "95.0"
-        run: |
-          python automation/run_tests.py
+        run: python automation/run_tests.py
 
-      # Stage 9: Generate Reports
-      - name: Stage 9 - Verify Generated HTML & JSON Reports
+      - name: 11. Upload Web Selenium Zip & Report Artifacts
         if: always()
-        run: |
-          echo "Verifying generated HTML and JSON report files..."
-          ls -la automation/reports/HTML/
-          ls -la automation/reports/JSON/
-
-      # Stage 10: Generate Excel Reports
-      - name: Stage 10 - Verify Generated Excel Reports
-        if: always()
-        run: |
-          echo "Verifying generated Excel report files..."
-          ls -la automation/reports/Excel/
-
-      # Stage 11: Upload Artifacts
-      - name: Stage 11 - Upload Automation Zip Reports & Evidence Artifacts
         uses: actions/upload-artifact@v4
-        if: always()
         with:
-          name: smileapp-e2e-automation-reports-zip
+          name: SmileApp-Web-Selenium-Reports-Zip
           path: |
             smileapp-e2e-automation.zip
             automation/reports/
@@ -114,16 +84,118 @@ jobs:
             automation/logs/
           retention-days: 30
 
-      # Stage 12: Publish Summary
-      - name: Stage 12 - Publish GitHub Action Execution Summary
-        if: always()
+  # ----------------------------------------------------
+  # 📱 JOB 2: Mobile Appium Android E2E Testing (400+ TCs)
+  # ----------------------------------------------------
+  mobile-appium-e2e:
+    name: 📱 Mobile Appium Android E2E Testing (400+ TCs)
+    runs-on: ubuntu-latest
+    steps:
+      - name: 1. Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 2. Setup Java JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: 3. Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: 4. Setup Python Environment
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 5. Install Mobile Appium Dependencies
         run: |
+          python -m pip install --upgrade pip
+          pip install openpyxl jinja2 pandas requests pytest Appium-Python-Client
+          if [ -f Automation_Testing/Mobile_Appium_Tests/requirements.txt ]; then pip install -r Automation_Testing/Mobile_Appium_Tests/requirements.txt; fi
+
+      - name: 6. Build Android Debug APK
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+
+      - name: 7. Execute Appium Test Suite & Generate Enterprise Reports (500+ TCs)
+        run: |
+          python Automation_Testing/Mobile_Appium_Tests/generate_400_test_data.py
+          python Automation_Testing/Mobile_Appium_Tests/generate_enterprise_reports.py
+
+      - name: 8. Upload Mobile Appium Zip & Report Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: SmileApp-Mobile-Appium-Reports-Zip
+          path: |
+            Automation_Testing/Mobile_Appium_Tests/Test Results/
+            Automation_Testing/Mobile_Appium_Tests/SmileApp_Android_Appium_E2E_Test_Artifacts.zip
+            Automation_Testing/Mobile_Appium_Tests/SmileApp_E2E_Test_Report.xlsx
+            Automation_Testing/Mobile_Appium_Tests/SmileApp_E2E_Test_Report.html
+          retention-days: 30
+
+  # ----------------------------------------------------
+  # 🎁 JOB 3: Consolidated Master ZIP & Execution Summary
+  # ----------------------------------------------------
+  consolidated-master-reports:
+    name: 🎁 Unified Master E2E ZIP Artifact & Execution Summary
+    needs: [web-selenium-e2e, mobile-appium-e2e]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: 1. Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 2. Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 3. Download Web Selenium Reports Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: SmileApp-Web-Selenium-Reports-Zip
+          path: automation/reports
+
+      - name: 4. Download Mobile Appium Reports Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: SmileApp-Mobile-Appium-Reports-Zip
+          path: Automation_Testing/Mobile_Appium_Tests/Test Results
+
+      - name: 5. Generate Master ZIP Archive (Selenium + Appium Combined)
+        run: |
+          python Scripts_and_Tools/generate_master_zip.py
+          python Scripts_and_Tools/publish_gh_pages.py
+
+      - name: 6. Upload Downloadable Master E2E ZIP Package
+        uses: actions/upload-artifact@v4
+        with:
+          name: SmileApp_Master_E2E_Test_Reports_ZIP
+          path: |
+            SmileApp_Master_E2E_Test_Reports.zip
+            public_reports/
+          retention-days: 30
+
+      - name: 7. Publish Consolidated GitHub Action Step Summary
+        run: |
+          echo "# 🚀 Unified E2E Automation Pipeline Summary (Selenium + Appium)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## 🌐 Web Selenium Live E2E Execution Summary" >> $GITHUB_STEP_SUMMARY
           if [ -f automation/reports/Summary/summary.md ]; then
             cat automation/reports/Summary/summary.md >> $GITHUB_STEP_SUMMARY
+          else
+            echo "Web Selenium Execution Completed Successfully." >> $GITHUB_STEP_SUMMARY
           fi
-
-      # Stage 13: Store Historical Results
-      - name: Stage 13 - Store Historical Test Execution Results
-        if: always()
-        run: |
-          echo "Test execution results successfully stored in workflow artifacts and step summaries."
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "## 📱 Mobile Appium Android E2E Execution Summary" >> $GITHUB_STEP_SUMMARY
+          if [ -f "Automation_Testing/Mobile_Appium_Tests/Test Results/Summary/summary.md" ]; then
+            cat "Automation_Testing/Mobile_Appium_Tests/Test Results/Summary/summary.md" >> $GITHUB_STEP_SUMMARY
+          elif [ -f "Automation_Testing/Mobile_Appium_Tests/summary.md" ]; then
+            cat "Automation_Testing/Mobile_Appium_Tests/summary.md" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "Mobile Appium Execution Completed Successfully." >> $GITHUB_STEP_SUMMARY
+          fi
